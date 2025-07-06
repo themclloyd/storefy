@@ -1,3 +1,4 @@
+
 import { Building2, BarChart3, Package, Users, ShoppingCart, Settings, LogOut, Store, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -21,11 +22,34 @@ const navigationItems = [
 
 export function Sidebar({ activeView, onViewChange, currentStore }: SidebarProps) {
   const { signOut } = useAuth();
-  const { userRole, isOwner } = useStore();
+  const { userRole, isOwner, stores } = useStore();
+
+  // Check for PIN session
+  const pinSession = localStorage.getItem('pin_session');
+  const pinData = pinSession ? JSON.parse(pinSession) : null;
+  
+  // Use PIN session role if available
+  const effectiveRole = pinData?.role || userRole;
+  const effectiveIsOwner = pinData ? pinData.role === 'owner' : isOwner;
 
   const handleSignOut = async () => {
+    // Clear PIN session if exists
+    if (pinSession) {
+      localStorage.removeItem('pin_session');
+      window.location.href = '/pin-login';
+      return;
+    }
+    
     await signOut();
   };
+
+  // Add stores management for owners with multiple stores
+  const allNavigationItems = [
+    ...(effectiveIsOwner && stores && stores.length > 1 
+      ? [{ id: "stores", label: "Stores", icon: Building2 }] 
+      : []),
+    ...navigationItems
+  ];
 
   return (
     <div className="flex flex-col h-full bg-sidebar text-sidebar-foreground border-r border-sidebar-accent">
@@ -50,9 +74,10 @@ export function Sidebar({ activeView, onViewChange, currentStore }: SidebarProps
           <p className="font-medium text-sidebar-foreground mt-1">
             {currentStore || "Loading..."}
           </p>
-          {userRole && (
+          {effectiveRole && (
             <p className="text-xs text-sidebar-foreground/60 mt-1 capitalize">
-              Role: {userRole}
+              Role: {effectiveRole}
+              {pinData && " (PIN)"}
             </p>
           )}
         </div>
@@ -60,16 +85,21 @@ export function Sidebar({ activeView, onViewChange, currentStore }: SidebarProps
 
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-2">
-        {navigationItems.map((item) => {
+        {allNavigationItems.map((item) => {
           const Icon = item.icon;
           
           // Hide settings for cashiers
-          if (item.id === 'settings' && userRole === 'cashier') {
+          if (item.id === 'settings' && effectiveRole === 'cashier') {
             return null;
           }
           
           // Hide reports for cashiers
-          if (item.id === 'reports' && userRole === 'cashier') {
+          if (item.id === 'reports' && effectiveRole === 'cashier') {
+            return null;
+          }
+          
+          // Hide stores management for non-owners
+          if (item.id === 'stores' && !effectiveIsOwner) {
             return null;
           }
           
@@ -100,7 +130,7 @@ export function Sidebar({ activeView, onViewChange, currentStore }: SidebarProps
           onClick={handleSignOut}
         >
           <LogOut className="w-5 h-5" />
-          Sign Out
+          {pinSession ? "End Session" : "Sign Out"}
         </Button>
       </div>
     </div>

@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -5,9 +6,75 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Settings, Store, Users, CreditCard, Globe, Bell, Shield } from "lucide-react";
+import { Settings, Store, Users, CreditCard, Globe, Bell, Shield, Key, UserPlus } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useState } from "react";
+import { useStore } from "@/contexts/StoreContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export function SettingsView() {
+  const { currentStore, isOwner } = useStore();
+  const [showPinLoginDialog, setShowPinLoginDialog] = useState(false);
+  const [showAddMemberDialog, setShowAddMemberDialog] = useState(false);
+  const [memberName, setMemberName] = useState('');
+  const [memberEmail, setMemberEmail] = useState('');
+  const [memberRole, setMemberRole] = useState<'manager' | 'cashier'>('cashier');
+  const [memberPin, setMemberPin] = useState('');
+  const [adding, setAdding] = useState(false);
+
+  const handleAddMember = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentStore || !memberName.trim() || !memberEmail.trim() || !memberPin.trim()) return;
+
+    setAdding(true);
+    try {
+      // First, check if user exists or invite them
+      const { data: userData, error: userError } = await supabase.auth.admin.getUserByEmail(memberEmail);
+      
+      let userId;
+      if (userError || !userData.user) {
+        // Invite the user to sign up
+        const { data: inviteData, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(memberEmail, {
+          data: { display_name: memberName }
+        });
+        
+        if (inviteError) throw inviteError;
+        userId = inviteData.user?.id;
+      } else {
+        userId = userData.user.id;
+      }
+
+      if (!userId) throw new Error('Failed to get user ID');
+
+      // Add them as a store member with PIN
+      const { error } = await supabase
+        .from('store_members')
+        .insert([
+          {
+            store_id: currentStore.id,
+            user_id: userId,
+            role: memberRole,
+            pin: memberPin,
+            is_active: true
+          }
+        ]);
+
+      if (error) throw error;
+
+      toast.success('Team member added successfully!');
+      setShowAddMemberDialog(false);
+      setMemberName('');
+      setMemberEmail('');
+      setMemberRole('cashier');
+      setMemberPin('');
+    } catch (error: any) {
+      toast.error('Failed to add team member: ' + error.message);
+    } finally {
+      setAdding(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -29,20 +96,20 @@ export function SettingsView() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="store-name">Store Name</Label>
-              <Input id="store-name" defaultValue="Main Store" />
+              <Input id="store-name" defaultValue={currentStore?.name || "Main Store"} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="store-address">Address</Label>
-              <Input id="store-address" defaultValue="123 Main Street, City, State 12345" />
+              <Input id="store-address" defaultValue={currentStore?.address || "123 Main Street, City, State 12345"} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="store-phone">Phone</Label>
-                <Input id="store-phone" defaultValue="+1 (555) 123-4567" />
+                <Input id="store-phone" defaultValue={currentStore?.phone || "+1 (555) 123-4567"} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="store-email">Email</Label>
-                <Input id="store-email" defaultValue="contact@store.com" />
+                <Input id="store-email" defaultValue={currentStore?.email || "contact@store.com"} />
               </div>
             </div>
             <Button className="w-full">Update Store Info</Button>
@@ -60,7 +127,7 @@ export function SettingsView() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="currency">Currency</Label>
-              <Select defaultValue="usd">
+              <Select defaultValue={currentStore?.currency?.toLowerCase() || "usd"}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -88,12 +155,154 @@ export function SettingsView() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="tax-rate">Tax Rate (%)</Label>
-              <Input id="tax-rate" defaultValue="8.25" type="number" step="0.01" />
+              <Input id="tax-rate" defaultValue={currentStore?.tax_rate?.toString() || "8.25"} type="number" step="0.01" />
             </div>
             <Button className="w-full">Update Settings</Button>
           </CardContent>
         </Card>
       </div>
+
+      {/* Team & Role Management - Only for store owners */}
+      {isOwner && (
+        <Card className="card-professional">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <Users className="w-5 h-5" />
+              Team & Role Management
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="font-medium text-foreground">Team Members</h3>
+                  <p className="text-sm text-muted-foreground">Manage your store team and their access</p>
+                </div>
+                <div className="flex gap-2">
+                  <Dialog open={showPinLoginDialog} onOpenChange={setShowPinLoginDialog}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Key className="w-4 h-4 mr-2" />
+                        PIN Login
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Team PIN Login</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <p className="text-sm text-muted-foreground">
+                          Team members can access the POS system using their name and 4-digit PIN
+                        </p>
+                        <Button 
+                          className="w-full bg-gradient-primary text-white"
+                          onClick={() => {
+                            setShowPinLoginDialog(false);
+                            // Navigate to PIN login page
+                            window.location.href = '/pin-login';
+                          }}
+                        >
+                          <Key className="w-4 h-4 mr-2" />
+                          Go to PIN Login
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+
+                  <Dialog open={showAddMemberDialog} onOpenChange={setShowAddMemberDialog}>
+                    <DialogTrigger asChild>
+                      <Button size="sm">
+                        <UserPlus className="w-4 h-4 mr-2" />
+                        Add Member
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Add Team Member</DialogTitle>
+                      </DialogHeader>
+                      <form onSubmit={handleAddMember} className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="memberName">Name *</Label>
+                          <Input
+                            id="memberName"
+                            placeholder="Enter member name"
+                            value={memberName}
+                            onChange={(e) => setMemberName(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="memberEmail">Email *</Label>
+                          <Input
+                            id="memberEmail"
+                            type="email"
+                            placeholder="Enter member email"
+                            value={memberEmail}
+                            onChange={(e) => setMemberEmail(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="memberRole">Role</Label>
+                          <Select value={memberRole} onValueChange={(value: 'manager' | 'cashier') => setMemberRole(value)}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="manager">Manager</SelectItem>
+                              <SelectItem value="cashier">Cashier</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="memberPin">4-Digit PIN *</Label>
+                          <Input
+                            id="memberPin"
+                            type="password"
+                            placeholder="Enter 4-digit PIN"
+                            value={memberPin}
+                            onChange={(e) => setMemberPin(e.target.value)}
+                            maxLength={4}
+                            pattern="[0-9]{4}"
+                            required
+                          />
+                        </div>
+                        <Button
+                          type="submit"
+                          className="w-full bg-gradient-primary text-white"
+                          disabled={adding}
+                        >
+                          {adding ? 'Adding...' : 'Add Team Member'}
+                        </Button>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  { name: "Store Owner", users: 1, permissions: ["Full Access"], role: "owner" },
+                  { name: "Manager", users: 2, permissions: ["POS", "Inventory", "Reports"], role: "manager" },
+                  { name: "Cashier", users: 4, permissions: ["POS Only"], role: "cashier" },
+                ].map((role) => (
+                  <div key={role.name} className="flex items-center justify-between p-4 border border-border rounded-lg">
+                    <div>
+                      <p className="font-medium text-foreground">{role.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {role.users} user{role.users !== 1 ? 's' : ''} • {role.permissions.join(', ')}
+                      </p>
+                    </div>
+                    <Badge variant={role.role === 'owner' ? "default" : "outline"}>
+                      {role.role}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Payment Methods */}
       <Card className="card-professional">
@@ -125,40 +334,6 @@ export function SettingsView() {
             </div>
             <Button variant="outline" className="w-full">
               Add Payment Method
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* User Roles */}
-      <Card className="card-professional">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-foreground">
-            <Users className="w-5 h-5" />
-            User Roles & Permissions
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {[
-              { name: "Store Owner", users: 1, permissions: ["Full Access"] },
-              { name: "Manager", users: 2, permissions: ["POS", "Inventory", "Reports"] },
-              { name: "Cashier", users: 4, permissions: ["POS Only"] },
-            ].map((role) => (
-              <div key={role.name} className="flex items-center justify-between p-4 border border-border rounded-lg">
-                <div>
-                  <p className="font-medium text-foreground">{role.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {role.users} user{role.users !== 1 ? 's' : ''} • {role.permissions.join(', ')}
-                  </p>
-                </div>
-                <Button variant="outline" size="sm">
-                  Edit Role
-                </Button>
-              </div>
-            ))}
-            <Button variant="outline" className="w-full">
-              Add New Role
             </Button>
           </div>
         </CardContent>
