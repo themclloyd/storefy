@@ -4,17 +4,25 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Plus, Users, Phone, Mail, Edit, Eye, Loader2 } from "lucide-react";
+import { Search, Plus, Users, Phone, Mail, Edit, Eye, Loader2, Download, BarChart3 } from "lucide-react";
 import { useStore } from "@/contexts/StoreContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AddCustomerDialog } from "./AddCustomerDialog";
+import { EditCustomerDialog } from "./EditCustomerDialog";
+import { CustomerDetailsModal } from "./CustomerDetailsModal";
+import { CustomerExportDialog } from "./CustomerExportDialog";
+import { CustomerStatusDialog } from "./CustomerStatusDialog";
+import { CustomerAnalytics } from "./CustomerAnalytics";
+import { CustomerFilters } from "./CustomerFilters";
 
 interface Customer {
   id: string;
   name: string;
   email: string | null;
   phone: string | null;
+  address: string | null;
   total_orders: number | null;
   total_spent: number | null;
   status: string | null;
@@ -25,12 +33,19 @@ interface Customer {
 export function CustomersView() {
   const { currentStore } = useStore();
   const { user } = useAuth();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("all");
+
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
 
-  const statuses = ["all", "active", "vip", "inactive"];
+
 
   useEffect(() => {
     if (currentStore && user) {
@@ -49,6 +64,7 @@ export function CustomersView() {
           name,
           email,
           phone,
+          address,
           total_orders,
           total_spent,
           status,
@@ -82,6 +98,7 @@ export function CustomersView() {
       );
 
       setCustomers(customersWithLastOrder);
+      setFilteredCustomers(customersWithLastOrder);
     } catch (error) {
       console.error('Error fetching customers:', error);
       toast.error('Failed to load customers');
@@ -90,17 +107,30 @@ export function CustomersView() {
     }
   };
 
-  const filteredCustomers = customers.filter(customer => {
-    const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (customer.email && customer.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                         (customer.phone && customer.phone.includes(searchTerm));
-    const matchesStatus = selectedStatus === "all" || customer.status === selectedStatus;
-    return matchesSearch && matchesStatus;
-  });
+  const handleViewCustomer = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setDetailsModalOpen(true);
+  };
 
-  const totalCustomers = customers.length;
-  const activeCustomers = customers.filter(c => c.status === 'active').length;
-  const vipCustomers = customers.filter(c => c.status === 'vip').length;
+  const handleEditCustomer = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setEditDialogOpen(true);
+  };
+
+  const handleCustomerUpdated = () => {
+    fetchCustomers();
+  };
+
+  const handleStatusChange = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setStatusDialogOpen(true);
+  };
+
+  // Remove the old filtering logic since it's now handled by CustomerFilters component
+
+  const totalCustomers = filteredCustomers.length;
+  const activeCustomers = filteredCustomers.filter(c => c.status === 'active').length;
+  const vipCustomers = filteredCustomers.filter(c => c.status === 'vip').length;
 
   if (loading) {
     return (
@@ -120,10 +150,31 @@ export function CustomersView() {
             Manage your customer relationships and track purchase history
           </p>
         </div>
-        <Button className="bg-gradient-primary text-white">
-          <Plus className="w-4 h-4 mr-2" />
-          Add Customer
-        </Button>
+        <div className="flex gap-3">
+          <Button
+            variant="outline"
+            onClick={() => setShowAnalytics(!showAnalytics)}
+            disabled={customers.length === 0}
+          >
+            <BarChart3 className="w-4 h-4 mr-2" />
+            {showAnalytics ? 'Hide Analytics' : 'Show Analytics'}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setExportDialogOpen(true)}
+            disabled={customers.length === 0}
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Export
+          </Button>
+          <Button
+            className="bg-gradient-primary text-white"
+            onClick={() => setAddDialogOpen(true)}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Customer
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -166,33 +217,10 @@ export function CustomersView() {
       </div>
 
       {/* Filters */}
-      <Card className="card-professional">
-        <CardContent className="p-6">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="Search customers..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <div className="flex gap-2">
-              {statuses.map((status) => (
-                <Button
-                  key={status}
-                  variant={selectedStatus === status ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedStatus(status)}
-                >
-                  {status === "all" ? "All Status" : status.charAt(0).toUpperCase() + status.slice(1)}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <CustomerFilters
+        customers={customers}
+        onFilteredCustomersChange={setFilteredCustomers}
+      />
 
       {/* Customers Table */}
       <Card className="card-professional">
@@ -216,7 +244,7 @@ export function CustomersView() {
               {filteredCustomers.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                    {customers.length === 0 ? "No customers found. Add your first customer to get started." : "No customers match your search criteria."}
+                    {customers.length === 0 ? "No customers found. Add your first customer to get started." : "No customers match your filter criteria."}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -260,20 +288,31 @@ export function CustomersView() {
                           customer.status === 'active' ? 'secondary' : 'outline'
                         }
                         className={
-                          customer.status === 'vip' ? 'bg-warning text-warning-foreground' :
-                          customer.status === 'active' ? 'bg-success/10 text-success' :
-                          'text-muted-foreground'
+                          customer.status === 'vip' ? 'bg-warning text-warning-foreground cursor-pointer hover:bg-warning/80' :
+                          customer.status === 'active' ? 'bg-success/10 text-success cursor-pointer hover:bg-success/20' :
+                          'text-muted-foreground cursor-pointer hover:bg-muted'
                         }
+                        onClick={() => handleStatusChange(customer)}
                       >
                         {(customer.status || 'active').toUpperCase()}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleViewCustomer(customer)}
+                          title="View customer details"
+                        >
                           <Eye className="w-3 h-3" />
                         </Button>
-                        <Button size="sm" variant="outline">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleEditCustomer(customer)}
+                          title={`Edit customer${(customer.total_orders || 0) === 0 ? ' (can be deleted)' : ''}`}
+                        >
                           <Edit className="w-3 h-3" />
                         </Button>
                       </div>
@@ -285,6 +324,46 @@ export function CustomersView() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Analytics Section */}
+      {showAnalytics && customers.length > 0 && (
+        <CustomerAnalytics customers={customers} />
+      )}
+
+      {/* Dialogs and Modals */}
+      <AddCustomerDialog
+        open={addDialogOpen}
+        onOpenChange={setAddDialogOpen}
+        onCustomerAdded={handleCustomerUpdated}
+      />
+
+      <EditCustomerDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        customer={selectedCustomer}
+        onCustomerUpdated={handleCustomerUpdated}
+        onCustomerDeleted={handleCustomerUpdated}
+      />
+
+      <CustomerDetailsModal
+        open={detailsModalOpen}
+        onOpenChange={setDetailsModalOpen}
+        customer={selectedCustomer}
+        onEditCustomer={handleEditCustomer}
+      />
+
+      <CustomerExportDialog
+        open={exportDialogOpen}
+        onOpenChange={setExportDialogOpen}
+        customers={filteredCustomers}
+      />
+
+      <CustomerStatusDialog
+        open={statusDialogOpen}
+        onOpenChange={setStatusDialogOpen}
+        customer={selectedCustomer}
+        onStatusUpdated={handleCustomerUpdated}
+      />
     </div>
   );
 }
