@@ -378,6 +378,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      initialize_sample_data: {
+        Args: { _store_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       store_role: "owner" | "manager" | "cashier"

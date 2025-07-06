@@ -1,50 +1,169 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, ShoppingCart, Package, Users, TrendingUp, TrendingDown } from "lucide-react";
+import { useStore } from "@/contexts/StoreContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
-const stats = [
-  {
-    title: "Today's Sales",
-    value: "$2,847.32",
-    change: "+12.5%",
-    trend: "up" as const,
-    icon: DollarSign,
-  },
-  {
-    title: "Orders",
-    value: "47",
-    change: "+8.2%",
-    trend: "up" as const,
-    icon: ShoppingCart,
-  },
-  {
-    title: "Low Stock Items",
-    value: "12",
-    change: "-2",
-    trend: "down" as const,
-    icon: Package,
-  },
-  {
-    title: "New Customers",
-    value: "8",
-    change: "+3",
-    trend: "up" as const,
-    icon: Users,
-  },
-];
+interface DashboardStats {
+  todaysSales: number;
+  totalOrders: number;
+  lowStockItems: number;
+  totalCustomers: number;
+}
 
 export function DashboardView() {
+  const { currentStore } = useStore();
+  const { user } = useAuth();
+  const [stats, setStats] = useState<DashboardStats>({
+    todaysSales: 0,
+    totalOrders: 0,
+    lowStockItems: 0,
+    totalCustomers: 0,
+  });
+  const [recentOrders, setRecentOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (currentStore && user) {
+      fetchDashboardData();
+    }
+  }, [currentStore, user]);
+
+  const fetchDashboardData = async () => {
+    if (!currentStore) return;
+
+    try {
+      // Get today's date range
+      const today = new Date();
+      const todayStart = new Date(today.setHours(0, 0, 0, 0)).toISOString();
+      const todayEnd = new Date(today.setHours(23, 59, 59, 999)).toISOString();
+
+      // Fetch today's sales
+      const { data: todaysOrders } = await supabase
+        .from('orders')
+        .select('total')
+        .eq('store_id', currentStore.id)
+        .gte('created_at', todayStart)
+        .lte('created_at', todayEnd);
+
+      const todaysSales = todaysOrders?.reduce((sum, order) => sum + Number(order.total), 0) || 0;
+
+      // Fetch total orders count for today
+      const totalOrders = todaysOrders?.length || 0;
+
+      // Fetch low stock items
+      const { data: lowStockProducts } = await supabase
+        .from('products')
+        .select('id, stock_quantity, low_stock_threshold')
+        .eq('store_id', currentStore.id)
+        .eq('is_active', true);
+
+      const lowStockItems = lowStockProducts?.filter(
+        product => product.stock_quantity <= product.low_stock_threshold
+      ).length || 0;
+
+      // Fetch total customers
+      const { count: customersCount } = await supabase
+        .from('customers')
+        .select('*', { count: 'exact', head: true })
+        .eq('store_id', currentStore.id);
+
+      // Fetch recent orders
+      const { data: orders } = await supabase
+        .from('orders')
+        .select(`
+          id,
+          order_number,
+          total,
+          created_at,
+          customers (name)
+        `)
+        .eq('store_id', currentStore.id)
+        .order('created_at', { ascending: false })
+        .limit(4);
+
+      setStats({
+        todaysSales,
+        totalOrders,
+        lowStockItems,
+        totalCustomers: customersCount || 0,
+      });
+
+      setRecentOrders(orders || []);
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const statsData = [
+    {
+      title: "Today's Sales",
+      value: `$${stats.todaysSales.toFixed(2)}`,
+      change: "+12.5%",
+      trend: "up" as const,
+      icon: DollarSign,
+    },
+    {
+      title: "Orders",
+      value: stats.totalOrders.toString(),
+      change: "+8.2%",
+      trend: "up" as const,
+      icon: ShoppingCart,
+    },
+    {
+      title: "Low Stock Items",
+      value: stats.lowStockItems.toString(),
+      change: stats.lowStockItems > 0 ? "Alert" : "Good",
+      trend: stats.lowStockItems > 0 ? "down" : "up" as const,
+      icon: Package,
+    },
+    {
+      title: "Total Customers",
+      value: stats.totalCustomers.toString(),
+      change: "+3",
+      trend: "up" as const,
+      icon: Users,
+    },
+  ];
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+          <p className="text-muted-foreground mt-2">Loading store data...</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((i) => (
+            <Card key={i} className="card-professional">
+              <CardContent className="p-6">
+                <div className="animate-pulse">
+                  <div className="h-4 bg-muted rounded w-1/2 mb-2"></div>
+                  <div className="h-8 bg-muted rounded w-3/4"></div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
         <p className="text-muted-foreground mt-2">
-          Welcome back! Here's what's happening at your store today.
+          Welcome back! Here's what's happening at {currentStore?.name} today.
         </p>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat) => {
+        {statsData.map((stat) => {
           const Icon = stat.icon;
           const TrendIcon = stat.trend === "up" ? TrendingUp : TrendingDown;
           
@@ -81,18 +200,26 @@ export function DashboardView() {
             <CardTitle className="text-foreground">Recent Orders</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="flex items-center justify-between py-2 border-b border-border last:border-0">
-                <div>
-                  <p className="font-medium text-foreground">Order #{1000 + i}</p>
-                  <p className="text-sm text-muted-foreground">Customer {i}</p>
+            {recentOrders.length > 0 ? (
+              recentOrders.map((order) => (
+                <div key={order.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                  <div>
+                    <p className="font-medium text-foreground">{order.order_number}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {order.customers?.name || 'Walk-in Customer'}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium text-foreground">${Number(order.total).toFixed(2)}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {new Date(order.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-medium text-foreground">${(Math.random() * 100 + 20).toFixed(2)}</p>
-                  <p className="text-sm text-muted-foreground">{Math.floor(Math.random() * 60)} mins ago</p>
-                </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-center text-muted-foreground py-4">No recent orders</p>
+            )}
           </CardContent>
         </Card>
 

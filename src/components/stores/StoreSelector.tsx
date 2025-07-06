@@ -47,6 +47,8 @@ export function StoreSelector() {
       
       // Auto-select the new store
       if (data) {
+        // Initialize sample data for the new store
+        await supabase.rpc('initialize_sample_data', { _store_id: data.id });
         selectStore(data.id);
       }
     } catch (error) {
@@ -223,7 +225,12 @@ export function StoreSelector() {
             <Button
               className="bg-gradient-primary text-white"
               disabled={!currentStore}
-              onClick={() => window.location.href = '/dashboard'}
+              onClick={() => {
+                if (currentStore) {
+                  // Force re-render by navigating to root
+                  window.location.reload();
+                }
+              }}
             >
               Continue to Dashboard
             </Button>
