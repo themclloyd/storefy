@@ -7,6 +7,8 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { DashboardView } from "@/components/dashboard/DashboardView";
 import { POSView } from "@/components/pos/POSView";
 import { InventoryView } from "@/components/inventory/InventoryView";
+import { CategoriesView } from "@/components/inventory/CategoriesView";
+import { SuppliersView } from "@/components/inventory/SuppliersView";
 import { CustomersView } from "@/components/customers/CustomersView";
 import { ReportsView } from "@/components/reports/ReportsView";
 import { SettingsView } from "@/components/settings/SettingsView";
@@ -51,6 +53,26 @@ const Index = () => {
         return <POSView />;
       case "inventory":
         return <InventoryView />;
+      case "categories":
+        return (
+          <CategoriesView
+            onClose={() => setActiveView("inventory")}
+            onViewCategoryProducts={(categoryId, categoryName) => {
+              // This will be handled by the InventoryView's filtered view
+              setActiveView("inventory");
+            }}
+          />
+        );
+      case "suppliers":
+        return (
+          <SuppliersView
+            onClose={() => setActiveView("inventory")}
+            onViewSupplierProducts={(supplierId, supplierName) => {
+              // This will be handled by the InventoryView's filtered view
+              setActiveView("inventory");
+            }}
+          />
+        );
       case "customers":
         return <CustomersView />;
       case "reports":

@@ -47,11 +47,28 @@ CREATE TABLE public.categories (
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
+-- Create suppliers table
+CREATE TABLE public.suppliers (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  store_id UUID NOT NULL REFERENCES public.stores(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  contact_person TEXT,
+  email TEXT,
+  phone TEXT,
+  address TEXT,
+  website TEXT,
+  notes TEXT,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
 -- Create products table
 CREATE TABLE public.products (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   store_id UUID NOT NULL REFERENCES public.stores(id) ON DELETE CASCADE,
   category_id UUID REFERENCES public.categories(id) ON DELETE SET NULL,
+  supplier_id UUID REFERENCES public.suppliers(id) ON DELETE SET NULL,
   name TEXT NOT NULL,
   sku TEXT,
   description TEXT,
@@ -59,6 +76,7 @@ CREATE TABLE public.products (
   cost DECIMAL(10,2),
   stock_quantity INTEGER DEFAULT 0,
   low_stock_threshold INTEGER DEFAULT 5,
+  image_url TEXT,
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
@@ -104,7 +122,23 @@ CREATE TABLE public.order_items (
   product_id UUID NOT NULL REFERENCES public.products(id),
   quantity INTEGER NOT NULL,
   unit_price DECIMAL(10,2) NOT NULL,
-  total_price DECIMAL(10,2) NOT NULL
+  total_price DECIMAL(10,2) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
+-- Create stock_adjustments table for tracking inventory changes
+CREATE TABLE public.stock_adjustments (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  store_id UUID NOT NULL REFERENCES public.stores(id) ON DELETE CASCADE,
+  product_id UUID NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id),
+  adjustment_type TEXT NOT NULL CHECK (adjustment_type IN ('manual', 'sale', 'return', 'damage', 'restock', 'transfer')),
+  quantity_change INTEGER NOT NULL,
+  previous_quantity INTEGER NOT NULL,
+  new_quantity INTEGER NOT NULL,
+  reason TEXT,
+  reference_id UUID, -- Can reference order_id or other related records
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
 -- Enable Row Level Security
@@ -112,10 +146,12 @@ ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.stores ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.store_members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.suppliers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.stock_adjustments ENABLE ROW LEVEL SECURITY;
 
 -- Profiles policies
 CREATE POLICY "Users can view all profiles" ON public.profiles FOR SELECT USING (true);
@@ -163,16 +199,18 @@ $$;
 
 -- Store data policies using helper function
 CREATE POLICY "Store access for categories" ON public.categories FOR ALL USING (public.has_store_access(store_id));
+CREATE POLICY "Store access for suppliers" ON public.suppliers FOR ALL USING (public.has_store_access(store_id));
 CREATE POLICY "Store access for products" ON public.products FOR ALL USING (public.has_store_access(store_id));
 CREATE POLICY "Store access for customers" ON public.customers FOR ALL USING (public.has_store_access(store_id));
 CREATE POLICY "Store access for orders" ON public.orders FOR ALL USING (public.has_store_access(store_id));
-CREATE POLICY "Store access for order_items" ON public.order_items 
+CREATE POLICY "Store access for order_items" ON public.order_items
   FOR ALL USING (
     EXISTS (
-      SELECT 1 FROM public.orders o 
+      SELECT 1 FROM public.orders o
       WHERE o.id = order_items.order_id AND public.has_store_access(o.store_id)
     )
   );
+CREATE POLICY "Store access for stock_adjustments" ON public.stock_adjustments FOR ALL USING (public.has_store_access(store_id));
 
 -- Create trigger function for updating timestamps
 CREATE OR REPLACE FUNCTION public.update_updated_at_column()
@@ -187,6 +225,7 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON public.profiles FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 CREATE TRIGGER update_stores_updated_at BEFORE UPDATE ON public.stores FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 CREATE TRIGGER update_store_members_updated_at BEFORE UPDATE ON public.store_members FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE TRIGGER update_suppliers_updated_at BEFORE UPDATE ON public.suppliers FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 CREATE TRIGGER update_products_updated_at BEFORE UPDATE ON public.products FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 CREATE TRIGGER update_customers_updated_at BEFORE UPDATE ON public.customers FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 

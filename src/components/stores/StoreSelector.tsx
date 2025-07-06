@@ -55,8 +55,6 @@ export function StoreSelector() {
       
       // Auto-select the new store
       if (data) {
-        // Initialize sample data for the new store
-        await supabase.rpc('initialize_sample_data', { _store_id: data.id });
         selectStore(data.id);
       }
     } catch (error) {

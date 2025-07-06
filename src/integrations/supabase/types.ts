@@ -203,6 +203,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          image_url: string | null
           is_active: boolean | null
           low_stock_threshold: number | null
           name: string
@@ -210,6 +211,7 @@ export type Database = {
           sku: string | null
           stock_quantity: number | null
           store_id: string
+          supplier_id: string | null
           updated_at: string
         }
         Insert: {
@@ -218,6 +220,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          image_url?: string | null
           is_active?: boolean | null
           low_stock_threshold?: number | null
           name: string
@@ -225,6 +228,7 @@ export type Database = {
           sku?: string | null
           stock_quantity?: number | null
           store_id: string
+          supplier_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -233,6 +237,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          image_url?: string | null
           is_active?: boolean | null
           low_stock_threshold?: number | null
           name?: string
@@ -240,6 +245,7 @@ export type Database = {
           sku?: string | null
           stock_quantity?: number | null
           store_id?: string
+          supplier_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -255,6 +261,13 @@ export type Database = {
             columns: ["store_id"]
             isOneToOne: false
             referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
             referencedColumns: ["id"]
           },
         ]
@@ -285,6 +298,70 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      stock_adjustments: {
+        Row: {
+          adjustment_type: string
+          created_at: string
+          id: string
+          new_quantity: number
+          previous_quantity: number
+          product_id: string
+          quantity_change: number
+          reason: string | null
+          reference_id: string | null
+          store_id: string
+          user_id: string
+        }
+        Insert: {
+          adjustment_type: string
+          created_at?: string
+          id?: string
+          new_quantity: number
+          previous_quantity: number
+          product_id: string
+          quantity_change: number
+          reason?: string | null
+          reference_id?: string | null
+          store_id: string
+          user_id: string
+        }
+        Update: {
+          adjustment_type?: string
+          created_at?: string
+          id?: string
+          new_quantity?: number
+          previous_quantity?: number
+          product_id?: string
+          quantity_change?: number
+          reason?: string | null
+          reference_id?: string | null
+          store_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_adjustments_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_adjustments_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_adjustments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       store_members: {
         Row: {
@@ -320,6 +397,59 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "store_members_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suppliers: {
+        Row: {
+          address: string | null
+          contact_person: string | null
+          created_at: string
+          email: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          notes: string | null
+          phone: string | null
+          store_id: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          contact_person?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          notes?: string | null
+          phone?: string | null
+          store_id: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          contact_person?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          store_id?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suppliers_store_id_fkey"
             columns: ["store_id"]
             isOneToOne: false
             referencedRelation: "stores"
