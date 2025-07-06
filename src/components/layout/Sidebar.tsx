@@ -1,6 +1,8 @@
 import { Building2, BarChart3, Package, Users, ShoppingCart, Settings, LogOut, Store, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { useStore } from "@/contexts/StoreContext";
 
 interface SidebarProps {
   activeView: string;
@@ -18,6 +20,13 @@ const navigationItems = [
 ];
 
 export function Sidebar({ activeView, onViewChange, currentStore }: SidebarProps) {
+  const { signOut } = useAuth();
+  const { userRole, isOwner } = useStore();
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
   return (
     <div className="flex flex-col h-full bg-sidebar text-sidebar-foreground border-r border-sidebar-accent">
       {/* Logo & Store Selector */}
@@ -39,8 +48,13 @@ export function Sidebar({ activeView, onViewChange, currentStore }: SidebarProps
             <span className="text-sidebar-foreground/70">Current Store:</span>
           </div>
           <p className="font-medium text-sidebar-foreground mt-1">
-            {currentStore || "Main Store"}
+            {currentStore || "Loading..."}
           </p>
+          {userRole && (
+            <p className="text-xs text-sidebar-foreground/60 mt-1 capitalize">
+              Role: {userRole}
+            </p>
+          )}
         </div>
       </div>
 
@@ -48,6 +62,17 @@ export function Sidebar({ activeView, onViewChange, currentStore }: SidebarProps
       <nav className="flex-1 p-4 space-y-2">
         {navigationItems.map((item) => {
           const Icon = item.icon;
+          
+          // Hide settings for cashiers
+          if (item.id === 'settings' && userRole === 'cashier') {
+            return null;
+          }
+          
+          // Hide reports for cashiers
+          if (item.id === 'reports' && userRole === 'cashier') {
+            return null;
+          }
+          
           return (
             <Button
               key={item.id}
@@ -72,6 +97,7 @@ export function Sidebar({ activeView, onViewChange, currentStore }: SidebarProps
         <Button 
           variant="ghost" 
           className="w-full justify-start gap-3 text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+          onClick={handleSignOut}
         >
           <LogOut className="w-5 h-5" />
           Sign Out
