@@ -19,6 +19,13 @@ export function StoreSelector() {
   const [newStoreAddress, setNewStoreAddress] = useState('');
   const [creating, setCreating] = useState(false);
 
+  // Generate a unique store code
+  const generateStoreCode = (storeName: string) => {
+    const prefix = storeName.replace(/[^A-Za-z0-9]/g, '').slice(0, 4).toUpperCase();
+    const suffix = Math.floor(Math.random() * 999).toString().padStart(3, '0');
+    return prefix + suffix;
+  };
+
   const handleCreateStore = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !newStoreName.trim()) return;
@@ -32,6 +39,7 @@ export function StoreSelector() {
             owner_id: user.id,
             name: newStoreName.trim(),
             address: newStoreAddress.trim() || null,
+            store_code: generateStoreCode(newStoreName.trim()),
           }
         ])
         .select()

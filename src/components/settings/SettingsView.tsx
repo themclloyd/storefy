@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Settings, Store, Users, CreditCard, Globe, Bell, Shield, Key, UserPlus } from "lucide-react";
+import { Settings, Store, Users, CreditCard, Globe, Bell, Shield, Key, UserPlus, Copy, ExternalLink, QrCode } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useState } from "react";
 import { useStore } from "@/contexts/StoreContext";
@@ -22,6 +22,21 @@ export function SettingsView() {
   const [memberRole, setMemberRole] = useState<'manager' | 'cashier'>('cashier');
   const [memberPin, setMemberPin] = useState('');
   const [adding, setAdding] = useState(false);
+
+  const copyStoreCode = () => {
+    if (currentStore?.store_code) {
+      navigator.clipboard.writeText(currentStore.store_code);
+      toast.success('Store code copied to clipboard!');
+    }
+  };
+
+  const copyTeamLoginUrl = () => {
+    if (currentStore?.store_code) {
+      const url = `${window.location.origin}/store/${currentStore.store_code.toLowerCase()}`;
+      navigator.clipboard.writeText(url);
+      toast.success('Team login URL copied to clipboard!');
+    }
+  };
 
   const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -150,6 +165,80 @@ export function SettingsView() {
               <Input id="tax-rate" defaultValue={currentStore?.tax_rate?.toString() || "8.25"} type="number" step="0.01" />
             </div>
             <Button className="w-full">Update Settings</Button>
+          </CardContent>
+        </Card>
+
+        {/* Team Access & Store Code */}
+        <Card className="card-professional">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <QrCode className="w-5 h-5" />
+              Team Access
+            </CardTitle>
+            <p className="text-muted-foreground">
+              Share direct access to your store with team members
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="bg-muted/50 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-2">
+                <Label className="font-medium">Store Code</Label>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={copyStoreCode}
+                  className="h-8"
+                >
+                  <Copy className="w-3 h-3 mr-1" />
+                  Copy
+                </Button>
+              </div>
+              <div className="font-mono text-2xl font-bold text-primary mb-2">
+                {currentStore?.store_code}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Team members use this code to access the system
+              </p>
+            </div>
+
+            <div className="bg-muted/50 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-2">
+                <Label className="font-medium">Direct Team Login URL</Label>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={copyTeamLoginUrl}
+                    className="h-8"
+                  >
+                    <Copy className="w-3 h-3 mr-1" />
+                    Copy URL
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => window.open(`/store/${currentStore?.store_code?.toLowerCase()}`, '_blank')}
+                    className="h-8"
+                  >
+                    <ExternalLink className="w-3 h-3 mr-1" />
+                    Open
+                  </Button>
+                </div>
+              </div>
+              <div className="font-mono text-sm text-muted-foreground mb-2 break-all">
+                {window.location.origin}/store/{currentStore?.store_code?.toLowerCase()}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Team members can bookmark this URL for direct access
+              </p>
+            </div>
+
+            <div className="bg-info/10 border border-info/20 rounded-lg p-3">
+              <p className="text-sm text-info-foreground">
+                💡 <strong>Team Setup:</strong> Share the store code or direct URL with your team members. 
+                They can access the system independently without needing your login credentials.
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>

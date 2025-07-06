@@ -11,6 +11,7 @@ interface Store {
   currency: string;
   tax_rate: number;
   owner_id: string;
+  store_code?: string;
   role?: string;
 }
 

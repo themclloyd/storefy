@@ -26,8 +26,8 @@ export default function StoreLoginPage() {
       const { data: storeData, error: storeError } = await supabase
         .from('stores')
         .select('id, name')
-        .eq('store_code', storeCode?.toUpperCase())
-        .single();
+        .eq('store_code', storeCode?.toUpperCase() || '')
+        .maybeSingle();
 
       if (storeError || !storeData) {
         toast.error('Invalid store code. Please check with your manager.');
@@ -44,7 +44,7 @@ export default function StoreLoginPage() {
         .eq('pin', pin)
         .eq('store_id', storeData.id)
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
 
       if (error || !memberData) {
         toast.error('Invalid name or PIN');
@@ -56,7 +56,7 @@ export default function StoreLoginPage() {
         .from('profiles')
         .select('display_name')
         .eq('user_id', memberData.user_id)
-        .single();
+        .maybeSingle();
 
       // Check if the name matches
       const displayName = profileData?.display_name || '';

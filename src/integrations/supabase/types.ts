@@ -337,6 +337,7 @@ export type Database = {
           name: string
           owner_id: string
           phone: string | null
+          store_code: string
           tax_rate: number | null
           updated_at: string
         }
@@ -349,6 +350,7 @@ export type Database = {
           name: string
           owner_id: string
           phone?: string | null
+          store_code: string
           tax_rate?: number | null
           updated_at?: string
         }
@@ -361,6 +363,7 @@ export type Database = {
           name?: string
           owner_id?: string
           phone?: string | null
+          store_code?: string
           tax_rate?: number | null
           updated_at?: string
         }
