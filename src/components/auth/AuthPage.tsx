@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Store, LogIn, UserPlus, AlertCircle } from 'lucide-react';
+import { Store, LogIn, UserPlus, AlertCircle, KeyRound } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 
@@ -143,6 +143,19 @@ export function AuthPage() {
 
           <div className="space-y-4">
             <Separator />
+            
+            {/* PIN Login for Team Members */}
+            <div className="text-center">
+              <Button
+                variant="outline"
+                onClick={() => navigate('/pin-login')}
+                className="w-full border-primary/20 text-primary hover:bg-primary/5"
+              >
+                <KeyRound className="w-4 h-4 mr-2" />
+                Team Member PIN Login
+              </Button>
+            </div>
+            
             <div className="text-center">
               <Button
                 variant="ghost"
