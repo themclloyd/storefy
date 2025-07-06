@@ -1,5 +1,5 @@
 
-import { Building2, BarChart3, Package, Users, ShoppingCart, Settings, LogOut, Store, CreditCard, FolderOpen, Truck, ChevronDown, ChevronRight } from "lucide-react";
+import { Building2, BarChart3, Package, Users, ShoppingCart, Settings, LogOut, Store, CreditCard, FolderOpen, Truck, ChevronDown, ChevronRight, Clock, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -16,6 +16,8 @@ const navigationItems = [
   { id: "dashboard", label: "Dashboard", icon: BarChart3 },
   { id: "pos", label: "POS System", icon: ShoppingCart },
   { id: "inventory", label: "Inventory", icon: Package },
+  { id: "layby", label: "Layby", icon: Clock },
+  { id: "transactions", label: "Transactions", icon: Receipt },
   { id: "customers", label: "Customers", icon: Users },
   { id: "reports", label: "Reports", icon: BarChart3 },
   { id: "settings", label: "Settings", icon: Settings },

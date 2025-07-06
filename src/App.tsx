@@ -24,6 +24,17 @@ const App = () => (
           <StoreProvider>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/dashboard" element={<Index />} />
+              <Route path="/pos" element={<Index />} />
+              <Route path="/inventory" element={<Index />} />
+              <Route path="/categories" element={<Index />} />
+              <Route path="/suppliers" element={<Index />} />
+              <Route path="/layby" element={<Index />} />
+              <Route path="/transactions" element={<Index />} />
+              <Route path="/customers" element={<Index />} />
+              <Route path="/reports" element={<Index />} />
+              <Route path="/settings" element={<Index />} />
+              <Route path="/stores" element={<Index />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/pin-login" element={<PinLoginPage />} />
               <Route path="/store/:storeCode" element={<StoreLoginPage />} />

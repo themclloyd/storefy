@@ -2,13 +2,15 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useStore } from "@/contexts/StoreContext";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { DashboardView } from "@/components/dashboard/DashboardView";
 import { POSView } from "@/components/pos/POSView";
 import { InventoryView } from "@/components/inventory/InventoryView";
 import { CategoriesView } from "@/components/inventory/CategoriesView";
 import { SuppliersView } from "@/components/inventory/SuppliersView";
+import { LaybyView } from "@/components/layby/LaybyView";
+import { TransactionView } from "@/components/transactions/TransactionView";
 import { CustomersView } from "@/components/customers/CustomersView";
 import { ReportsView } from "@/components/reports/ReportsView";
 import { SettingsView } from "@/components/settings/SettingsView";
@@ -19,7 +21,8 @@ const Index = () => {
   const { user, loading: authLoading } = useAuth();
   const { currentStore, stores, loading: storeLoading, isOwner } = useStore();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   const [activeView, setActiveView] = useState("dashboard");
 
   // Check for PIN session
@@ -32,13 +35,70 @@ const Index = () => {
     }
   }, [user, authLoading, navigate, hasPinSession]);
 
-  // Handle URL parameters for view selection
+  // Handle URL path for view selection
   useEffect(() => {
-    const viewParam = searchParams.get('view');
-    if (viewParam) {
-      setActiveView(viewParam);
-    }
-  }, [searchParams]);
+    const path = location.pathname;
+    const pathToView = {
+      '/': 'dashboard',
+      '/dashboard': 'dashboard',
+      '/pos': 'pos',
+      '/inventory': 'inventory',
+      '/categories': 'categories',
+      '/suppliers': 'suppliers',
+      '/layby': 'layby',
+      '/transactions': 'transactions',
+      '/customers': 'customers',
+      '/reports': 'reports',
+      '/settings': 'settings',
+      '/stores': 'stores'
+    };
+
+    const view = pathToView[path as keyof typeof pathToView] || 'dashboard';
+    setActiveView(view);
+  }, [location.pathname]);
+
+  // Update document title based on active view
+  useEffect(() => {
+    const viewTitles = {
+      dashboard: "Dashboard",
+      pos: "POS System",
+      inventory: "Inventory",
+      categories: "Categories",
+      suppliers: "Suppliers",
+      layby: "Layby",
+      transactions: "Transactions",
+      customers: "Customers",
+      reports: "Reports",
+      settings: "Settings",
+      stores: "Store Management"
+    };
+
+    const viewTitle = viewTitles[activeView as keyof typeof viewTitles] || "Dashboard";
+    document.title = `${viewTitle} - Storefy`;
+  }, [activeView]);
+
+  // Handle view changes with URL updates
+  const handleViewChange = (view: string) => {
+    setActiveView(view);
+
+    // Navigate to clean URLs
+    const viewToPath = {
+      'dashboard': '/',
+      'pos': '/pos',
+      'inventory': '/inventory',
+      'categories': '/categories',
+      'suppliers': '/suppliers',
+      'layby': '/layby',
+      'transactions': '/transactions',
+      'customers': '/customers',
+      'reports': '/reports',
+      'settings': '/settings',
+      'stores': '/stores'
+    };
+
+    const path = viewToPath[view as keyof typeof viewToPath] || '/';
+    navigate(path, { replace: false });
+  };
 
   const renderView = () => {
     // Show store management view for owners with multiple stores
@@ -56,23 +116,27 @@ const Index = () => {
       case "categories":
         return (
           <CategoriesView
-            onClose={() => setActiveView("inventory")}
+            onClose={() => handleViewChange("inventory")}
             onViewCategoryProducts={(categoryId, categoryName) => {
               // This will be handled by the InventoryView's filtered view
-              setActiveView("inventory");
+              handleViewChange("inventory");
             }}
           />
         );
       case "suppliers":
         return (
           <SuppliersView
-            onClose={() => setActiveView("inventory")}
+            onClose={() => handleViewChange("inventory")}
             onViewSupplierProducts={(supplierId, supplierName) => {
               // This will be handled by the InventoryView's filtered view
-              setActiveView("inventory");
+              handleViewChange("inventory");
             }}
           />
         );
+      case "layby":
+        return <LaybyView />;
+      case "transactions":
+        return <TransactionView />;
       case "customers":
         return <CustomersView />;
       case "reports":
@@ -122,9 +186,9 @@ const Index = () => {
       <div className="h-screen flex bg-background">
         {/* Sidebar for PIN users */}
         <div className="w-64 flex-shrink-0">
-          <Sidebar 
-            activeView={activeView} 
-            onViewChange={setActiveView}
+          <Sidebar
+            activeView={activeView}
+            onViewChange={handleViewChange}
             currentStore={pinData.store_name}
           />
         </div>
@@ -132,6 +196,7 @@ const Index = () => {
         {/* Main Content */}
         <div className="flex-1 overflow-auto">
           <div className="p-8">
+
             {renderView()}
           </div>
         </div>
@@ -153,9 +218,9 @@ const Index = () => {
     <div className="h-screen flex bg-background">
       {/* Sidebar */}
       <div className="w-64 flex-shrink-0">
-        <Sidebar 
-          activeView={activeView} 
-          onViewChange={setActiveView}
+        <Sidebar
+          activeView={activeView}
+          onViewChange={handleViewChange}
           currentStore={currentStore.name}
         />
       </div>
@@ -163,6 +228,7 @@ const Index = () => {
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
         <div className="p-8">
+
           {renderView()}
         </div>
       </div>
