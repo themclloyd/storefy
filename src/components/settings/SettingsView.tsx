@@ -29,21 +29,13 @@ export function SettingsView() {
 
     setAdding(true);
     try {
-      // First, check if user exists or invite them
-      const { data: userData, error: userError } = await supabase.auth.admin.getUserByEmail(memberEmail);
+      // Invite the user to sign up
+      const { data: inviteData, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(memberEmail, {
+        data: { display_name: memberName }
+      });
       
-      let userId;
-      if (userError || !userData.user) {
-        // Invite the user to sign up
-        const { data: inviteData, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(memberEmail, {
-          data: { display_name: memberName }
-        });
-        
-        if (inviteError) throw inviteError;
-        userId = inviteData.user?.id;
-      } else {
-        userId = userData.user.id;
-      }
+      if (inviteError) throw inviteError;
+      const userId = inviteData.user?.id;
 
       if (!userId) throw new Error('Failed to get user ID');
 

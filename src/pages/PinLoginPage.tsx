@@ -22,13 +22,12 @@ export default function PinLoginPage() {
 
     setLoading(true);
     try {
-      // Find store member by PIN and get their profile
+      // Find store member by PIN
       const { data: memberData, error } = await supabase
         .from('store_members')
         .select(`
           *,
-          stores (name, id),
-          profiles (display_name)
+          stores (name, id)
         `)
         .eq('pin', pin)
         .eq('is_active', true)
@@ -39,8 +38,15 @@ export default function PinLoginPage() {
         return;
       }
 
+      // Get the user's profile separately
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('user_id', memberData.user_id)
+        .single();
+
       // Check if the name matches
-      const displayName = memberData.profiles?.display_name || '';
+      const displayName = profileData?.display_name || '';
       if (displayName.toLowerCase() !== memberName.toLowerCase()) {
         toast.error('Invalid name or PIN');
         return;
