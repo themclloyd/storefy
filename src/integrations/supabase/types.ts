@@ -382,6 +382,14 @@ export type Database = {
         Args: { _store_id: string }
         Returns: undefined
       }
+      user_can_access_store: {
+        Args: { _store_id: string }
+        Returns: boolean
+      }
+      user_owns_store: {
+        Args: { _store_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       store_role: "owner" | "manager" | "cashier"
