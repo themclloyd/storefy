@@ -25,6 +25,7 @@ import {
 import { useStore } from "@/contexts/StoreContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useTax } from "@/hooks/useTax";
 
 interface Customer {
   id: string;
@@ -62,6 +63,7 @@ export function CustomerDetailsModal({
   onEditCustomer 
 }: CustomerDetailsModalProps) {
   const { currentStore } = useStore();
+  const { formatCurrency } = useTax();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
@@ -221,7 +223,7 @@ export function CustomerDetailsModal({
                       <span>Total Spent</span>
                     </div>
                     <span className="font-semibold text-success">
-                      ${(customer.total_spent || 0).toFixed(2)}
+                      {formatCurrency(customer.total_spent || 0)}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">

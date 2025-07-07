@@ -21,6 +21,7 @@ interface StoreContextType {
   userRole: string | null;
   loading: boolean;
   selectStore: (storeId: string) => void;
+  updateCurrentStore: (updatedStore: Partial<Store>) => void;
   refreshStores: () => Promise<void>;
   isOwner: boolean;
   canManage: boolean;
@@ -95,6 +96,20 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const updateCurrentStore = (updatedStore: Partial<Store>) => {
+    if (currentStore) {
+      const newStore = { ...currentStore, ...updatedStore };
+      setCurrentStore(newStore);
+
+      // Also update the store in the stores array
+      setStores(prevStores =>
+        prevStores.map(store =>
+          store.id === currentStore.id ? newStore : store
+        )
+      );
+    }
+  };
+
   const refreshStores = async () => {
     setLoading(true);
     await fetchStores();
@@ -110,6 +125,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     userRole,
     loading,
     selectStore,
+    updateCurrentStore,
     refreshStores,
     isOwner,
     canManage,

@@ -15,7 +15,9 @@ import { useStore } from "@/contexts/StoreContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { teamMemberLogs } from "@/lib/activityLogger";
+import { teamMemberLogs, logActivity } from "@/lib/activityLogger";
+import { clearTaxCache, percentageToDecimal, isValidTaxRate, WORLD_CURRENCIES } from "@/lib/taxUtils";
+import { PaymentMethodsSettings } from "./PaymentMethodsSettings";
 
 interface TeamMember {
   id: string;
@@ -37,7 +39,7 @@ interface RoleStats {
 }
 
 export function SettingsView() {
-  const { currentStore, isOwner, userRole, refreshStores } = useStore();
+  const { currentStore, isOwner, userRole, updateCurrentStore } = useStore();
   const { user } = useAuth();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [roleStats, setRoleStats] = useState<RoleStats>({ owner: 0, manager: 0, cashier: 0, total: 0 });
@@ -73,7 +75,7 @@ export function SettingsView() {
   const [storeAddress, setStoreAddress] = useState('');
   const [storePhone, setStorePhone] = useState('');
   const [storeEmail, setStoreEmail] = useState('');
-  const [storeCurrency, setStoreCurrency] = useState('USD');
+  const [storeCurrency, setStoreCurrency] = useState('MWK');
   const [storeTaxRate, setStoreTaxRate] = useState('8.25');
   const [updatingStore, setUpdatingStore] = useState(false);
 
@@ -95,7 +97,7 @@ export function SettingsView() {
       setStoreAddress(currentStore.address || '');
       setStorePhone(currentStore.phone || '');
       setStoreEmail(currentStore.email || '');
-      setStoreCurrency(currentStore.currency || 'USD');
+      setStoreCurrency(currentStore.currency || 'MWK');
       setStoreTaxRate(currentStore.tax_rate?.toString() || '8.25');
     }
   }, [currentStore]);
@@ -239,8 +241,8 @@ export function SettingsView() {
     }
 
     // Validate tax rate
-    const taxRate = parseFloat(storeTaxRate);
-    if (isNaN(taxRate) || taxRate < 0 || taxRate > 100) {
+    const taxRateDecimal = percentageToDecimal(parseFloat(storeTaxRate));
+    if (isNaN(taxRateDecimal) || !isValidTaxRate(taxRateDecimal)) {
       toast.error('Tax rate must be a valid percentage between 0 and 100');
       return;
     }
@@ -252,8 +254,9 @@ export function SettingsView() {
     }
 
     setUpdatingStore(true);
+
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('stores')
         .update({
           name: storeName.trim(),
@@ -261,33 +264,54 @@ export function SettingsView() {
           phone: storePhone.trim() || null,
           email: storeEmail.trim() || null,
           currency: storeCurrency,
-          tax_rate: taxRate / 100, // Convert percentage to decimal
+          tax_rate: taxRateDecimal,
           updated_at: new Date().toISOString()
         })
-        .eq('id', currentStore.id);
+        .eq('id', currentStore.id)
+        .select();
 
       if (error) throw error;
 
+      // Clear tax cache since tax rate might have changed
+      clearTaxCache();
+
       // Log the activity
-      await teamMemberLogs.updated(
-        currentStore.id,
-        user?.user_metadata?.display_name || user?.email || 'Store Owner',
-        'Store Settings',
-        {
+      try {
+        const changes = {
           name: storeName !== currentStore.name ? { from: currentStore.name, to: storeName } : undefined,
           address: storeAddress !== currentStore.address ? { from: currentStore.address, to: storeAddress } : undefined,
           phone: storePhone !== currentStore.phone ? { from: currentStore.phone, to: storePhone } : undefined,
           email: storeEmail !== currentStore.email ? { from: currentStore.email, to: storeEmail } : undefined,
           currency: storeCurrency !== currentStore.currency ? { from: currentStore.currency, to: storeCurrency } : undefined,
-          tax_rate: storeTaxRate !== (currentStore.tax_rate * 100).toString() ? { from: `${currentStore.tax_rate * 100}%`, to: `${storeTaxRate}%` } : undefined
-        },
-        user?.id
-      );
+          tax_rate: storeTaxRate !== ((currentStore.tax_rate || 0) * 100).toString() ? { from: `${((currentStore.tax_rate || 0) * 100).toFixed(2)}%`, to: `${storeTaxRate}%` } : undefined
+        };
+
+        const actualChanges = Object.fromEntries(
+          Object.entries(changes).filter(([_, value]) => value !== undefined)
+        );
+
+        if (Object.keys(actualChanges).length > 0) {
+          await logActivity({
+            store_id: currentStore.id,
+            actor_id: user?.id,
+            actor_name: user?.user_metadata?.display_name || user?.email || 'Store Owner',
+            action_type: 'store_settings_updated',
+            target_type: 'store',
+            target_name: currentStore.name,
+            description: `${user?.user_metadata?.display_name || user?.email || 'Store Owner'} updated store settings`,
+            metadata: { changes: actualChanges }
+          });
+        }
+      } catch (logError) {
+        console.error('Error logging activity:', logError);
+      }
 
       toast.success('Store settings updated successfully!');
 
-      // Refresh store data
-      await refreshStores();
+      // Update the current store in context without full refresh
+      if (data && data[0]) {
+        updateCurrentStore(data[0]);
+      }
 
     } catch (error: any) {
       console.error('Error updating store:', error);
@@ -297,12 +321,14 @@ export function SettingsView() {
     }
   };
 
+
+
   const fetchActivityLogs = async () => {
     if (!currentStore) return;
 
     setLogsLoading(true);
     try {
-      const { data: logs, error } = await supabase
+      const { data: logs, error } = await (supabase as any)
         .from('activity_logs')
         .select('*')
         .eq('store_id', currentStore.id)
@@ -974,6 +1000,72 @@ export function SettingsView() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Store Access */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="w-5 h-5" />
+            Store Access
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Share your store code with team members to give them access
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="bg-muted/50 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-2">
+              <Label className="font-medium">Store Code</Label>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  if (currentStore?.store_code) {
+                    navigator.clipboard.writeText(currentStore.store_code);
+                    toast.success('Store code copied to clipboard!');
+                  }
+                }}
+                className="h-8"
+              >
+                <Copy className="w-3 h-3 mr-1" />
+                Copy
+              </Button>
+            </div>
+            <div className="font-mono text-xl font-bold text-primary mb-2">
+              {currentStore?.store_code}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Team members use this code to access your store
+            </p>
+          </div>
+
+          {/* Short Link for Store Login */}
+          <div className="mt-4 p-4 border border-border rounded-lg">
+            <div className="flex items-center justify-between mb-2">
+              <Label className="font-medium">Quick Access Link</Label>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const shortLink = `${window.location.origin}/store/${currentStore?.store_code}`;
+                  navigator.clipboard.writeText(shortLink);
+                  toast.success('Store link copied to clipboard!');
+                }}
+                className="h-8"
+              >
+                <Copy className="w-3 h-3 mr-1" />
+                Copy Link
+              </Button>
+            </div>
+            <div className="font-mono text-sm text-muted-foreground mb-2 break-all">
+              {window.location.origin}/store/{currentStore?.store_code}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Share this link with team members for quick store access
+            </p>
+          </div>
+        </CardContent>
+      </Card>
           </TabsContent>
 
           {/* Store Settings Tab */}
@@ -1045,15 +1137,12 @@ export function SettingsView() {
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="USD">USD ($) - US Dollar</SelectItem>
-                            <SelectItem value="EUR">EUR (€) - Euro</SelectItem>
-                            <SelectItem value="GBP">GBP (£) - British Pound</SelectItem>
-                            <SelectItem value="CAD">CAD (C$) - Canadian Dollar</SelectItem>
-                            <SelectItem value="AUD">AUD (A$) - Australian Dollar</SelectItem>
-                            <SelectItem value="JPY">JPY (¥) - Japanese Yen</SelectItem>
-                            <SelectItem value="CNY">CNY (¥) - Chinese Yuan</SelectItem>
-                            <SelectItem value="INR">INR (₹) - Indian Rupee</SelectItem>
+                          <SelectContent className="max-h-60">
+                            {Object.entries(WORLD_CURRENCIES).map(([code, info]) => (
+                              <SelectItem key={code} value={code}>
+                                {code} ({info.symbol}) - {info.name}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       </div>
@@ -1077,40 +1166,16 @@ export function SettingsView() {
                   </div>
                 </div>
 
-                {/* Store Code Display */}
-                <div className="border-t pt-6">
-                  <h3 className="text-lg font-semibold text-foreground mb-4">Store Access</h3>
-                  <div className="bg-muted/50 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <Label className="font-medium">Store Code</Label>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          if (currentStore?.store_code) {
-                            navigator.clipboard.writeText(currentStore.store_code);
-                            toast.success('Store code copied to clipboard!');
-                          }
-                        }}
-                        className="h-8"
-                      >
-                        <Copy className="w-3 h-3 mr-1" />
-                        Copy
-                      </Button>
-                    </div>
-                    <div className="font-mono text-xl font-bold text-primary mb-2">
-                      {currentStore?.store_code}
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Team members use this code to access your store
-                    </p>
-                  </div>
-                </div>
+
 
                 {/* Save Button */}
                 <div className="border-t pt-6">
                   <Button
-                    onClick={handleUpdateStore}
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleUpdateStore();
+                    }}
                     disabled={updatingStore || !storeName.trim()}
                     className="w-full md:w-auto"
                   >
@@ -1123,24 +1188,7 @@ export function SettingsView() {
 
           {/* Payment Methods Tab */}
           <TabsContent value="payments" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="w-5 h-5" />
-                  Payment Methods
-                </CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Configure accepted payment methods for your store
-                </p>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8 text-muted-foreground">
-                  <CreditCard className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                  <p>Payment settings coming soon</p>
-                  <p className="text-sm">Set up credit cards, cash, and digital payment options</p>
-                </div>
-              </CardContent>
-            </Card>
+            <PaymentMethodsSettings />
           </TabsContent>
 
           {/* Notifications Tab */}

@@ -22,6 +22,7 @@ import { AdvancedFilters, FilterOptions } from "./AdvancedFilters";
 import { ExportDialog } from "./ExportDialog";
 import { ProductHistoryModal } from "./ProductHistoryModal";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useTax } from "@/hooks/useTax";
 
 interface Product {
   id: string;
@@ -48,6 +49,7 @@ interface Product {
 export function InventoryView() {
   const { currentStore } = useStore();
   const { user } = useAuth();
+  const { formatCurrency } = useTax();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [products, setProducts] = useState<Product[]>([]);
@@ -420,7 +422,7 @@ export function InventoryView() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-success">
-              ${products.reduce((sum, item) => sum + (item.stock_quantity * item.cost), 0).toFixed(2)}
+              {formatCurrency(products.reduce((sum, item) => sum + (item.stock_quantity * item.cost), 0))}
             </div>
           </CardContent>
         </Card>

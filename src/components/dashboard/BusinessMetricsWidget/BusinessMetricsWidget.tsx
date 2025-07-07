@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ArrowUp, ArrowDown, Minus } from "lucide-react";
+import { useTax } from "@/hooks/useTax";
 
 export interface MetricData {
   label: string;
@@ -24,20 +25,21 @@ export interface BusinessMetricsWidgetProps {
   className?: string;
 }
 
-export function BusinessMetricsWidget({ 
-  title, 
-  icon: Icon, 
-  iconColor, 
-  metrics, 
-  className = "" 
+export function BusinessMetricsWidget({
+  title,
+  icon: Icon,
+  iconColor,
+  metrics,
+  className = ""
 }: BusinessMetricsWidgetProps) {
-  
+  const { formatCurrency } = useTax();
+
   const formatValue = (value: string | number, format?: string) => {
     if (typeof value === 'string') return value;
-    
+
     switch (format) {
       case 'currency':
-        return `$${value.toFixed(2)}`;
+        return formatCurrency(value);
       case 'percentage':
         return `${value.toFixed(1)}%`;
       case 'time':

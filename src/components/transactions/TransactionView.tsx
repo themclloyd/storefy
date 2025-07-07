@@ -3,6 +3,8 @@ import { useStore } from "@/contexts/StoreContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useTax } from "@/hooks/useTax";
+import { usePaymentMethods } from "@/hooks/usePaymentMethods";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -34,6 +36,8 @@ interface Transaction {
 export function TransactionView() {
   const { currentStore } = useStore();
   const { user } = useAuth();
+  const { formatCurrency } = useTax();
+  const { getPaymentOptions, getPaymentMethodDisplay, getPaymentMethodBadgeVariant } = usePaymentMethods();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -106,15 +110,9 @@ export function TransactionView() {
   };
 
   const getPaymentMethodBadge = (method: string) => {
-    const methodConfig = {
-      cash: { label: "Cash", variant: "default" as const },
-      card: { label: "Card", variant: "secondary" as const },
-      bank_transfer: { label: "Bank Transfer", variant: "outline" as const },
-      other: { label: "Other", variant: "outline" as const },
-    };
-    
-    const config = methodConfig[method as keyof typeof methodConfig] || methodConfig.other;
-    return <Badge variant={config.variant}>{config.label}</Badge>;
+    const label = getPaymentMethodDisplay(method);
+    const variant = getPaymentMethodBadgeVariant(method);
+    return <Badge variant={variant}>{label}</Badge>;
   };
 
   // Calculate statistics
@@ -283,19 +281,17 @@ export function TransactionView() {
               <div className="text-center p-4 bg-green-50 rounded-lg">
                 <div className="text-sm text-muted-foreground">Total Revenue</div>
                 <div className="text-xl font-bold text-green-600">
-                  ${filteredTransactions
+                  {formatCurrency(filteredTransactions
                     .filter(t => ['sale', 'layby_payment', 'layby_deposit'].includes(t.transaction_type))
-                    .reduce((sum, t) => sum + t.amount, 0)
-                    .toFixed(2)}
+                    .reduce((sum, t) => sum + t.amount, 0))}
                 </div>
               </div>
               <div className="text-center p-4 bg-red-50 rounded-lg">
                 <div className="text-sm text-muted-foreground">Total Refunds</div>
                 <div className="text-xl font-bold text-red-600">
-                  ${filteredTransactions
+                  {formatCurrency(filteredTransactions
                     .filter(t => t.transaction_type === 'refund')
-                    .reduce((sum, t) => sum + t.amount, 0)
-                    .toFixed(2)}
+                    .reduce((sum, t) => sum + t.amount, 0))}
                 </div>
               </div>
             </div>
@@ -340,11 +336,29 @@ export function TransactionView() {
                   <SelectValue placeholder="Payment Method" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Methods</SelectItem>
-                  <SelectItem value="cash">Cash</SelectItem>
-                  <SelectItem value="card">Card</SelectItem>
-                  <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
+                  <SelectItem value="all">
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="w-4 h-4" />
+                      <span>All Methods</span>
+                    </div>
+                  </SelectItem>
+                  {getPaymentOptions().map((option) => (
+                    <SelectItem key={option.id} value={option.id}>
+                      <div className="flex items-center gap-2">
+                        {option.type === 'cash' ? (
+                          <DollarSign className="w-4 h-4" />
+                        ) : (
+                          <CreditCard className="w-4 h-4" />
+                        )}
+                        <div className="flex flex-col items-start">
+                          <span>{option.name}</span>
+                          {option.provider && (
+                            <span className="text-xs text-muted-foreground">{option.provider}</span>
+                          )}
+                        </div>
+                      </div>
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
 
@@ -427,7 +441,7 @@ export function TransactionView() {
                         <TableCell className={`font-semibold ${
                           transaction.transaction_type === 'refund' ? 'text-red-600' : 'text-green-600'
                         }`}>
-                          {transaction.transaction_type === 'refund' ? '-' : ''}${transaction.amount.toFixed(2)}
+                          {transaction.transaction_type === 'refund' ? '-' : ''}{formatCurrency(transaction.amount)}
                         </TableCell>
                         <TableCell>
                           <Button variant="ghost" size="sm">

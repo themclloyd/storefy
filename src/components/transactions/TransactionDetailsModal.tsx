@@ -3,6 +3,7 @@ import { useStore } from "@/contexts/StoreContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { usePaymentMethods } from "@/hooks/usePaymentMethods";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -122,14 +123,15 @@ interface TransactionHistoryEntry {
   user_email?: string;
 }
 
-export function TransactionDetailsModal({ 
-  transaction, 
-  open, 
-  onOpenChange, 
-  onTransactionUpdate 
+export function TransactionDetailsModal({
+  transaction,
+  open,
+  onOpenChange,
+  onTransactionUpdate
 }: TransactionDetailsModalProps) {
   const { currentStore } = useStore();
   const { user } = useAuth();
+  const { getPaymentMethodDisplay, getPaymentMethodBadgeVariant } = usePaymentMethods();
   const [loading, setLoading] = useState(false);
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
   const [laybyDetails, setLaybyDetails] = useState<LaybyDetails | null>(null);
@@ -472,15 +474,9 @@ export function TransactionDetailsModal({
   };
 
   const getPaymentMethodBadge = (method: string) => {
-    const methodConfig = {
-      cash: { label: "Cash", variant: "default" as const },
-      card: { label: "Card", variant: "secondary" as const },
-      bank_transfer: { label: "Bank Transfer", variant: "outline" as const },
-      other: { label: "Other", variant: "outline" as const },
-    };
-    
-    const config = methodConfig[method as keyof typeof methodConfig] || methodConfig.other;
-    return <Badge variant={config.variant}>{config.label}</Badge>;
+    const label = getPaymentMethodDisplay(method);
+    const variant = getPaymentMethodBadgeVariant(method);
+    return <Badge variant={variant}>{label}</Badge>;
   };
 
   return (

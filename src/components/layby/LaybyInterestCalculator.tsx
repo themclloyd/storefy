@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Calculator, DollarSign, Calendar, AlertTriangle } from "lucide-react";
+import { useTax } from "@/hooks/useTax";
 
 interface LaybyInterestCalculatorProps {
   open: boolean;
@@ -31,6 +32,7 @@ interface OverdueLayby {
 export function LaybyInterestCalculator({ open, onOpenChange, onSuccess }: LaybyInterestCalculatorProps) {
   const { currentStore } = useStore();
   const { user } = useAuth();
+  const { formatCurrency } = useTax();
   const [loading, setLoading] = useState(false);
   const [applying, setApplying] = useState(false);
   const [overdueLaybys, setOverdueLaybys] = useState<OverdueLayby[]>([]);
@@ -321,7 +323,7 @@ export function LaybyInterestCalculator({ open, onOpenChange, onSuccess }: Layby
                           </TableCell>
                           <TableCell className="font-medium">{layby.layby_number}</TableCell>
                           <TableCell>{layby.customer_name}</TableCell>
-                          <TableCell>${layby.balance_remaining.toFixed(2)}</TableCell>
+                          <TableCell>{formatCurrency(layby.balance_remaining)}</TableCell>
                           <TableCell>
                             <div>
                               {new Date(layby.due_date).toLocaleDateString()}
@@ -336,9 +338,9 @@ export function LaybyInterestCalculator({ open, onOpenChange, onSuccess }: Layby
                             </Badge>
                           </TableCell>
                           <TableCell>{(layby.interest_rate * 100).toFixed(2)}%</TableCell>
-                          <TableCell>${layby.interest_amount.toFixed(2)}</TableCell>
+                          <TableCell>{formatCurrency(layby.interest_amount)}</TableCell>
                           <TableCell className="font-medium text-orange-600">
-                            ${layby.calculated_interest.toFixed(2)}
+                            {formatCurrency(layby.calculated_interest)}
                           </TableCell>
                           <TableCell className="font-bold">
                             ${(layby.interest_amount + layby.calculated_interest).toFixed(2)}

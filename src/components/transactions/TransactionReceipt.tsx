@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Printer, Download } from "lucide-react";
+import { useTax } from "@/hooks/useTax";
 import { format } from "date-fns";
 
 interface TransactionReceiptItem {
@@ -62,6 +63,8 @@ export const TransactionReceipt = forwardRef<HTMLDivElement, TransactionReceiptP
     onPrint,
     onDownload,
   }, ref) => {
+    const { formatCurrency } = useTax();
+
     const formatDate = (dateString: string) => {
       return format(new Date(dateString), "PPP 'at' p");
     };
@@ -145,11 +148,11 @@ export const TransactionReceipt = forwardRef<HTMLDivElement, TransactionReceiptP
                           <p className="text-xs text-muted-foreground">SKU: {item.sku}</p>
                         </div>
                         <p className="text-sm font-medium text-foreground">
-                          ${item.total_price.toFixed(2)}
+                          {formatCurrency(item.total_price)}
                         </p>
                       </div>
                       <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>{item.quantity} × ${item.unit_price.toFixed(2)}</span>
+                        <span>{item.quantity} × {formatCurrency(item.unit_price)}</span>
                       </div>
                     </div>
                   ))}
@@ -163,21 +166,21 @@ export const TransactionReceipt = forwardRef<HTMLDivElement, TransactionReceiptP
               {subtotal > 0 && (
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal:</span>
-                  <span className="text-foreground">${subtotal.toFixed(2)}</span>
+                  <span className="text-foreground">{formatCurrency(subtotal)}</span>
                 </div>
               )}
-              
+
               {discountAmount > 0 && (
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Discount:</span>
-                  <span className="text-success">-${discountAmount.toFixed(2)}</span>
+                  <span className="text-success">-{formatCurrency(discountAmount)}</span>
                 </div>
               )}
-              
+
               {taxAmount > 0 && (
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Tax:</span>
-                  <span className="text-foreground">${taxAmount.toFixed(2)}</span>
+                  <span className="text-foreground">{formatCurrency(taxAmount)}</span>
                 </div>
               )}
               
@@ -188,7 +191,7 @@ export const TransactionReceipt = forwardRef<HTMLDivElement, TransactionReceiptP
                   {transactionType === 'refund' ? 'Refund Amount:' : 'Total:'}
                 </span>
                 <span className={`text-foreground ${transactionType === 'refund' ? 'text-red-600' : ''}`}>
-                  {transactionType === 'refund' ? '-' : ''}${total.toFixed(2)}
+                  {transactionType === 'refund' ? '-' : ''}{formatCurrency(total)}
                 </span>
               </div>
               
@@ -200,7 +203,7 @@ export const TransactionReceipt = forwardRef<HTMLDivElement, TransactionReceiptP
               {isLayby && laybyBalance > 0 && (
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Remaining Balance:</span>
-                  <span className="text-foreground font-medium">${laybyBalance.toFixed(2)}</span>
+                  <span className="text-foreground font-medium">{formatCurrency(laybyBalance)}</span>
                 </div>
               )}
             </div>

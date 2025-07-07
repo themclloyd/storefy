@@ -3,11 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ShoppingCart, Plus, Minus, Trash2, Percent, DollarSign, CreditCard, Search, Loader2, User, UserPlus, History, Grid3X3, List, LayoutGrid } from "lucide-react";
 import { useStore } from "@/contexts/StoreContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { usePaymentMethods } from "@/hooks/usePaymentMethods";
+import { useTax } from "@/hooks/useTax";
+import { TaxDisplay } from "@/components/common/TaxDisplay";
 import { ReceiptDialog } from "./ReceiptDialog";
 import { OrderHistoryDialog } from "./OrderHistoryDialog";
 import { AddCustomerDialog } from "./AddCustomerDialog";
@@ -52,6 +56,8 @@ interface Customer {
 export function POSView() {
   const { currentStore } = useStore();
   const { user } = useAuth();
+  const { getPaymentOptions, isValidPaymentMethod, formatPaymentMethodDisplay } = usePaymentMethods();
+  const { calculateItemsTax, formatCurrency } = useTax();
 
   const [cart, setCart] = useState<CartItem[]>([]);
   const [discountType, setDiscountType] = useState<"percent" | "fixed">("percent");
@@ -86,6 +92,9 @@ export function POSView() {
   // Add customer state
   const [showAddCustomer, setShowAddCustomer] = useState(false);
 
+  // Tax calculation state
+  const [taxCalculation, setTaxCalculation] = useState<any>(null);
+
   // Fetch products, categories, and customers
   useEffect(() => {
     if (currentStore) {
@@ -94,6 +103,39 @@ export function POSView() {
       fetchCustomers();
     }
   }, [currentStore]);
+
+  // Calculate tax when cart changes
+  useEffect(() => {
+    const calculateCartTax = async () => {
+      if (cart.length === 0 || !currentStore) {
+        setTaxCalculation(null);
+        return;
+      }
+
+      try {
+        const cartItems = cart.map(item => ({
+          price: item.price,
+          quantity: item.quantity,
+          taxable: true // All items are taxable by default
+        }));
+
+        const subtotalBeforeDiscount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const discountAmount = discountValue ?
+          (discountType === "percent" ? subtotalBeforeDiscount * (parseFloat(discountValue) / 100) : parseFloat(discountValue)) : 0;
+
+        // Calculate tax on discounted amount
+        const taxableAmount = Math.max(0, subtotalBeforeDiscount - discountAmount);
+        const calculation = await calculateItemsTax([{ price: taxableAmount, quantity: 1, taxable: true }]);
+
+        setTaxCalculation(calculation);
+      } catch (error) {
+        console.error('Error calculating tax:', error);
+        setTaxCalculation(null);
+      }
+    };
+
+    calculateCartTax();
+  }, [cart, discountValue, discountType, currentStore, calculateItemsTax]);
 
   const fetchProducts = async () => {
     if (!currentStore) return;
@@ -329,7 +371,9 @@ export function POSView() {
 
     // 4. Validate payment method is selected
     if (!paymentMethod) {
-      validationErrors.push('Payment method is required - please select Cash or Card');
+      validationErrors.push('Payment method is required - please select a payment method');
+    } else if (!isValidPaymentMethod(paymentMethod)) {
+      validationErrors.push('Selected payment method is not available');
     }
 
     // 5. Validate product stock availability
@@ -521,12 +565,14 @@ export function POSView() {
     }
   };
 
-  // Calculate totals
+  // Calculate totals using tax utility
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const discountAmount = discountValue ?
     (discountType === "percent" ? subtotal * (parseFloat(discountValue) / 100) : parseFloat(discountValue)) : 0;
-  const taxRate = currentStore?.tax_rate || 0;
-  const taxAmount = (subtotal - discountAmount) * taxRate;
+
+  // Use tax calculation from hook or fallback to simple calculation
+  const taxRate = taxCalculation?.taxRate || currentStore?.tax_rate || 0;
+  const taxAmount = taxCalculation?.taxAmount || ((subtotal - discountAmount) * taxRate);
   const total = Math.max(0, subtotal - discountAmount + taxAmount);
 
   return (
@@ -666,7 +712,7 @@ export function POSView() {
 
                           {/* Price and Add Button */}
                           <div className="flex items-center justify-between">
-                            <span className="text-lg font-bold">${product.price.toFixed(2)}</span>
+                            <span className="text-lg font-bold">{formatCurrency(product.price)}</span>
                             <div className="flex items-center gap-2">
                               <Button
                                 size="sm"
@@ -745,7 +791,7 @@ export function POSView() {
 
                           {/* Price and Add Button */}
                           <div className="flex items-center justify-between">
-                            <span className="text-2xl font-bold">${product.price.toFixed(2)}</span>
+                            <span className="text-2xl font-bold">{formatCurrency(product.price)}</span>
                             <div className="flex items-center gap-3">
                               <Button
                                 size="sm"
@@ -827,7 +873,7 @@ export function POSView() {
 
                               {/* Price and Controls */}
                               <div className="flex items-center gap-4 flex-shrink-0">
-                                <span className="text-xl font-bold">${product.price.toFixed(2)}</span>
+                                <span className="text-xl font-bold">{formatCurrency(product.price)}</span>
                                 <div className="flex items-center gap-2">
                                   <Button
                                     size="sm"
@@ -1013,11 +1059,11 @@ export function POSView() {
                           <div className="flex items-center justify-between">
                             <h5 className="font-medium text-foreground truncate">{item.name}</h5>
                             <span className="text-sm font-medium text-foreground ml-2">
-                              ${(item.price * item.quantity).toFixed(2)}
+                              {formatCurrency(item.price * item.quantity)}
                             </span>
                           </div>
                           <div className="flex items-center justify-between mt-1">
-                            <p className="text-sm text-muted-foreground">${item.price.toFixed(2)} each</p>
+                            <p className="text-sm text-muted-foreground">{formatCurrency(item.price)} each</p>
                             <div className="flex items-center gap-2">
                               <Button
                                 size="sm"
@@ -1057,26 +1103,54 @@ export function POSView() {
                   {/* Payment Method */}
                   <div className="space-y-3">
                     <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Payment Method</h4>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Button
-                        variant={paymentMethod === "cash" ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setPaymentMethod("cash")}
-                        className="justify-start"
-                      >
-                        <DollarSign className="w-4 h-4 mr-2" />
-                        Cash
-                      </Button>
-                      <Button
-                        variant={paymentMethod === "card" ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setPaymentMethod("card")}
-                        className="justify-start"
-                      >
-                        <CreditCard className="w-4 h-4 mr-2" />
-                        Card
-                      </Button>
-                    </div>
+                    <Select value={paymentMethod || ""} onValueChange={setPaymentMethod}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select payment method">
+                          {paymentMethod && (
+                            <div className="flex items-center gap-2">
+                              {(() => {
+                                const option = getPaymentOptions().find(opt => opt.id === paymentMethod);
+                                if (!option) return null;
+                                return (
+                                  <>
+                                    {option.type === 'cash' ? (
+                                      <DollarSign className="w-4 h-4" />
+                                    ) : (
+                                      <CreditCard className="w-4 h-4" />
+                                    )}
+                                    <div className="flex flex-col items-start">
+                                      <span>{option.name}</span>
+                                      {option.provider && (
+                                        <span className="text-xs text-muted-foreground">{option.provider}</span>
+                                      )}
+                                    </div>
+                                  </>
+                                );
+                              })()}
+                            </div>
+                          )}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getPaymentOptions().map((option) => (
+                          <SelectItem key={option.id} value={option.id}>
+                            <div className="flex items-center gap-2">
+                              {option.type === 'cash' ? (
+                                <DollarSign className="w-4 h-4" />
+                              ) : (
+                                <CreditCard className="w-4 h-4" />
+                              )}
+                              <div className="flex flex-col items-start">
+                                <span>{option.name}</span>
+                                {option.provider && (
+                                  <span className="text-xs text-muted-foreground">{option.provider}</span>
+                                )}
+                              </div>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   {/* Discount Section */}
@@ -1125,18 +1199,25 @@ export function POSView() {
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Subtotal</span>
-                        <span className="font-medium">${subtotal.toFixed(2)}</span>
+                        <span className="font-medium">{formatCurrency(subtotal)}</span>
                       </div>
                       {discountAmount > 0 && (
                         <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground">Discount</span>
-                          <span className="font-medium text-green-600">-${discountAmount.toFixed(2)}</span>
+                          <span className="font-medium text-green-600">-{formatCurrency(discountAmount)}</span>
                         </div>
                       )}
-                      {taxAmount > 0 && (
+                      {taxAmount > 0 && taxCalculation && (
+                        <TaxDisplay
+                          calculation={taxCalculation}
+                          variant="compact"
+                          showBreakdown={false}
+                        />
+                      )}
+                      {taxAmount > 0 && !taxCalculation && (
                         <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground">Tax ({(taxRate * 100).toFixed(1)}%)</span>
-                          <span className="font-medium">${taxAmount.toFixed(2)}</span>
+                          <span className="font-medium">{formatCurrency(taxAmount)}</span>
                         </div>
                       )}
                     </div>
@@ -1156,11 +1237,11 @@ export function POSView() {
                       </>
                     ) : isOrderValid() ? (
                       <>
-                        Complete Order - ${total.toFixed(2)}
+                        Complete Order - {formatCurrency(total)}
                       </>
                     ) : (
                       <>
-                        Complete Order - ${total.toFixed(2)}
+                        Complete Order - {formatCurrency(total)}
                       </>
                     )}
                   </Button>

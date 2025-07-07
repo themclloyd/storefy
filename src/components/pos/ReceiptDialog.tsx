@@ -8,6 +8,7 @@ import {
 import { OrderReceipt } from "./OrderReceipt";
 import { toast } from "sonner";
 import jsPDF from 'jspdf';
+import { useTax } from "@/hooks/useTax";
 
 interface ReceiptItem {
   id: string;
@@ -62,6 +63,7 @@ export function ReceiptDialog({
   cashierName,
 }: ReceiptDialogProps) {
   const receiptRef = useRef<HTMLDivElement>(null);
+  const { formatCurrency } = useTax();
 
   const handlePrint = () => {
     if (receiptRef.current) {
@@ -193,7 +195,7 @@ export function ReceiptDialog({
       items.forEach(item => {
         addText(`${item.name}`, 9);
         addText(`${item.sku}`, 8);
-        addText(`${item.quantity} x $${item.unit_price.toFixed(2)} = $${item.total_price.toFixed(2)}`, 8);
+        addText(`${item.quantity} x ${formatCurrency(item.unit_price)} = ${formatCurrency(item.total_price)}`, 8);
         yPosition += 1;
       });
 
@@ -202,12 +204,12 @@ export function ReceiptDialog({
       yPosition += 2;
 
       // Totals
-      addText(`Subtotal: $${subtotal.toFixed(2)}`, 9);
+      addText(`Subtotal: ${formatCurrency(subtotal)}`, 9);
       if (discountAmount > 0) {
-        addText(`Discount${discountCode ? ` (${discountCode})` : ''}: -$${discountAmount.toFixed(2)}`, 9);
+        addText(`Discount${discountCode ? ` (${discountCode})` : ''}: -${formatCurrency(discountAmount)}`, 9);
       }
       if (taxAmount > 0) {
-        addText(`Tax (${(taxRate * 100).toFixed(1)}%): $${taxAmount.toFixed(2)}`, 9);
+        addText(`Tax (${(taxRate * 100).toFixed(1)}%): ${formatCurrency(taxAmount)}`, 9);
       }
       addText(`TOTAL: $${total.toFixed(2)}`, 11);
       addText(`Payment: ${paymentMethod}`, 9);

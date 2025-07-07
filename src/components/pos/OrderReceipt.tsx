@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Printer, Download } from "lucide-react";
+import { useTax } from "@/hooks/useTax";
 
 interface ReceiptItem {
   id: string;
@@ -57,6 +58,8 @@ export const OrderReceipt = forwardRef<HTMLDivElement, ReceiptProps>(
     onPrint,
     onDownload,
   }, ref) => {
+    const { formatCurrency } = useTax();
+
     const formatDate = (dateString: string) => {
       return new Date(dateString).toLocaleString();
     };
@@ -132,24 +135,24 @@ export const OrderReceipt = forwardRef<HTMLDivElement, ReceiptProps>(
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Subtotal:</span>
-                <span className="text-foreground">${subtotal.toFixed(2)}</span>
+                <span className="text-foreground">{formatCurrency(subtotal)}</span>
               </div>
-              
+
               {discountAmount > 0 && (
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">
                     Discount {discountCode ? `(${discountCode})` : ''}:
                   </span>
-                  <span className="text-success">-${discountAmount.toFixed(2)}</span>
+                  <span className="text-success">-{formatCurrency(discountAmount)}</span>
                 </div>
               )}
-              
+
               {taxAmount > 0 && (
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">
                     Tax ({(taxRate * 100).toFixed(1)}%):
                   </span>
-                  <span className="text-foreground">${taxAmount.toFixed(2)}</span>
+                  <span className="text-foreground">{formatCurrency(taxAmount)}</span>
                 </div>
               )}
               

@@ -28,6 +28,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useTax } from "@/hooks/useTax";
 import {
   LineChart,
   Line,
@@ -95,6 +96,7 @@ interface TopProduct {
 export function DashboardView() {
   const { currentStore } = useStore();
   const { user } = useAuth();
+  const { formatCurrency } = useTax();
   const [stats, setStats] = useState<DashboardStats>({
     todaysSales: 0,
     yesterdaysSales: 0,
@@ -451,7 +453,7 @@ export function DashboardView() {
           <CardContent>
             <div className="space-y-3">
               <div className="text-3xl font-bold text-green-700 dark:text-green-400 animate-pulse">
-                ${stats.todaysSales.toFixed(2)}
+                {formatCurrency(stats.todaysSales)}
               </div>
               <div className="flex items-center gap-2">
                 {stats.salesGrowth >= 0 ? (
@@ -492,7 +494,7 @@ export function DashboardView() {
           <CardContent>
             <div className="space-y-3">
               <div className="text-3xl font-bold text-blue-700 dark:text-blue-400">
-                ${stats.averageTransactionValue.toFixed(2)}
+                {formatCurrency(stats.averageTransactionValue)}
               </div>
               <div className="text-sm text-muted-foreground">
                 From {stats.totalOrders} orders today
@@ -606,11 +608,11 @@ export function DashboardView() {
                   <YAxis
                     className="text-sm"
                     tick={{ fontSize: 12 }}
-                    tickFormatter={(value) => `$${value}`}
+                    tickFormatter={(value) => formatCurrency(value)}
                   />
                   <Tooltip
                     formatter={(value: any, name: string) => [
-                      name === 'sales' ? `$${value.toFixed(2)}` : value,
+                      name === 'sales' ? formatCurrency(value) : value,
                       name === 'sales' ? 'Sales' : 'Orders'
                     ]}
                     labelStyle={{ color: '#374151' }}
@@ -659,7 +661,7 @@ export function DashboardView() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-green-600">${product.sales.toFixed(2)}</p>
+                      <p className="font-bold text-green-600">{formatCurrency(product.sales)}</p>
                       <div className="w-16 h-2 bg-green-100 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-green-500 transition-all duration-1000 ease-out"
@@ -707,7 +709,7 @@ export function DashboardView() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-green-600">${Number(order.total).toFixed(2)}</p>
+                      <p className="font-bold text-green-600">{formatCurrency(Number(order.total))}</p>
                       <p className="text-sm text-muted-foreground">
                         {new Date(order.created_at).toLocaleTimeString()}
                       </p>
@@ -818,7 +820,7 @@ export function DashboardView() {
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-foreground mb-1">
-                ${stats.inventoryValue.toFixed(0)}
+                {formatCurrency(stats.inventoryValue)}
               </div>
               <div className="text-sm text-muted-foreground">Inventory Value</div>
             </div>
@@ -830,7 +832,7 @@ export function DashboardView() {
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-foreground mb-1">
-                ${stats.averageCustomerValue.toFixed(2)}
+                {formatCurrency(stats.averageCustomerValue)}
               </div>
               <div className="text-sm text-muted-foreground">Avg Customer Value</div>
             </div>

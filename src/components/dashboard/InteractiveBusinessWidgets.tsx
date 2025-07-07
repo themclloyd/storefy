@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { useTax } from "@/hooks/useTax";
 import { 
   ShoppingCart, 
   Package, 
@@ -62,6 +63,7 @@ interface PerformanceComparison {
 
 export function InteractiveBusinessWidgets() {
   const { currentStore } = useStore();
+  const { formatCurrency } = useTax();
   const [selectedTimeframe, setSelectedTimeframe] = useState<'today' | 'week' | 'month'>('today');
 
   const quickActions: QuickAction[] = [
@@ -182,7 +184,7 @@ export function InteractiveBusinessWidgets() {
   const formatValue = (value: number, format: string) => {
     switch (format) {
       case 'currency':
-        return `$${value.toFixed(2)}`;
+        return formatCurrency(value);
       case 'percentage':
         return `${value.toFixed(1)}%`;
       default:
