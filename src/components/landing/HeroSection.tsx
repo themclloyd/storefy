@@ -27,13 +27,15 @@ export const HeroSection = () => {
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 animate-fade-in-up animation-delay-600">
               <Button
                 onClick={() => navigate('/auth')}
-                className="bg-primary hover:bg-primary-dark text-primary-foreground font-medium px-8 h-12 text-base rounded-full transform hover:scale-105 transition-all duration-200 hover:shadow-lg"
+                size="lg"
+                className="font-medium px-8 text-base transform hover:scale-105 transition-all duration-200 hover:shadow-lg"
               >
                 Start Free Trial
               </Button>
               <Button
                 variant="ghost"
-                className="text-muted-foreground hover:text-foreground font-medium px-4 h-12 text-base rounded-full transform hover:scale-105 transition-all duration-200"
+                size="lg"
+                className="text-muted-foreground hover:text-foreground font-medium px-4 text-base transform hover:scale-105 transition-all duration-200"
               >
                 Watch Demo
               </Button>

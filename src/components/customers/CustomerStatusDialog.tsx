@@ -290,7 +290,6 @@ export function CustomerStatusDialog({
           <Button
             onClick={handleStatusUpdate}
             disabled={loading || !newStatus || newStatus === currentStatus}
-            className="bg-gradient-primary text-white"
           >
             {loading ? (
               <>

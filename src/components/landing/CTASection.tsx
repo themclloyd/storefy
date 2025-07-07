@@ -35,19 +35,18 @@ export const CTASection = () => {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up animation-delay-600">
               <Button
-                size="xl"
-                rounded="full"
+                size="lg"
+                variant="secondary"
                 onClick={() => navigate('/auth')}
-                className="bg-background hover:bg-muted text-primary font-medium transform hover:scale-105 transition-all duration-200 hover:shadow-xl flex items-center gap-2"
+                className="font-medium transform hover:scale-105 transition-all duration-200 hover:shadow-xl flex items-center gap-2"
               >
                 Start Free Trial
                 <ArrowRight className="w-4 h-4" />
               </Button>
               <Button
-                size="xl"
-                rounded="full"
-                variant="ghost"
-                className="text-primary-foreground hover:bg-primary-foreground/10 font-medium transform hover:scale-105 transition-all duration-200 flex items-center gap-2"
+                size="lg"
+                variant="outline"
+                className="font-medium transform hover:scale-105 transition-all duration-200 flex items-center gap-2"
               >
                 <Smartphone className="w-4 h-4" />
                 Download Mobile App

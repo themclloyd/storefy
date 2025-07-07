@@ -136,8 +136,7 @@ export function CategoriesView({ onClose, onViewCategoryProducts }: CategoriesVi
           <Button variant="outline" onClick={onClose}>
             Back to Inventory
           </Button>
-          <Button 
-            className="bg-gradient-primary text-white"
+          <Button
             onClick={() => setShowAddDialog(true)}
           >
             <Plus className="w-4 h-4 mr-2" />

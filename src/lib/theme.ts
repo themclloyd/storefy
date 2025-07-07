@@ -3,36 +3,20 @@
  * Centralized theme configuration for consistent design across the application
  */
 
-// Core theme colors based on CSS variables - PayPal Inspired
+// Core theme colors based on CSS variables - Neutral Theme
 export const themeColors = {
-  // Primary brand colors - PayPal Blue
+  // Primary colors
   primary: {
-    DEFAULT: 'hsl(var(--primary))', // #0070BA PayPal Blue
+    DEFAULT: 'hsl(var(--primary))',
     foreground: 'hsl(var(--primary-foreground))',
-    dark: 'hsl(var(--primary-dark))',
-    light: 'hsl(var(--primary-light))',
-    accent: 'hsl(var(--primary-accent))',
   },
 
-  // Secondary brand colors - Clean Gray
+  // Secondary colors
   secondary: {
-    DEFAULT: 'hsl(var(--secondary))', // #F5F7FA Light Gray
+    DEFAULT: 'hsl(var(--secondary))',
     foreground: 'hsl(var(--secondary-foreground))',
-    dark: 'hsl(var(--secondary-dark))',
-    light: 'hsl(var(--secondary-light))',
   },
-  
-  // Tertiary colors
-  tertiary: {
-    DEFAULT: 'hsl(var(--tertiary))', // #10B981
-    foreground: 'hsl(var(--tertiary-foreground))',
-  },
-  
-  quaternary: {
-    DEFAULT: 'hsl(var(--quaternary))', // #F59E0B
-    foreground: 'hsl(var(--quaternary-foreground))',
-  },
-  
+
   // Neutral colors
   background: 'hsl(var(--background))',
   foreground: 'hsl(var(--foreground))',
@@ -40,38 +24,36 @@ export const themeColors = {
     DEFAULT: 'hsl(var(--muted))',
     foreground: 'hsl(var(--muted-foreground))',
   },
-  
+
   // Card colors
   card: {
     DEFAULT: 'hsl(var(--card))',
     foreground: 'hsl(var(--card-foreground))',
-    border: 'hsl(var(--card-border))',
-    hover: 'hsl(var(--card-hover))',
   },
-  
+
   // Status colors
-  success: {
-    DEFAULT: 'hsl(var(--success))',
-    foreground: 'hsl(var(--success-foreground))',
-    light: 'hsl(var(--success-light))',
-  },
-  
-  warning: {
-    DEFAULT: 'hsl(var(--warning))',
-    foreground: 'hsl(var(--warning-foreground))',
-    light: 'hsl(var(--warning-light))',
-  },
-  
   destructive: {
     DEFAULT: 'hsl(var(--destructive))',
     foreground: 'hsl(var(--destructive-foreground))',
-    light: 'hsl(var(--destructive-light))',
   },
-  
-  info: {
-    DEFAULT: 'hsl(var(--info))',
-    foreground: 'hsl(var(--info-foreground))',
-    light: 'hsl(var(--info-light))',
+
+  // Interactive elements
+  accent: {
+    DEFAULT: 'hsl(var(--accent))',
+    foreground: 'hsl(var(--accent-foreground))',
+  },
+
+  border: 'hsl(var(--border))',
+  input: 'hsl(var(--input))',
+  ring: 'hsl(var(--ring))',
+
+  // Chart colors
+  chart: {
+    1: 'hsl(var(--chart-1))',
+    2: 'hsl(var(--chart-2))',
+    3: 'hsl(var(--chart-3))',
+    4: 'hsl(var(--chart-4))',
+    5: 'hsl(var(--chart-5))',
   },
 } as const;
 
@@ -125,18 +107,18 @@ export const spacing = {
   32: '8rem',     // 128px
 } as const;
 
-// Border radius system - PayPal Style
+// Border radius system - Neutral Theme
 export const borderRadius = {
   none: '0',
   sm: '0.25rem',    // 4px
-  DEFAULT: '0.375rem', // 6px - PayPal standard
+  DEFAULT: '0.5rem', // 8px - Neutral theme standard
   md: '0.5rem',     // 8px
   lg: '0.75rem',    // 12px
   xl: '1rem',       // 16px
   '2xl': '1.5rem',  // 24px
   '3xl': '2rem',    // 32px
   '4xl': '2.5rem',  // 40px
-  full: '9999px',   // Fully rounded - PayPal buttons
+  full: '9999px',   // Fully rounded
 } as const;
 
 // Shadow system
@@ -151,31 +133,27 @@ export const shadows = {
   none: '0 0 #0000',
 } as const;
 
-// Component variants - PayPal Style
+// Component variants - Neutral Theme
 export const componentVariants = {
   button: {
-    primary: 'bg-primary hover:bg-primary-dark text-primary-foreground rounded-full shadow-soft',
-    secondary: 'bg-secondary hover:bg-secondary-dark text-secondary-foreground border border-border rounded-full shadow-soft',
-    success: 'bg-success hover:bg-success/90 text-success-foreground rounded-full shadow-soft',
-    warning: 'bg-warning hover:bg-warning/90 text-warning-foreground rounded-full shadow-soft',
-    destructive: 'bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-full shadow-soft',
-    outline: 'border border-border bg-background hover:bg-muted text-foreground rounded-full shadow-soft',
-    ghost: 'hover:bg-muted text-foreground rounded-full',
+    primary: 'bg-primary hover:bg-primary/90 text-primary-foreground rounded-md',
+    secondary: 'bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border rounded-md',
+    destructive: 'bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-md',
+    outline: 'border border-border bg-background hover:bg-accent text-foreground rounded-md',
+    ghost: 'hover:bg-accent text-foreground rounded-md',
   },
 
   card: {
-    default: 'bg-card border border-card-border shadow-soft rounded-lg',
-    elevated: 'bg-card border border-card-border shadow-medium rounded-lg',
-    interactive: 'bg-card border border-card-border shadow-soft hover:shadow-medium hover:bg-card-hover transition-all rounded-lg',
+    default: 'bg-card border border-border rounded-lg',
+    elevated: 'bg-card border border-border shadow-sm rounded-lg',
+    interactive: 'bg-card border border-border hover:bg-accent/50 transition-colors rounded-lg',
   },
 
   badge: {
-    primary: 'bg-primary/10 text-primary border-primary/20 rounded-full',
-    secondary: 'bg-secondary/10 text-secondary border-secondary/20 rounded-full',
-    success: 'bg-success/10 text-success border-success/20 rounded-full',
-    warning: 'bg-warning/10 text-warning border-warning/20 rounded-full',
-    destructive: 'bg-destructive/10 text-destructive border-destructive/20 rounded-full',
-    muted: 'bg-muted text-muted-foreground border-border rounded-full',
+    primary: 'bg-primary/10 text-primary border-primary/20 rounded-md',
+    secondary: 'bg-secondary/10 text-secondary-foreground border-secondary/20 rounded-md',
+    destructive: 'bg-destructive/10 text-destructive border-destructive/20 rounded-md',
+    muted: 'bg-muted text-muted-foreground border-border rounded-md',
   },
 } as const;
 

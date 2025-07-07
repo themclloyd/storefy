@@ -111,22 +111,22 @@ export function CustomerDetailsModal({
   const getStatusColor = (status: string | null) => {
     switch (status) {
       case 'vip':
-        return 'bg-warning text-warning-foreground';
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400';
       case 'active':
-        return 'bg-success/10 text-success';
+        return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
       case 'inactive':
         return 'text-muted-foreground';
       default:
-        return 'bg-success/10 text-success';
+        return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
     }
   };
 
   const getOrderStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
-        return 'bg-success/10 text-success';
+        return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
       case 'pending':
-        return 'bg-warning/10 text-warning';
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400';
       case 'cancelled':
         return 'bg-destructive/10 text-destructive';
       case 'refunded':

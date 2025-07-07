@@ -91,10 +91,10 @@ export const PricingSection = () => {
 
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto animate-stagger">
           {pricingPlans.map((plan, index) => (
-            <div key={index} className={`relative ${plan.popular ? 'bg-primary text-primary-foreground shadow-xl scale-105' : 'bg-card text-card-foreground shadow-lg'} rounded-2xl p-8 transition-all duration-300 border ${plan.popular ? 'border-primary' : 'border-card-border'} animate-fade-in-up hover-lift`}>
+            <div key={index} className={`relative ${plan.popular ? 'bg-primary text-primary-foreground shadow-xl scale-105' : 'bg-card text-card-foreground shadow-lg'} rounded-2xl p-8 transition-all duration-300 border ${plan.popular ? 'border-primary' : 'border-border'} animate-fade-in-up hover-lift`}>
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-primary-dark text-primary-foreground px-4 py-2 rounded-full text-sm font-medium shadow-lg">
+                  <span className="bg-primary/90 text-primary-foreground px-4 py-2 rounded-full text-sm font-medium shadow-lg">
                     Most Popular
                   </span>
                 </div>
@@ -124,11 +124,11 @@ export const PricingSection = () => {
                 </ul>
 
                 <Button
-                  rounded="full"
                   className={`w-full h-12 font-medium ${plan.popular
                     ? 'bg-background hover:bg-muted text-primary shadow-lg'
-                    : 'bg-primary hover:bg-primary-dark text-primary-foreground'
+                    : ''
                   } transform hover:scale-105 transition-all duration-200`}
+                  variant={plan.popular ? "outline" : "default"}
                   onClick={() => navigate('/auth')}
                 >
                   Start Free Trial

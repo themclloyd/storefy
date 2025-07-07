@@ -285,7 +285,6 @@ export function LaybyInterestCalculator({ open, onOpenChange, onSuccess }: Layby
                 <Button
                   onClick={handleApplyInterest}
                   disabled={selectedLaybys.length === 0 || applying}
-                  className="bg-gradient-primary text-white"
                 >
                   {applying ? "Applying..." : `Apply Interest ($${totalInterestToApply.toFixed(2)})`}
                 </Button>

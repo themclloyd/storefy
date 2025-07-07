@@ -27,27 +27,57 @@ export function AuthPage() {
     }
   }, [user, navigate]);
 
+  // Test Supabase connection on component mount
+  useEffect(() => {
+    const testConnection = async () => {
+      try {
+        console.log('Testing Supabase connection...');
+        const { data, error } = await supabase.auth.getSession();
+        console.log('Supabase session test:', { data, error });
+
+        // Test a simple query
+        const { data: testData, error: testError } = await supabase
+          .from('profiles')
+          .select('count')
+          .limit(1);
+        console.log('Supabase query test:', { testData, testError });
+      } catch (err) {
+        console.error('Supabase connection test failed:', err);
+      }
+    };
+    testConnection();
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
+    console.log('Attempting login with:', { email, password: '***' });
+
     try {
       if (isLogin) {
         const { error } = await signIn(email, password);
+        console.log('Sign in result:', { error });
         if (error) {
-          setError(error.message);
+          console.error('Sign in error:', error);
+          setError(`Login failed: ${error.message}`);
+        } else {
+          console.log('Sign in successful');
         }
       } else {
         const { error } = await signUp(email, password, displayName);
+        console.log('Sign up result:', { error });
         if (error) {
-          setError(error.message);
+          console.error('Sign up error:', error);
+          setError(`Sign up failed: ${error.message}`);
         } else {
           setError('Check your email for the confirmation link!');
         }
       }
     } catch (err) {
-      setError('An unexpected error occurred');
+      console.error('Unexpected error:', err);
+      setError(`An unexpected error occurred: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
@@ -151,7 +181,6 @@ export function AuthPage() {
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   required={!isLogin}
-                  className="h-12 rounded-xl border-border"
                 />
               </div>
             )}
@@ -167,7 +196,6 @@ export function AuthPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="h-12 rounded-xl border-border"
               />
             </div>
 
@@ -179,10 +207,10 @@ export function AuthPage() {
                 {isLogin && (
                   <Button
                     type="button"
-                    variant="ghost"
+                    variant="link"
                     onClick={handleForgotPassword}
                     disabled={forgotPasswordLoading}
-                    className="text-xs text-primary hover:text-primary/80 hover:bg-transparent p-0 h-auto"
+                    className="text-xs p-0 h-auto"
                   >
                     {forgotPasswordLoading ? 'Sending...' : 'Forgot password?'}
                   </Button>
@@ -197,13 +225,14 @@ export function AuthPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={6}
-                  className="h-12 rounded-xl border-border pr-12"
+                  className="pr-10"
                 />
                 <Button
                   type="button"
                   variant="ghost"
+                  size="icon"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-0 top-0 h-12 w-12 rounded-xl hover:bg-transparent"
+                  className="absolute right-0 top-0 h-10 w-10"
                 >
                   {showPassword ? (
                     <EyeOff className="w-4 h-4 text-muted-foreground" />
@@ -215,7 +244,7 @@ export function AuthPage() {
             </div>
 
             {error && (
-              <div className="flex items-center gap-2 p-4 bg-destructive/10 border border-destructive/20 rounded-xl">
+              <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
                 <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0" />
                 <p className="text-sm text-destructive">{error}</p>
               </div>
@@ -223,7 +252,7 @@ export function AuthPage() {
 
             <Button
               type="submit"
-              className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary-dark rounded-xl font-medium"
+              className="w-full h-12"
               disabled={loading}
             >
               {loading ? (
@@ -263,7 +292,7 @@ export function AuthPage() {
                 <Button
                   variant="outline"
                   onClick={() => navigate('/pin-login')}
-                  className="w-full h-12 border-primary/20 text-primary hover:bg-primary/5 rounded-xl"
+                  className="w-full"
                 >
                   <KeyRound className="w-4 h-4 mr-2" />
                   Team Member PIN Login
@@ -273,13 +302,12 @@ export function AuthPage() {
 
             <div className="text-center">
               <Button
-                variant="ghost"
+                variant="link"
                 onClick={() => {
                   setIsLogin(!isLogin);
                   setError('');
                   setShowPassword(false);
                 }}
-                className="text-primary hover:text-primary/80 hover:bg-transparent"
               >
                 {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
               </Button>

@@ -377,7 +377,6 @@ export function InventoryView() {
             Manage Suppliers
           </Button>
           <Button
-            className="bg-gradient-primary text-white"
             onClick={() => setShowAddDialog(true)}
           >
             <Plus className="w-4 h-4 mr-2" />

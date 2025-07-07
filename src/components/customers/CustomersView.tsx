@@ -168,7 +168,6 @@ export function CustomersView() {
             Export
           </Button>
           <Button
-            className="bg-gradient-primary text-white"
             onClick={() => setAddDialogOpen(true)}
           >
             <Plus className="w-4 h-4 mr-2" />

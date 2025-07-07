@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { StoreProvider } from "@/contexts/StoreContext";
-import { ThemeToggleButton } from './components/ui/button';
+import { ThemeToggleButton } from './components/ui/theme-toggle';
 
 // Lazy load page components
 const LandingPage = lazy(() => import("./pages/LandingPage"));
@@ -15,7 +15,7 @@ const AuthPage = lazy(() => import("./pages/AuthPage"));
 const PinLoginPage = lazy(() => import("./pages/PinLoginPage"));
 const StoreLoginPage = lazy(() => import("./pages/StoreLoginPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-const PayPalStyleDemo = lazy(() => import("./components/demo/PayPalStyleDemo").then(module => ({ default: module.PayPalStyleDemo })));
+
 
 // Loading component for page-level Suspense
 const PageLoader = () => (
@@ -58,7 +58,7 @@ const App = () => (
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="/pin-login" element={<PinLoginPage />} />
                 <Route path="/store/:storeCode" element={<StoreLoginPage />} />
-                <Route path="/paypal-demo" element={<PayPalStyleDemo />} />
+
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

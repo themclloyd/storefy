@@ -162,7 +162,7 @@ export default function PinLoginPage() {
 
             <Button
               type="submit"
-              className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary-dark rounded-xl font-medium"
+              className="w-full h-12"
               disabled={loading}
             >
               {loading ? (

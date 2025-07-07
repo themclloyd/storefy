@@ -5,6 +5,9 @@ import { useStore } from "@/contexts/StoreContext";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { StoreSelector } from "@/components/stores/StoreSelector";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import { PanelLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 // Lazy load view components for code splitting
 const DashboardView = lazy(() => import("@/components/dashboard/DashboardView").then(module => ({ default: module.DashboardView })));
@@ -207,24 +210,26 @@ const Index = () => {
     }
 
     return (
-      <div className="h-screen flex bg-background">
-        {/* Sidebar for PIN users */}
-        <div className="w-64 flex-shrink-0">
-          <Sidebar
-            activeView={activeView}
-            onViewChange={handleViewChange}
-            currentStore={pinData.store_name}
-          />
-        </div>
-        
-        {/* Main Content */}
-        <div className="flex-1 overflow-auto">
-          <div className="p-8">
-
-            {renderView()}
+      <SidebarProvider defaultOpen={true}>
+        <Sidebar
+          activeView={activeView}
+          onViewChange={handleViewChange}
+          currentStore={pinData.store_name}
+        />
+        <SidebarInset>
+          <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+            <SidebarTrigger className="-ml-1" />
+            <div className="ml-auto">
+              <h1 className="text-lg font-semibold">{pinData.store_name}</h1>
+            </div>
+          </header>
+          <div className="flex-1 overflow-auto">
+            <div className="p-6">
+              {renderView()}
+            </div>
           </div>
-        </div>
-      </div>
+        </SidebarInset>
+      </SidebarProvider>
     );
   }
 
@@ -239,24 +244,26 @@ const Index = () => {
   }
 
   return (
-    <div className="h-screen flex bg-background">
-      {/* Sidebar */}
-      <div className="w-64 flex-shrink-0">
-        <Sidebar
-          activeView={activeView}
-          onViewChange={handleViewChange}
-          currentStore={currentStore.name}
-        />
-      </div>
-      
-      {/* Main Content */}
-      <div className="flex-1 overflow-auto">
-        <div className="p-8">
-
-          {renderView()}
+    <SidebarProvider defaultOpen={true}>
+      <Sidebar
+        activeView={activeView}
+        onViewChange={handleViewChange}
+        currentStore={currentStore.name}
+      />
+      <SidebarInset>
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+          <SidebarTrigger className="-ml-1" />
+          <div className="ml-auto">
+            <h1 className="text-lg font-semibold">{currentStore.name}</h1>
+          </div>
+        </header>
+        <div className="flex-1 overflow-auto">
+          <div className="p-6">
+            {renderView()}
+          </div>
         </div>
-      </div>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 };
 

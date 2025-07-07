@@ -256,7 +256,6 @@ export function AddCustomerDialog({ open, onOpenChange, onCustomerAdded }: AddCu
               <Button
                 type="submit"
                 disabled={loading}
-                className="bg-gradient-primary text-white"
               >
                 {loading ? (
                   <>

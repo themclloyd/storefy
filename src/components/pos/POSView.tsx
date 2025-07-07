@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, Plus, Minus, Trash2, Percent, DollarSign, CreditCard, Search, Loader2, User, UserPlus, History } from "lucide-react";
+import { ShoppingCart, Plus, Minus, Trash2, Percent, DollarSign, CreditCard, Search, Loader2, User, UserPlus, History, Grid3X3, List, LayoutGrid } from "lucide-react";
 import { useStore } from "@/contexts/StoreContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,6 +19,7 @@ interface CartItem {
   quantity: number;
   sku: string;
   stock_quantity: number;
+  image_url: string | null;
 }
 
 interface Product {
@@ -63,6 +64,7 @@ export function POSView() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"grid" | "compact" | "list">("compact");
 
   // Customer management state
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -195,7 +197,8 @@ export function POSView() {
         price: product.price,
         quantity: 1,
         sku: product.sku,
-        stock_quantity: product.stock_quantity
+        stock_quantity: product.stock_quantity,
+        image_url: product.image_url
       }]);
     }
   };
@@ -214,6 +217,71 @@ export function POSView() {
       setCart(cart.map(item =>
         item.id === id ? { ...item, quantity } : item
       ));
+    }
+  };
+
+  // Helper function to get quantity of a product in cart
+  const getCartQuantity = (productId: string) => {
+    const cartItem = cart.find(item => item.id === productId);
+    return cartItem ? cartItem.quantity : 0;
+  };
+
+  // Helper function to check if order is ready to process
+  const isOrderValid = () => {
+    return cart.length > 0 && selectedCustomer && paymentMethod &&
+           cart.every(item => item.quantity <= item.stock_quantity && item.stock_quantity > 0);
+  };
+
+  // Function to show validation errors when user clicks disabled button
+  const showValidationErrors = () => {
+    const validationErrors = [];
+
+    if (cart.length === 0) {
+      validationErrors.push('Add products to your cart');
+    }
+
+    if (!selectedCustomer) {
+      validationErrors.push('Select a customer');
+    }
+
+    if (!paymentMethod) {
+      validationErrors.push('Choose a payment method (Cash or Card)');
+    }
+
+    const stockErrors = [];
+    cart.forEach(item => {
+      if (item.quantity > item.stock_quantity) {
+        stockErrors.push(`${item.name}: Only ${item.stock_quantity} available`);
+      }
+      if (item.stock_quantity <= 0) {
+        stockErrors.push(`${item.name}: Out of stock`);
+      }
+    });
+
+    if (stockErrors.length > 0) {
+      validationErrors.push(...stockErrors);
+    }
+
+    if (validationErrors.length > 0) {
+      toast.error(
+        <div className="space-y-2">
+          <div className="font-semibold">Complete these steps to checkout:</div>
+          <ul className="text-sm space-y-1">
+            {validationErrors.map((error, index) => (
+              <li key={index} className="flex items-start gap-2">
+                <span className="text-orange-500 mt-0.5">•</span>
+                <span>{error}</span>
+              </li>
+            ))}
+          </ul>
+        </div>,
+        {
+          duration: 5000,
+          style: {
+            maxWidth: '350px',
+          }
+        }
+      );
     }
   };
 
@@ -241,8 +309,66 @@ export function POSView() {
 
   // Process order
   const processOrder = async () => {
-    if (!currentStore || !user || cart.length === 0) {
-      toast.error('Cannot process order: missing required information');
+    // Comprehensive validation
+    const validationErrors = [];
+
+    // 1. Validate system requirements
+    if (!currentStore || !user) {
+      validationErrors.push('System error - missing store or user information');
+    }
+
+    // 2. Validate cart has products
+    if (cart.length === 0) {
+      validationErrors.push('Cart is empty - please add products to continue');
+    }
+
+    // 3. Validate customer is selected
+    if (!selectedCustomer) {
+      validationErrors.push('Customer is required - please select a customer from the list');
+    }
+
+    // 4. Validate payment method is selected
+    if (!paymentMethod) {
+      validationErrors.push('Payment method is required - please select Cash or Card');
+    }
+
+    // 5. Validate product stock availability
+    const stockErrors = [];
+    cart.forEach(item => {
+      if (item.quantity > item.stock_quantity) {
+        stockErrors.push(`${item.name}: Only ${item.stock_quantity} available, but ${item.quantity} requested`);
+      }
+      if (item.stock_quantity <= 0) {
+        stockErrors.push(`${item.name}: Out of stock`);
+      }
+    });
+
+    if (stockErrors.length > 0) {
+      validationErrors.push(...stockErrors);
+    }
+
+    // Show validation errors if any
+    if (validationErrors.length > 0) {
+      toast.error(
+        <div className="space-y-2">
+          <div className="font-semibold text-red-600">⚠️ Cannot Process Order</div>
+          <div className="text-sm">Please fix the following issues:</div>
+          <ul className="text-sm space-y-1">
+            {validationErrors.map((error, index) => (
+              <li key={index} className="flex items-start gap-1">
+                <span className="text-red-500 mt-0.5">•</span>
+                <span>{error}</span>
+              </li>
+            ))}
+          </ul>
+        </div>,
+        {
+          duration: 8000,
+          style: {
+            maxWidth: '400px',
+          }
+        }
+      );
       return;
     }
 
@@ -405,9 +531,9 @@ export function POSView() {
 
   return (
     <>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
       {/* Products Section */}
-      <div className="space-y-6">
+      <div className="lg:col-span-2 space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-foreground">POS System</h1>
@@ -423,100 +549,39 @@ export function POSView() {
           </Button>
         </div>
 
-        {/* Customer Selection */}
-        <Card className="card-professional">
+
+
+        <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-foreground">
-              <User className="w-5 h-5" />
-              Customer
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {selectedCustomer ? (
-              <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                <div>
-                  <h4 className="font-medium text-foreground">{selectedCustomer.name}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedCustomer.email || selectedCustomer.phone || 'No contact info'}
-                  </p>
-                </div>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-foreground">Products</CardTitle>
+              <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
                 <Button
-                  variant="outline"
+                  variant={viewMode === "compact" ? "default" : "ghost"}
                   size="sm"
-                  onClick={() => setSelectedCustomer(null)}
+                  onClick={() => setViewMode("compact")}
+                  className="h-8 w-8 p-0"
                 >
-                  Change
+                  <Grid3X3 className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant={viewMode === "grid" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("grid")}
+                  className="h-8 w-8 p-0"
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant={viewMode === "list" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("list")}
+                  className="h-8 w-8 p-0"
+                >
+                  <List className="w-4 h-4" />
                 </Button>
               </div>
-            ) : (
-              <div className="space-y-3">
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowCustomerSearch(!showCustomerSearch)}
-                    className="flex-1"
-                  >
-                    <User className="w-4 h-4 mr-2" />
-                    Select Customer
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowAddCustomer(true)}
-                  >
-                    <UserPlus className="w-4 h-4 mr-2" />
-                    New
-                  </Button>
-                </div>
-
-                {showCustomerSearch && (
-                  <div className="space-y-2">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                      <Input
-                        placeholder="Search customers..."
-                        value={customerSearchTerm}
-                        onChange={(e) => setCustomerSearchTerm(e.target.value)}
-                        className="pl-10"
-                      />
-                    </div>
-
-                    {customerSearchTerm && (
-                      <div className="max-h-40 overflow-y-auto border border-border rounded-md">
-                        {filteredCustomers.length === 0 ? (
-                          <div className="p-3 text-center text-muted-foreground text-sm">
-                            No customers found
-                          </div>
-                        ) : (
-                          filteredCustomers.map((customer) => (
-                            <div
-                              key={customer.id}
-                              className="p-3 hover:bg-muted/50 cursor-pointer border-b border-border last:border-b-0"
-                              onClick={() => {
-                                setSelectedCustomer(customer);
-                                setShowCustomerSearch(false);
-                                setCustomerSearchTerm("");
-                              }}
-                            >
-                              <div className="font-medium text-foreground">{customer.name}</div>
-                              <div className="text-sm text-muted-foreground">
-                                {customer.email || customer.phone || 'No contact info'}
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className="card-professional">
-          <CardHeader>
-            <CardTitle className="text-foreground">Products</CardTitle>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Search and Filter Controls */}
@@ -544,7 +609,7 @@ export function POSView() {
               </select>
             </div>
 
-            {/* Products Grid */}
+            {/* Products Display */}
             {loading ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
@@ -555,192 +620,551 @@ export function POSView() {
                 {searchTerm || selectedCategory ? 'No products found matching your criteria' : 'No products available'}
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {filteredProducts.map((product) => (
-                  <div
-                    key={product.id}
-                    className="p-4 border border-border rounded-lg hover:shadow-medium transition-smooth cursor-pointer"
-                    onClick={() => addToCart(product)}
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-medium text-foreground">{product.name}</h3>
-                      <Badge variant="secondary" className="text-xs">{product.sku}</Badge>
-                    </div>
-                    <div className="flex justify-between items-center mb-2">
-                      <p className="text-2xl font-bold text-primary">${product.price.toFixed(2)}</p>
-                      <Badge variant={product.stock_quantity > 0 ? "default" : "destructive"} className="text-xs">
-                        Stock: {product.stock_quantity}
-                      </Badge>
-                    </div>
-                    {product.categories && (
-                      <p className="text-xs text-muted-foreground mb-2">{product.categories.name}</p>
-                    )}
-                    <Button
-                      className="w-full mt-2"
-                      size="sm"
-                      disabled={product.stock_quantity === 0}
-                    >
-                      <Plus className="w-4 h-4 mr-1" />
-                      {product.stock_quantity === 0 ? 'Out of Stock' : 'Add to Cart'}
-                    </Button>
+              <>
+                {/* Compact View */}
+                {viewMode === "compact" && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {filteredProducts.map((product) => (
+                      <Card
+                        key={product.id}
+                        className="cursor-pointer hover:shadow-md transition-shadow overflow-hidden"
+                        onClick={() => addToCart(product)}
+                      >
+                        {/* Product Image */}
+                        <div className="aspect-[4/3] bg-muted overflow-hidden">
+                          {product.image_url ? (
+                            <img
+                              src={product.image_url}
+                              alt={product.name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.nextElementSibling.style.display = 'flex';
+                              }}
+                            />
+                          ) : null}
+                          <div className={`w-full h-full flex items-center justify-center ${product.image_url ? 'hidden' : 'flex'}`}>
+                            <span className="text-2xl font-semibold text-muted-foreground">
+                              {product.name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                        </div>
+
+                        <CardContent className="p-4">
+                          <h3 className="font-semibold text-sm mb-2 line-clamp-2 leading-tight">{product.name}</h3>
+                          <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
+                            {product.categories?.name || 'No category'} • {product.sku}
+                          </p>
+
+                          {/* Stock indicator */}
+                          <div className="flex items-center justify-between mb-3">
+                            <span className="text-xs text-muted-foreground">{product.stock_quantity} Available</span>
+                            <Badge variant={product.stock_quantity > 0 ? "default" : "destructive"} className="text-xs">
+                              {product.stock_quantity > 0 ? 'In Stock' : 'Out of Stock'}
+                            </Badge>
+                          </div>
+
+                          {/* Price and Add Button */}
+                          <div className="flex items-center justify-between">
+                            <span className="text-lg font-bold">${product.price.toFixed(2)}</span>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 w-8 p-0 rounded-full"
+                                disabled={getCartQuantity(product.id) === 0}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  updateQuantity(product.id, getCartQuantity(product.id) - 1);
+                                }}
+                              >
+                                <Minus className="w-4 h-4" />
+                              </Button>
+                              <span className="w-8 text-center font-medium">{getCartQuantity(product.id)}</span>
+                              <Button
+                                size="sm"
+                                className="h-8 w-8 p-0 rounded-full"
+                                disabled={product.stock_quantity === 0}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  addToCart(product);
+                                }}
+                              >
+                                <Plus className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
                   </div>
-                ))}
-              </div>
+                )}
+
+                {/* Grid View */}
+                {viewMode === "grid" && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredProducts.map((product) => (
+                      <Card
+                        key={product.id}
+                        className="cursor-pointer hover:shadow-lg transition-shadow overflow-hidden"
+                        onClick={() => addToCart(product)}
+                      >
+                        {/* Product Image */}
+                        <div className="aspect-[4/3] bg-muted overflow-hidden">
+                          {product.image_url ? (
+                            <img
+                              src={product.image_url}
+                              alt={product.name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.nextElementSibling.style.display = 'flex';
+                              }}
+                            />
+                          ) : null}
+                          <div className={`w-full h-full flex items-center justify-center ${product.image_url ? 'hidden' : 'flex'}`}>
+                            <span className="text-4xl font-semibold text-muted-foreground">
+                              {product.name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                        </div>
+
+                        <CardContent className="p-6">
+                          <h3 className="font-semibold text-lg mb-2 line-clamp-2">{product.name}</h3>
+                          <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+                            {product.categories?.name || 'No category'} • SKU: {product.sku}
+                          </p>
+
+                          {/* Stock indicator */}
+                          <div className="flex items-center justify-between mb-4">
+                            <span className="text-sm text-muted-foreground">{product.stock_quantity} Available</span>
+                            <Badge variant={product.stock_quantity > 0 ? "default" : "destructive"}>
+                              {product.stock_quantity > 0 ? 'In Stock' : 'Out of Stock'}
+                            </Badge>
+                          </div>
+
+                          {/* Price and Add Button */}
+                          <div className="flex items-center justify-between">
+                            <span className="text-2xl font-bold">${product.price.toFixed(2)}</span>
+                            <div className="flex items-center gap-3">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-10 w-10 p-0 rounded-full"
+                                disabled={getCartQuantity(product.id) === 0}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  updateQuantity(product.id, getCartQuantity(product.id) - 1);
+                                }}
+                              >
+                                <Minus className="w-5 h-5" />
+                              </Button>
+                              <span className="w-10 text-center font-semibold">{getCartQuantity(product.id)}</span>
+                              <Button
+                                size="sm"
+                                className="h-10 w-10 p-0 rounded-full"
+                                disabled={product.stock_quantity === 0}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  addToCart(product);
+                                }}
+                              >
+                                <Plus className="w-5 h-5" />
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+
+                {/* List View */}
+                {viewMode === "list" && (
+                  <div className="space-y-3">
+                    {filteredProducts.map((product) => (
+                      <Card
+                        key={product.id}
+                        className="cursor-pointer hover:shadow-md transition-shadow"
+                        onClick={() => addToCart(product)}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-center">
+                            {/* Product Image */}
+                            <div className="w-20 h-20 bg-muted rounded-lg overflow-hidden flex-shrink-0 mr-4">
+                              {product.image_url ? (
+                                <img
+                                  src={product.image_url}
+                                  alt={product.name}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                    e.currentTarget.nextElementSibling.style.display = 'flex';
+                                  }}
+                                />
+                              ) : null}
+                              <div className={`w-full h-full flex items-center justify-center ${product.image_url ? 'hidden' : 'flex'}`}>
+                                <span className="text-xl font-semibold text-muted-foreground">
+                                  {product.name.charAt(0).toUpperCase()}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Product Info */}
+                            <div className="flex items-center justify-between flex-1 min-w-0">
+                              <div className="flex-1 min-w-0 mr-4">
+                                <h3 className="font-semibold text-base mb-1 truncate">{product.name}</h3>
+                                <p className="text-sm text-muted-foreground mb-2">
+                                  {product.categories?.name || 'No category'} • SKU: {product.sku}
+                                </p>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm text-muted-foreground">{product.stock_quantity} Available</span>
+                                  <Badge variant={product.stock_quantity > 0 ? "default" : "destructive"} className="text-xs">
+                                    {product.stock_quantity > 0 ? 'In Stock' : 'Out of Stock'}
+                                  </Badge>
+                                </div>
+                              </div>
+
+                              {/* Price and Controls */}
+                              <div className="flex items-center gap-4 flex-shrink-0">
+                                <span className="text-xl font-bold">${product.price.toFixed(2)}</span>
+                                <div className="flex items-center gap-2">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="h-8 w-8 p-0 rounded-full"
+                                    disabled={getCartQuantity(product.id) === 0}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      updateQuantity(product.id, getCartQuantity(product.id) - 1);
+                                    }}
+                                  >
+                                    <Minus className="w-4 h-4" />
+                                  </Button>
+                                  <span className="w-8 text-center font-medium">{getCartQuantity(product.id)}</span>
+                                  <Button
+                                    size="sm"
+                                    className="h-8 w-8 p-0 rounded-full"
+                                    disabled={product.stock_quantity === 0}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      addToCart(product);
+                                    }}
+                                  >
+                                    <Plus className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </CardContent>
         </Card>
       </div>
 
       {/* Cart Section */}
-      <div className="space-y-6">
-        <Card className="card-professional h-fit">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2 text-foreground">
-              <ShoppingCart className="w-5 h-5" />
-              Shopping Cart ({cart.length} items)
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {cart.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">Cart is empty</p>
-            ) : (
-              <>
-                {/* Cart Items */}
-                <div className="space-y-3 max-h-64 overflow-y-auto">
-                  {cart.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-foreground">{item.name}</h4>
-                        <p className="text-sm text-muted-foreground">${item.price} each</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        >
-                          <Minus className="w-3 h-3" />
-                        </Button>
-                        <span className="w-8 text-center font-medium">{item.quantity}</span>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        >
-                          <Plus className="w-3 h-3" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => updateQuantity(item.id, 0)}
-                          className="text-destructive"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+      <div className="lg:col-span-1 space-y-6">
+        <Card className="sticky top-4 h-[85vh] flex flex-col">
+          <CardHeader className="pb-4 flex-shrink-0">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <ShoppingCart className="w-5 h-5 text-primary" />
+                <CardTitle className="text-foreground">Cart Summary</CardTitle>
+              </div>
+              <Badge variant="secondary" className="text-xs">
+                {cart.length} items
+              </Badge>
+            </div>
 
-                {/* Discount Section */}
-                <div className="border-t pt-4">
-                  <h4 className="font-medium text-foreground mb-3">Apply Discount</h4>
-                  <div className="space-y-3">
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant={discountType === "percent" ? "default" : "outline"}
-                        onClick={() => setDiscountType("percent")}
-                      >
-                        <Percent className="w-3 h-3 mr-1" />
-                        %
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant={discountType === "fixed" ? "default" : "outline"}
-                        onClick={() => setDiscountType("fixed")}
-                      >
-                        <DollarSign className="w-3 h-3 mr-1" />
-                        $
-                      </Button>
-                      <Input
-                        placeholder={discountType === "percent" ? "10" : "5.00"}
-                        value={discountValue}
-                        onChange={(e) => setDiscountValue(e.target.value)}
-                        className="flex-1"
-                      />
+            {/* Customer Selection */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <User className="w-4 h-4" />
+                <span className="font-medium">Customer</span>
+              </div>
+
+              {selectedCustomer ? (
+                <div className="flex items-center justify-between p-2 bg-muted/30 rounded-md">
+                  <div className="min-w-0 flex-1">
+                    <div className="font-medium text-sm truncate">{selectedCustomer.name}</div>
+                    <div className="text-xs text-muted-foreground truncate">
+                      {selectedCustomer.email || selectedCustomer.phone || 'No contact info'}
                     </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedCustomer(null)}
+                    className="h-6 px-2 text-xs flex-shrink-0 ml-2"
+                  >
+                    Change
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowCustomerSearch(!showCustomerSearch)}
+                    className="flex-1 h-8 text-xs"
+                  >
+                    <User className="w-3 h-3 mr-1" />
+                    Select Customer
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowAddCustomer(true)}
+                    className="h-8 px-2"
+                  >
+                    <UserPlus className="w-3 h-3" />
+                  </Button>
+                </div>
+              )}
+
+              {/* Customer Search Dropdown */}
+              {showCustomerSearch && !selectedCustomer && (
+                <div className="space-y-2">
+                  <div className="relative">
+                    <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground w-3 h-3" />
                     <Input
-                      placeholder="Enter discount code (optional)"
-                      value={discountCode}
-                      onChange={(e) => setDiscountCode(e.target.value)}
+                      placeholder="Search customers..."
+                      value={customerSearchTerm}
+                      onChange={(e) => setCustomerSearchTerm(e.target.value)}
+                      className="pl-7 h-8 text-xs"
+                      size="sm"
                     />
                   </div>
-                </div>
 
-                {/* Payment Method Selection */}
-                <div className="border-t pt-4">
-                  <h4 className="font-medium text-foreground mb-3">Payment Method</h4>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button
-                      variant={paymentMethod === "cash" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setPaymentMethod("cash")}
-                    >
-                      Cash
-                    </Button>
-                    <Button
-                      variant={paymentMethod === "card" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setPaymentMethod("card")}
-                    >
-                      Card
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Totals */}
-                <div className="border-t pt-4 space-y-2">
-                  <div className="flex justify-between text-muted-foreground">
-                    <span>Subtotal:</span>
-                    <span>${subtotal.toFixed(2)}</span>
-                  </div>
-                  {discountAmount > 0 && (
-                    <div className="flex justify-between text-success">
-                      <span>Discount:</span>
-                      <span>-${discountAmount.toFixed(2)}</span>
+                  {customerSearchTerm && (
+                    <div className="max-h-32 overflow-y-auto border border-border rounded-md bg-background">
+                      {filteredCustomers.length === 0 ? (
+                        <div className="p-2 text-center text-muted-foreground text-xs">
+                          No customers found
+                        </div>
+                      ) : (
+                        filteredCustomers.map((customer) => (
+                          <div
+                            key={customer.id}
+                            className="p-2 hover:bg-muted/50 cursor-pointer border-b border-border last:border-b-0"
+                            onClick={() => {
+                              setSelectedCustomer(customer);
+                              setShowCustomerSearch(false);
+                              setCustomerSearchTerm("");
+                            }}
+                          >
+                            <div className="font-medium text-xs">{customer.name}</div>
+                            <div className="text-xs text-muted-foreground truncate">
+                              {customer.email || customer.phone || 'No contact info'}
+                            </div>
+                          </div>
+                        ))
+                      )}
                     </div>
                   )}
-                  {taxAmount > 0 && (
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Tax ({(taxRate * 100).toFixed(1)}%):</span>
-                      <span>${taxAmount.toFixed(2)}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between text-lg font-bold text-foreground border-t pt-2">
-                    <span>Total:</span>
-                    <span>${total.toFixed(2)}</span>
+                </div>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent className="flex-1 flex flex-col overflow-hidden">
+            {cart.length === 0 ? (
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-center">
+                  <ShoppingCart className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">Your cart is empty</p>
+                  <p className="text-sm text-muted-foreground mt-1">Add products to get started</p>
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Cart Items List - Scrollable */}
+                <div className="flex-1 overflow-hidden flex flex-col">
+                  <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3 flex-shrink-0">Items</h4>
+                  <div className="flex-1 overflow-y-auto space-y-2 pr-2">
+                    {cart.map((item) => (
+                      <div key={item.id} className="flex items-center gap-3 py-3 border-b border-border/50 last:border-0">
+                        {/* Product Image */}
+                        <div className="w-12 h-12 bg-muted rounded-md overflow-hidden flex-shrink-0">
+                          {item.image_url ? (
+                            <img
+                              src={item.image_url}
+                              alt={item.name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.nextElementSibling.style.display = 'flex';
+                              }}
+                            />
+                          ) : null}
+                          <div className={`w-full h-full flex items-center justify-center ${item.image_url ? 'hidden' : 'flex'}`}>
+                            <span className="text-sm font-medium text-muted-foreground">
+                              {item.name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <h5 className="font-medium text-foreground truncate">{item.name}</h5>
+                            <span className="text-sm font-medium text-foreground ml-2">
+                              ${(item.price * item.quantity).toFixed(2)}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between mt-1">
+                            <p className="text-sm text-muted-foreground">${item.price.toFixed(2)} each</p>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                className="h-6 w-6 p-0"
+                              >
+                                <Minus className="w-3 h-3" />
+                              </Button>
+                              <span className="text-sm font-medium w-6 text-center">{item.quantity}</span>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                className="h-6 w-6 p-0"
+                              >
+                                <Plus className="w-3 h-3" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => updateQuantity(item.id, 0)}
+                                className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                {/* Checkout Button */}
-                <Button
-                  className="w-full bg-gradient-primary text-white font-medium py-3"
-                  onClick={processOrder}
-                  disabled={isProcessingOrder || cart.length === 0}
-                >
-                  {isProcessingOrder ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard className="w-4 h-4 mr-2" />
-                      Process Payment - ${total.toFixed(2)}
-                    </>
-                  )}
-                </Button>
+                {/* Fixed Bottom Section */}
+                <div className="flex-shrink-0 space-y-4 pt-4 border-t">
+                  {/* Payment Method */}
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Payment Method</h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        variant={paymentMethod === "cash" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setPaymentMethod("cash")}
+                        className="justify-start"
+                      >
+                        <DollarSign className="w-4 h-4 mr-2" />
+                        Cash
+                      </Button>
+                      <Button
+                        variant={paymentMethod === "card" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setPaymentMethod("card")}
+                        className="justify-start"
+                      >
+                        <CreditCard className="w-4 h-4 mr-2" />
+                        Card
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Discount Section */}
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Discount</h4>
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant={discountType === "percent" ? "default" : "outline"}
+                          onClick={() => setDiscountType("percent")}
+                          className="px-3"
+                        >
+                          <Percent className="w-3 h-3 mr-1" />
+                          %
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={discountType === "fixed" ? "default" : "outline"}
+                          onClick={() => setDiscountType("fixed")}
+                          className="px-3"
+                        >
+                          <DollarSign className="w-3 h-3 mr-1" />
+                          $
+                        </Button>
+                        <Input
+                          placeholder={discountType === "percent" ? "10" : "5.00"}
+                          value={discountValue}
+                          onChange={(e) => setDiscountValue(e.target.value)}
+                          className="flex-1"
+                          size="sm"
+                        />
+                      </div>
+                      <Input
+                        placeholder="Discount code (optional)"
+                        value={discountCode}
+                        onChange={(e) => setDiscountCode(e.target.value)}
+                        size="sm"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Order Summary */}
+                  <div className="space-y-3 pt-4 border-t">
+                    <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Order Summary</h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Subtotal</span>
+                        <span className="font-medium">${subtotal.toFixed(2)}</span>
+                      </div>
+                      {discountAmount > 0 && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Discount</span>
+                          <span className="font-medium text-green-600">-${discountAmount.toFixed(2)}</span>
+                        </div>
+                      )}
+                      {taxAmount > 0 && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Tax ({(taxRate * 100).toFixed(1)}%)</span>
+                          <span className="font-medium">${taxAmount.toFixed(2)}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Checkout Button */}
+                  <Button
+                    className="w-full h-12 text-base font-medium"
+                    onClick={isOrderValid() ? processOrder : showValidationErrors}
+                    disabled={isProcessingOrder}
+                    variant={isOrderValid() ? "default" : "secondary"}
+                  >
+                    {isProcessingOrder ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Processing Order...
+                      </>
+                    ) : isOrderValid() ? (
+                      <>
+                        Complete Order - ${total.toFixed(2)}
+                      </>
+                    ) : (
+                      <>
+                        Complete Order - ${total.toFixed(2)}
+                      </>
+                    )}
+                  </Button>
+                </div>
               </>
             )}
           </CardContent>

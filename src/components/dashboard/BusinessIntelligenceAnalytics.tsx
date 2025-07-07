@@ -285,16 +285,16 @@ export function BusinessIntelligenceAnalytics() {
       case 'high':
         return 'text-destructive bg-destructive/10 border-destructive/20';
       case 'medium':
-        return 'text-warning bg-warning/10 border-warning/20';
+        return 'text-orange-600 bg-orange-50 border-orange-200 dark:text-orange-400 dark:bg-orange-950/20 dark:border-orange-800';
       case 'low':
-        return 'text-success bg-success/10 border-success/20';
+        return 'text-green-600 bg-green-50 border-green-200 dark:text-green-400 dark:bg-green-950/20 dark:border-green-800';
       default:
         return 'text-muted-foreground bg-muted border-border';
     }
   };
 
   const getRecommendationIcon = (recommendation: string) => {
-    if (recommendation.includes('increase')) return <ArrowUp className="w-4 h-4 text-success" />;
+    if (recommendation.includes('increase')) return <ArrowUp className="w-4 h-4 text-green-600 dark:text-green-400" />;
     if (recommendation.includes('decrease')) return <ArrowDown className="w-4 h-4 text-destructive" />;
     return <Target className="w-4 h-4 text-primary" />;
   };

@@ -219,7 +219,7 @@ export function StoreSelector() {
                   </div>
                   <Button
                     type="submit"
-                    className="w-full bg-gradient-primary text-white"
+                    className="w-full"
                     disabled={creating}
                   >
                     {creating ? 'Creating...' : 'Create Store'}
@@ -229,7 +229,6 @@ export function StoreSelector() {
             </Dialog>
 
             <Button
-              className="bg-gradient-primary text-white"
               disabled={!currentStore}
               onClick={() => {
                 if (currentStore) {
