@@ -49,7 +49,7 @@ export function CreateLaybyDialog({ open, onOpenChange, onSuccess }: CreateLayby
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedItems, setSelectedItems] = useState<LaybyItem[]>([]);
-  
+
   // Form data
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
@@ -58,13 +58,51 @@ export function CreateLaybyDialog({ open, onOpenChange, onSuccess }: CreateLayby
   const [depositAmount, setDepositAmount] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [notes, setNotes] = useState("");
+  const [paymentScheduleType, setPaymentScheduleType] = useState("custom");
+  const [priorityLevel, setPriorityLevel] = useState("normal");
+  const [interestRate, setInterestRate] = useState("");
+  const [laybySettings, setLaybySettings] = useState<any>(null);
 
   useEffect(() => {
     if (open && currentStore) {
       fetchProducts();
       fetchCustomers();
+      fetchLaybySettings();
     }
   }, [open, currentStore]);
+
+  const fetchLaybySettings = async () => {
+    if (!currentStore) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('layby_settings')
+        .select('*')
+        .eq('store_id', currentStore.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // Not found error
+        throw error;
+      }
+
+      if (data) {
+        setLaybySettings(data);
+        // Set default values from settings
+        if (!depositAmount && data.require_deposit_percent) {
+          const totalAmount = selectedItems.reduce((sum, item) => sum + item.total_price, 0);
+          if (totalAmount > 0) {
+            const defaultDeposit = (totalAmount * data.require_deposit_percent / 100).toFixed(2);
+            setDepositAmount(defaultDeposit);
+          }
+        }
+        if (!interestRate && data.default_interest_rate) {
+          setInterestRate(data.default_interest_rate.toString());
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching layby settings:', error);
+    }
+  };
 
   const fetchProducts = async () => {
     if (!currentStore) return;
@@ -178,6 +216,37 @@ export function CreateLaybyDialog({ open, onOpenChange, onSuccess }: CreateLayby
   const totalAmount = selectedItems.reduce((sum, item) => sum + item.total_price, 0);
   const depositAmountNum = parseFloat(depositAmount) || 0;
   const balanceRemaining = totalAmount - depositAmountNum;
+  const interestRateNum = parseFloat(interestRate) || 0;
+
+  // Calculate suggested deposit based on settings
+  const suggestedDeposit = laybySettings?.require_deposit_percent
+    ? (totalAmount * laybySettings.require_deposit_percent / 100).toFixed(2)
+    : "";
+
+  // Calculate suggested due date based on settings
+  const suggestedDueDate = laybySettings?.max_layby_duration_days
+    ? new Date(Date.now() + laybySettings.max_layby_duration_days * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    : "";
+
+  // Update deposit amount when total changes
+  useEffect(() => {
+    if (totalAmount > 0 && laybySettings?.require_deposit_percent && !depositAmount) {
+      const defaultDeposit = (totalAmount * laybySettings.require_deposit_percent / 100).toFixed(2);
+      setDepositAmount(defaultDeposit);
+    }
+  }, [totalAmount, laybySettings]);
+
+  // Update due date when payment schedule type changes
+  useEffect(() => {
+    if (paymentScheduleType !== 'custom' && !dueDate) {
+      const days = paymentScheduleType === 'weekly' ? 28 :
+                   paymentScheduleType === 'bi_weekly' ? 56 :
+                   paymentScheduleType === 'monthly' ? 90 :
+                   laybySettings?.max_layby_duration_days || 90;
+      const calculatedDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      setDueDate(calculatedDate);
+    }
+  }, [paymentScheduleType, laybySettings]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -207,6 +276,15 @@ export function CreateLaybyDialog({ open, onOpenChange, onSuccess }: CreateLayby
       return;
     }
 
+    // Validate deposit against minimum requirement
+    if (laybySettings?.require_deposit_percent) {
+      const minDeposit = totalAmount * laybySettings.require_deposit_percent / 100;
+      if (depositAmountNum < minDeposit) {
+        toast.error(`Minimum deposit required: $${minDeposit.toFixed(2)} (${laybySettings.require_deposit_percent}%)`);
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
@@ -218,7 +296,7 @@ export function CreateLaybyDialog({ open, onOpenChange, onSuccess }: CreateLayby
         throw laybyNumberError;
       }
 
-      // Create layby order
+      // Create layby order with enhanced fields
       const { data: laybyOrder, error: laybyError } = await supabase
         .from('layby_orders')
         .insert({
@@ -233,6 +311,10 @@ export function CreateLaybyDialog({ open, onOpenChange, onSuccess }: CreateLayby
           balance_remaining: balanceRemaining,
           due_date: dueDate || null,
           notes: notes.trim() || null,
+          payment_schedule_type: paymentScheduleType,
+          priority_level: priorityLevel,
+          interest_rate: interestRateNum,
+          inventory_reserved: laybySettings?.inventory_reservation_enabled ?? true,
           created_by: user.id
         })
         .select()
@@ -302,6 +384,58 @@ export function CreateLaybyDialog({ open, onOpenChange, onSuccess }: CreateLayby
         throw transactionError;
       }
 
+      // Generate payment schedule if not custom
+      if (paymentScheduleType !== 'custom') {
+        const startDate = new Date();
+        await supabase.rpc('generate_payment_schedule', {
+          _layby_order_id: laybyOrder.id,
+          _schedule_type: paymentScheduleType,
+          _start_date: startDate.toISOString().split('T')[0],
+          _total_amount: totalAmount,
+          _deposit_amount: depositAmountNum
+        });
+      }
+
+      // Reserve inventory if enabled
+      if (laybySettings?.inventory_reservation_enabled) {
+        for (const item of selectedItems) {
+          // Create stock adjustment record for reservation
+          await supabase
+            .from('stock_adjustments')
+            .insert({
+              store_id: currentStore.id,
+              product_id: item.product.id,
+              user_id: user.id,
+              adjustment_type: 'layby_reserve',
+              quantity_change: -item.quantity,
+              previous_quantity: item.product.stock_quantity,
+              new_quantity: item.product.stock_quantity - item.quantity,
+              reason: `Reserved for layby ${laybyNumberData}`,
+              reference_id: laybyOrder.id
+            });
+
+          // Update product stock
+          await supabase
+            .from('products')
+            .update({
+              stock_quantity: item.product.stock_quantity - item.quantity
+            })
+            .eq('id', item.product.id);
+        }
+      }
+
+      // Create history entry
+      await supabase
+        .from('layby_history')
+        .insert({
+          layby_order_id: laybyOrder.id,
+          action_type: 'created',
+          action_description: `Layby order created with ${paymentScheduleType} payment schedule`,
+          amount_involved: depositAmountNum,
+          performed_by: user.id,
+          notes: `Priority: ${priorityLevel}, Interest Rate: ${interestRateNum}%`
+        });
+
       toast.success('Layby order created successfully');
       onSuccess();
       onOpenChange(false);
@@ -324,6 +458,9 @@ export function CreateLaybyDialog({ open, onOpenChange, onSuccess }: CreateLayby
     setDueDate("");
     setNotes("");
     setSearchTerm("");
+    setPaymentScheduleType("custom");
+    setPriorityLevel("normal");
+    setInterestRate("");
   };
 
   return (
@@ -397,29 +534,92 @@ export function CreateLaybyDialog({ open, onOpenChange, onSuccess }: CreateLayby
                 <CardTitle className="text-lg">Payment Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="deposit-amount">Deposit Amount *</Label>
-                  <Input
-                    id="deposit-amount"
-                    type="number"
-                    step="0.01"
-                    min="0.01"
-                    value={depositAmount}
-                    onChange={(e) => setDepositAmount(e.target.value)}
-                    placeholder="Enter deposit amount"
-                    required
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="deposit-amount">Deposit Amount *</Label>
+                    <Input
+                      id="deposit-amount"
+                      type="number"
+                      step="0.01"
+                      min="0.01"
+                      value={depositAmount}
+                      onChange={(e) => setDepositAmount(e.target.value)}
+                      placeholder={suggestedDeposit ? `Suggested: $${suggestedDeposit}` : "Enter deposit amount"}
+                      required
+                    />
+                    {laybySettings?.require_deposit_percent && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Minimum: ${((totalAmount * laybySettings.require_deposit_percent) / 100).toFixed(2)} ({laybySettings.require_deposit_percent}%)
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <Label htmlFor="payment-schedule">Payment Schedule</Label>
+                    <Select value={paymentScheduleType} onValueChange={setPaymentScheduleType}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select payment schedule" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="custom">Custom</SelectItem>
+                        <SelectItem value="weekly">Weekly (4 payments)</SelectItem>
+                        <SelectItem value="bi_weekly">Bi-weekly (4 payments)</SelectItem>
+                        <SelectItem value="monthly">Monthly (3 payments)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
-                <div>
-                  <Label htmlFor="due-date">Due Date (Optional)</Label>
-                  <Input
-                    id="due-date"
-                    type="date"
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="due-date">Due Date</Label>
+                    <Input
+                      id="due-date"
+                      type="date"
+                      value={dueDate}
+                      onChange={(e) => setDueDate(e.target.value)}
+                      placeholder={suggestedDueDate}
+                    />
+                    {paymentScheduleType !== 'custom' && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Final payment due date (schedule will be generated automatically)
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <Label htmlFor="priority">Priority Level</Label>
+                    <Select value={priorityLevel} onValueChange={setPriorityLevel}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select priority" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="normal">Normal</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                        <SelectItem value="urgent">Urgent</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
+
+                {laybySettings?.default_interest_rate > 0 && (
+                  <div>
+                    <Label htmlFor="interest-rate">Interest Rate (% per year)</Label>
+                    <Input
+                      id="interest-rate"
+                      type="number"
+                      step="0.0001"
+                      min="0"
+                      value={interestRate}
+                      onChange={(e) => setInterestRate(e.target.value)}
+                      placeholder={laybySettings.default_interest_rate.toString()}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Applied to overdue amounts (default: {laybySettings.default_interest_rate}%)
+                    </p>
+                  </div>
+                )}
 
                 <div>
                   <Label htmlFor="notes">Notes</Label>

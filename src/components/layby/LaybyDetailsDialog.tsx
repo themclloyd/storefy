@@ -3,7 +3,7 @@ import { useStore } from "@/contexts/StoreContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -203,6 +203,9 @@ export function LaybyDetailsDialog({ open, onOpenChange, layby, onUpdate }: Layb
             <DialogTitle className="text-2xl">Layby Details</DialogTitle>
             {getStatusBadge(layby.status)}
           </div>
+          <DialogDescription>
+            View and manage layby order details, payments, and status updates.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">

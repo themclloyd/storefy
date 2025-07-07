@@ -74,11 +74,13 @@ interface OrderItem {
   quantity: number;
   unit_price: number;
   total_price: number;
-  product: {
+  product_id: string;
+  products: {
     id: string;
     name: string;
     sku: string;
-  };
+    is_active: boolean;
+  } | null;
 }
 
 interface LaybyDetails {
@@ -100,11 +102,13 @@ interface LaybyItem {
   quantity: number;
   unit_price: number;
   total_price: number;
-  product: {
+  product_id: string;
+  products: {
     id: string;
     name: string;
     sku: string;
-  };
+    is_active: boolean;
+  } | null;
 }
 
 interface TransactionHistoryEntry {
@@ -165,14 +169,19 @@ export function TransactionDetailsModal({
   };
 
   const fetchOrderDetails = async () => {
+    // First try with inner join to get only items with existing products
     const { data, error } = await supabase
       .from('orders')
       .select(`
         *,
         customers (id, name, email, phone),
         order_items (
-          *,
-          products (id, name, sku)
+          id,
+          quantity,
+          unit_price,
+          total_price,
+          product_id,
+          products (id, name, sku, is_active)
         )
       `)
       .eq('id', transaction.reference_id)
@@ -180,9 +189,33 @@ export function TransactionDetailsModal({
 
     if (error) {
       console.error('Error fetching order details:', error);
+      toast.error('Failed to load order details');
       return;
     }
 
+    // Check for items with missing products and fetch them separately
+    if (data.order_items) {
+      const itemsWithMissingProducts = data.order_items.filter(item => !item.products);
+
+      if (itemsWithMissingProducts.length > 0) {
+        console.warn('Found order items with missing products:', itemsWithMissingProducts);
+
+        // Try to fetch product info for missing products (including inactive ones)
+        for (const item of itemsWithMissingProducts) {
+          const { data: productData } = await supabase
+            .from('products')
+            .select('id, name, sku, is_active')
+            .eq('id', item.product_id)
+            .single();
+
+          if (productData) {
+            item.products = productData;
+          }
+        }
+      }
+    }
+
+    console.log('Order details fetched:', data);
     setOrderDetails(data);
   };
 
@@ -192,8 +225,12 @@ export function TransactionDetailsModal({
       .select(`
         *,
         layby_items (
-          *,
-          products (id, name, sku)
+          id,
+          quantity,
+          unit_price,
+          total_price,
+          product_id,
+          products (id, name, sku, is_active)
         )
       `)
       .eq('id', transaction.reference_id)
@@ -201,9 +238,33 @@ export function TransactionDetailsModal({
 
     if (error) {
       console.error('Error fetching layby details:', error);
+      toast.error('Failed to load layby details');
       return;
     }
 
+    // Check for items with missing products and fetch them separately
+    if (data.layby_items) {
+      const itemsWithMissingProducts = data.layby_items.filter(item => !item.products);
+
+      if (itemsWithMissingProducts.length > 0) {
+        console.warn('Found layby items with missing products:', itemsWithMissingProducts);
+
+        // Try to fetch product info for missing products (including inactive ones)
+        for (const item of itemsWithMissingProducts) {
+          const { data: productData } = await supabase
+            .from('products')
+            .select('id, name, sku, is_active')
+            .eq('id', item.product_id)
+            .single();
+
+          if (productData) {
+            item.products = productData;
+          }
+        }
+      }
+    }
+
+    console.log('Layby details fetched:', data);
     setLaybyDetails(data);
   };
 
@@ -584,8 +645,17 @@ export function TransactionDetailsModal({
                         <TableBody>
                           {orderDetails.order_items.map((item) => (
                             <TableRow key={item.id}>
-                              <TableCell>{item.product?.name || 'Unknown Product'}</TableCell>
-                              <TableCell>{item.product?.sku || 'N/A'}</TableCell>
+                              <TableCell>
+                                {item.products?.name || (
+                                  <span className="text-muted-foreground italic">
+                                    Product Not Found (ID: {item.product_id.slice(-8)})
+                                  </span>
+                                )}
+                                {item.products && !item.products.is_active && (
+                                  <Badge variant="secondary" className="ml-2">Inactive</Badge>
+                                )}
+                              </TableCell>
+                              <TableCell>{item.products?.sku || 'N/A'}</TableCell>
                               <TableCell>{item.quantity}</TableCell>
                               <TableCell>${item.unit_price.toFixed(2)}</TableCell>
                               <TableCell>${item.total_price.toFixed(2)}</TableCell>
@@ -644,8 +714,17 @@ export function TransactionDetailsModal({
                         <TableBody>
                           {laybyDetails.layby_items.map((item) => (
                             <TableRow key={item.id}>
-                              <TableCell>{item.product?.name || 'Unknown Product'}</TableCell>
-                              <TableCell>{item.product?.sku || 'N/A'}</TableCell>
+                              <TableCell>
+                                {item.products?.name || (
+                                  <span className="text-muted-foreground italic">
+                                    Product Not Found (ID: {item.product_id.slice(-8)})
+                                  </span>
+                                )}
+                                {item.products && !item.products.is_active && (
+                                  <Badge variant="secondary" className="ml-2">Inactive</Badge>
+                                )}
+                              </TableCell>
+                              <TableCell>{item.products?.sku || 'N/A'}</TableCell>
                               <TableCell>{item.quantity}</TableCell>
                               <TableCell>${item.unit_price.toFixed(2)}</TableCell>
                               <TableCell>${item.total_price.toFixed(2)}</TableCell>
@@ -725,16 +804,16 @@ export function TransactionDetailsModal({
           items={
             orderDetails?.order_items?.map(item => ({
               id: item.id,
-              name: item.product?.name || 'Unknown Product',
-              sku: item.product?.sku || 'N/A',
+              name: item.products?.name || `Product Not Found (${item.product_id.slice(-8)})`,
+              sku: item.products?.sku || 'N/A',
               quantity: item.quantity,
               unit_price: item.unit_price,
               total_price: item.total_price,
             })) ||
             laybyDetails?.layby_items?.map(item => ({
               id: item.id,
-              name: item.product?.name || 'Unknown Product',
-              sku: item.product?.sku || 'N/A',
+              name: item.products?.name || `Product Not Found (${item.product_id.slice(-8)})`,
+              sku: item.products?.sku || 'N/A',
               quantity: item.quantity,
               unit_price: item.unit_price,
               total_price: item.total_price,

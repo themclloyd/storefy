@@ -1,21 +1,33 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense, lazy } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useStore } from "@/contexts/StoreContext";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { Sidebar } from "@/components/layout/Sidebar";
-import { DashboardView } from "@/components/dashboard/DashboardView";
-import { POSView } from "@/components/pos/POSView";
-import { InventoryView } from "@/components/inventory/InventoryView";
-import { CategoriesView } from "@/components/inventory/CategoriesView";
-import { SuppliersView } from "@/components/inventory/SuppliersView";
-import { LaybyView } from "@/components/layby/LaybyView";
-import { TransactionView } from "@/components/transactions/TransactionView";
-import { CustomersView } from "@/components/customers/CustomersView";
-import { ReportsView } from "@/components/reports/ReportsView";
-import { SettingsView } from "@/components/settings/SettingsView";
 import { StoreSelector } from "@/components/stores/StoreSelector";
-import { StoreManagementView } from "@/components/stores/StoreManagementView";
+
+// Lazy load view components for code splitting
+const DashboardView = lazy(() => import("@/components/dashboard/DashboardView").then(module => ({ default: module.DashboardView })));
+const POSView = lazy(() => import("@/components/pos/POSView").then(module => ({ default: module.POSView })));
+const InventoryView = lazy(() => import("@/components/inventory/InventoryView").then(module => ({ default: module.InventoryView })));
+const CategoriesView = lazy(() => import("@/components/inventory/CategoriesView").then(module => ({ default: module.CategoriesView })));
+const SuppliersView = lazy(() => import("@/components/inventory/SuppliersView").then(module => ({ default: module.SuppliersView })));
+const LaybyView = lazy(() => import("@/components/layby/LaybyView").then(module => ({ default: module.LaybyView })));
+const TransactionView = lazy(() => import("@/components/transactions/TransactionView").then(module => ({ default: module.TransactionView })));
+const CustomersView = lazy(() => import("@/components/customers/CustomersView").then(module => ({ default: module.CustomersView })));
+const ReportsView = lazy(() => import("@/components/reports/ReportsView").then(module => ({ default: module.ReportsView })));
+const SettingsView = lazy(() => import("@/components/settings/SettingsView").then(module => ({ default: module.SettingsView })));
+const StoreManagementView = lazy(() => import("@/components/stores/StoreManagementView").then(module => ({ default: module.StoreManagementView })));
+
+// Loading component for Suspense fallback
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center p-8">
+    <div className="text-center">
+      <div className="w-8 h-8 bg-primary rounded-full animate-pulse mx-auto mb-4"></div>
+      <p className="text-muted-foreground">Loading...</p>
+    </div>
+  </div>
+);
 
 const Index = () => {
   const { user, loading: authLoading } = useAuth();
@@ -103,51 +115,63 @@ const Index = () => {
   const renderView = () => {
     // Show store management view for owners with multiple stores
     if (isOwner && stores.length > 1 && activeView === "stores") {
-      return <StoreManagementView />;
+      return (
+        <Suspense fallback={<LoadingSpinner />}>
+          <StoreManagementView />
+        </Suspense>
+      );
     }
 
-    switch (activeView) {
-      case "dashboard":
-        return <DashboardView />;
-      case "pos":
-        return <POSView />;
-      case "inventory":
-        return <InventoryView />;
-      case "categories":
-        return (
-          <CategoriesView
-            onClose={() => handleViewChange("inventory")}
-            onViewCategoryProducts={(categoryId, categoryName) => {
-              // This will be handled by the InventoryView's filtered view
-              handleViewChange("inventory");
-            }}
-          />
-        );
-      case "suppliers":
-        return (
-          <SuppliersView
-            onClose={() => handleViewChange("inventory")}
-            onViewSupplierProducts={(supplierId, supplierName) => {
-              // This will be handled by the InventoryView's filtered view
-              handleViewChange("inventory");
-            }}
-          />
-        );
-      case "layby":
-        return <LaybyView />;
-      case "transactions":
-        return <TransactionView />;
-      case "customers":
-        return <CustomersView />;
-      case "reports":
-        return <ReportsView />;
-      case "settings":
-        return <SettingsView />;
-      case "stores":
-        return <StoreManagementView />;
-      default:
-        return <DashboardView />;
-    }
+    const viewComponent = (() => {
+      switch (activeView) {
+        case "dashboard":
+          return <DashboardView />;
+        case "pos":
+          return <POSView />;
+        case "inventory":
+          return <InventoryView />;
+        case "categories":
+          return (
+            <CategoriesView
+              onClose={() => handleViewChange("inventory")}
+              onViewCategoryProducts={(categoryId, categoryName) => {
+                // This will be handled by the InventoryView's filtered view
+                handleViewChange("inventory");
+              }}
+            />
+          );
+        case "suppliers":
+          return (
+            <SuppliersView
+              onClose={() => handleViewChange("inventory")}
+              onViewSupplierProducts={(supplierId, supplierName) => {
+                // This will be handled by the InventoryView's filtered view
+                handleViewChange("inventory");
+              }}
+            />
+          );
+        case "layby":
+          return <LaybyView />;
+        case "transactions":
+          return <TransactionView />;
+        case "customers":
+          return <CustomersView />;
+        case "reports":
+          return <ReportsView />;
+        case "settings":
+          return <SettingsView />;
+        case "stores":
+          return <StoreManagementView />;
+        default:
+          return <DashboardView />;
+      }
+    })();
+
+    return (
+      <Suspense fallback={<LoadingSpinner />}>
+        {viewComponent}
+      </Suspense>
+    );
   };
 
   // Show loading spinner while checking auth

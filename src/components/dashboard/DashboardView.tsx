@@ -4,6 +4,7 @@ import { useStore } from "@/contexts/StoreContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { BusinessIntelligenceDashboard } from "./BusinessIntelligenceDashboard";
 
 interface DashboardStats {
   todaysSales: number;
@@ -155,91 +156,14 @@ export function DashboardView() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+        <h1 className="text-3xl font-bold text-foreground">Business Intelligence Dashboard</h1>
         <p className="text-muted-foreground mt-2">
-          Welcome back! Here's what's happening at {currentStore?.name} today.
+          Real-time insights and actionable intelligence for {currentStore?.name}
         </p>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {statsData.map((stat) => {
-          const Icon = stat.icon;
-          const TrendIcon = stat.trend === "up" ? TrendingUp : TrendingDown;
-          
-          return (
-            <Card key={stat.title} className="card-professional">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  {stat.title}
-                </CardTitle>
-                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <Icon className="h-5 w-5 text-primary" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-end justify-between">
-                  <div className="text-2xl font-bold text-foreground">{stat.value}</div>
-                  <div className={`flex items-center gap-1 text-sm ${
-                    stat.trend === "up" ? "text-success" : "text-destructive"
-                  }`}>
-                    <TrendIcon className="h-3 w-3" />
-                    {stat.change}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="card-professional">
-          <CardHeader>
-            <CardTitle className="text-foreground">Recent Orders</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {recentOrders.length > 0 ? (
-              recentOrders.map((order) => (
-                <div key={order.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
-                  <div>
-                    <p className="font-medium text-foreground">{order.order_number}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {order.customers?.name || 'Walk-in Customer'}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium text-foreground">${Number(order.total).toFixed(2)}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {new Date(order.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-center text-muted-foreground py-4">No recent orders</p>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className="card-professional">
-          <CardHeader>
-            <CardTitle className="text-foreground">Quick Actions</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <button className="w-full p-4 bg-gradient-primary text-white rounded-lg font-medium hover:opacity-90 transition-smooth">
-              Open POS System
-            </button>
-            <button className="w-full p-4 bg-secondary/10 text-secondary rounded-lg font-medium hover:bg-secondary/20 transition-smooth">
-              Add New Product
-            </button>
-            <button className="w-full p-4 bg-muted text-foreground rounded-lg font-medium hover:bg-muted/80 transition-smooth">
-              View Reports
-            </button>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Business Intelligence Dashboard */}
+      <BusinessIntelligenceDashboard />
     </div>
   );
 }
