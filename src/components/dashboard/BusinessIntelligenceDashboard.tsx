@@ -604,12 +604,12 @@ export function BusinessIntelligenceDashboard() {
         <Card className="card-professional">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
-              <Zap className="w-5 h-5 text-yellow-500" />
+              <Zap className="w-5 h-5 text-quaternary" />
               Quick Actions
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button className="w-full justify-start bg-gradient-primary text-white">
+            <Button className="w-full justify-start bg-primary text-primary-foreground hover:bg-primary-dark">
               <ShoppingCart className="w-4 h-4 mr-2" />
               Open POS System
             </Button>

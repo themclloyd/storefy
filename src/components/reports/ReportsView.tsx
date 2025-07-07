@@ -795,7 +795,7 @@ export function ReportsView() {
           {/* Export Button */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button className="bg-gradient-primary text-white">
+              <Button className="bg-primary text-primary-foreground hover:bg-primary-dark">
                 <Download className="w-4 h-4 mr-2" />
                 Export
               </Button>

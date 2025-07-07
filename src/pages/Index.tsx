@@ -43,7 +43,7 @@ const Index = () => {
 
   useEffect(() => {
     if (!authLoading && !user && !hasPinSession) {
-      navigate("/auth");
+      navigate("/");
     }
   }, [user, authLoading, navigate, hasPinSession]);
 
@@ -51,7 +51,7 @@ const Index = () => {
   useEffect(() => {
     const path = location.pathname;
     const pathToView = {
-      '/': 'dashboard',
+      '/app': 'dashboard',
       '/dashboard': 'dashboard',
       '/pos': 'pos',
       '/inventory': 'inventory',
@@ -95,7 +95,7 @@ const Index = () => {
 
     // Navigate to clean URLs
     const viewToPath = {
-      'dashboard': '/',
+      'dashboard': '/dashboard',
       'pos': '/pos',
       'inventory': '/inventory',
       'categories': '/categories',
@@ -108,7 +108,7 @@ const Index = () => {
       'stores': '/stores'
     };
 
-    const path = viewToPath[view as keyof typeof viewToPath] || '/';
+    const path = viewToPath[view as keyof typeof viewToPath] || '/dashboard';
     navigate(path, { replace: false });
   };
 

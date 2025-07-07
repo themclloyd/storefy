@@ -283,20 +283,20 @@ export function BusinessIntelligenceAnalytics() {
   const getImpactColor = (impact: string) => {
     switch (impact) {
       case 'high':
-        return 'text-red-600 bg-red-50 border-red-200';
+        return 'text-destructive bg-destructive/10 border-destructive/20';
       case 'medium':
-        return 'text-orange-600 bg-orange-50 border-orange-200';
+        return 'text-warning bg-warning/10 border-warning/20';
       case 'low':
-        return 'text-green-600 bg-green-50 border-green-200';
+        return 'text-success bg-success/10 border-success/20';
       default:
-        return 'text-gray-600 bg-gray-50 border-gray-200';
+        return 'text-muted-foreground bg-muted border-border';
     }
   };
 
   const getRecommendationIcon = (recommendation: string) => {
-    if (recommendation.includes('increase')) return <ArrowUp className="w-4 h-4 text-green-500" />;
-    if (recommendation.includes('decrease')) return <ArrowDown className="w-4 h-4 text-red-500" />;
-    return <Target className="w-4 h-4 text-blue-500" />;
+    if (recommendation.includes('increase')) return <ArrowUp className="w-4 h-4 text-success" />;
+    if (recommendation.includes('decrease')) return <ArrowDown className="w-4 h-4 text-destructive" />;
+    return <Target className="w-4 h-4 text-primary" />;
   };
 
   if (loading) {

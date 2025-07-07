@@ -18,8 +18,8 @@ export default {
 			}
 		},
 		fontFamily: {
-			sans: ['Inter', 'system-ui', 'sans-serif'],
-			inter: ['Inter', 'system-ui', 'sans-serif'],
+			sans: ['Space Grotesk', 'system-ui', 'sans-serif'],
+			'space-grotesk': ['Space Grotesk', 'system-ui', 'sans-serif'],
 		},
 		extend: {
 			colors: {
@@ -29,13 +29,14 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
+					DEFAULT: 'hsl(var(--primary))', // PayPal Blue #0070BA
 					foreground: 'hsl(var(--primary-foreground))',
 					dark: 'hsl(var(--primary-dark))',
-					light: 'hsl(var(--primary-light))'
+					light: 'hsl(var(--primary-light))',
+					accent: 'hsl(var(--primary-accent))'
 				},
 				secondary: {
-					DEFAULT: 'hsl(var(--secondary))',
+					DEFAULT: 'hsl(var(--secondary))', // Light Gray #F5F7FA
 					foreground: 'hsl(var(--secondary-foreground))',
 					dark: 'hsl(var(--secondary-dark))'
 				},
@@ -75,11 +76,7 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))'
 				}
 			},
-			backgroundImage: {
-				'gradient-primary': 'var(--gradient-primary)',
-				'gradient-surface': 'var(--gradient-surface)',
-				'gradient-glass': 'var(--gradient-glass)'
-			},
+
 			boxShadow: {
 				soft: 'var(--shadow-soft)',
 				medium: 'var(--shadow-medium)',
@@ -92,7 +89,12 @@ export default {
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				sm: 'calc(var(--radius) - 4px)',
+				'button': 'var(--radius-button)',
+				'card': 'var(--radius-card)',
+				'input': 'var(--radius-input)',
+				'3xl': '1.5rem',
+				'4xl': '2rem'
 			},
 			keyframes: {
 				'accordion-down': {

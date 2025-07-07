@@ -69,7 +69,7 @@ export function InteractiveBusinessWidgets() {
       id: 'pos',
       label: 'Open POS',
       icon: ShoppingCart,
-      color: 'bg-gradient-primary text-white',
+      color: 'bg-primary text-primary-foreground',
       handler: () => window.location.href = '/pos',
       description: 'Start selling immediately'
     },
@@ -77,7 +77,7 @@ export function InteractiveBusinessWidgets() {
       id: 'add-product',
       label: 'Add Product',
       icon: Plus,
-      color: 'bg-blue-500 text-white',
+      color: 'bg-primary text-primary-foreground',
       handler: () => window.location.href = '/inventory',
       description: 'Add new inventory item'
     },
@@ -85,7 +85,7 @@ export function InteractiveBusinessWidgets() {
       id: 'restock',
       label: 'Restock Items',
       icon: Package,
-      color: 'bg-orange-500 text-white',
+      color: 'bg-warning text-warning-foreground',
       handler: () => window.location.href = '/inventory',
       badge: 5, // This would come from actual low stock count
       description: 'Restock low inventory'
@@ -94,7 +94,7 @@ export function InteractiveBusinessWidgets() {
       id: 'customer-insights',
       label: 'Customer Insights',
       icon: Users,
-      color: 'bg-purple-500 text-white',
+      color: 'bg-secondary text-secondary-foreground',
       handler: () => window.location.href = '/customers',
       description: 'View customer analytics'
     },
@@ -102,7 +102,7 @@ export function InteractiveBusinessWidgets() {
       id: 'sales-report',
       label: 'Sales Report',
       icon: BarChart3,
-      color: 'bg-green-500 text-white',
+      color: 'bg-success text-success-foreground',
       handler: () => window.location.href = '/reports',
       description: 'Generate sales report'
     },
@@ -110,7 +110,7 @@ export function InteractiveBusinessWidgets() {
       id: 'set-targets',
       label: 'Set Targets',
       icon: Target,
-      color: 'bg-red-500 text-white',
+      color: 'bg-destructive text-destructive-foreground',
       handler: () => toast.info('Target setting feature coming soon!'),
       description: 'Set sales targets'
     }
@@ -367,15 +367,15 @@ export function InteractiveBusinessWidgets() {
               <p className="text-sm text-green-700 dark:text-green-300 mb-2">
                 Consider restocking Electronics category - high demand detected
               </p>
-              <Button variant="outline" size="sm" className="text-green-700 border-green-300">
+              <Button variant="outline" size="sm" className="text-success border-success/20">
                 View Details
               </Button>
             </div>
 
-            <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+            <div className="p-3 bg-primary/10 rounded-lg border border-primary/20">
               <div className="flex items-center gap-2 mb-2">
-                <Award className="w-4 h-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-800 dark:text-blue-400">
+                <Award className="w-4 h-4 text-primary" />
+                <span className="text-sm font-medium text-primary">
                   Customer Engagement
                 </span>
               </div>

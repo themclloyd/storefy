@@ -134,13 +134,13 @@ export function OrderHistoryDialog({ open, onOpenChange }: OrderHistoryDialogPro
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'completed':
-        return <Badge variant="default" className="bg-green-100 text-green-800"><CheckCircle className="w-3 h-3 mr-1" />Completed</Badge>;
+        return <Badge variant="default" className="bg-success/10 text-success border-success/20"><CheckCircle className="w-3 h-3 mr-1" />Completed</Badge>;
       case 'pending':
         return <Badge variant="secondary"><RefreshCw className="w-3 h-3 mr-1" />Pending</Badge>;
       case 'cancelled':
         return <Badge variant="destructive"><AlertTriangle className="w-3 h-3 mr-1" />Cancelled</Badge>;
       case 'refunded':
-        return <Badge variant="outline" className="border-orange-200 text-orange-800"><RefreshCw className="w-3 h-3 mr-1" />Refunded</Badge>;
+        return <Badge variant="outline" className="border-warning/20 text-warning"><RefreshCw className="w-3 h-3 mr-1" />Refunded</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }

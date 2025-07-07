@@ -240,13 +240,13 @@ export function LaybyCalendarView({ open, onOpenChange }: LaybyCalendarViewProps
                   <div
                     key={event.id}
                     className={`text-xs p-1 rounded truncate ${
-                      event.event_type === 'due_date' 
-                        ? event.status === 'overdue' 
-                          ? 'bg-red-100 text-red-800' 
-                          : 'bg-blue-100 text-blue-800'
+                      event.event_type === 'due_date'
+                        ? event.status === 'overdue'
+                          ? 'bg-destructive/10 text-destructive'
+                          : 'bg-primary/10 text-primary'
                         : event.status === 'overdue'
-                          ? 'bg-orange-100 text-orange-800'
-                          : 'bg-green-100 text-green-800'
+                          ? 'bg-warning/10 text-warning'
+                          : 'bg-success/10 text-success'
                     }`}
                     title={`${event.layby_number} - ${event.customer_name} - $${event.amount.toFixed(2)}`}
                   >
@@ -330,19 +330,19 @@ export function LaybyCalendarView({ open, onOpenChange }: LaybyCalendarViewProps
           {/* Legend */}
           <div className="flex flex-wrap gap-4 text-sm">
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-blue-100 border border-blue-200 rounded"></div>
+              <div className="w-4 h-4 bg-primary/10 border border-primary/20 rounded"></div>
               <span>Due Dates</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-green-100 border border-green-200 rounded"></div>
+              <div className="w-4 h-4 bg-success/10 border border-success/20 rounded"></div>
               <span>Payment Schedule</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-red-100 border border-red-200 rounded"></div>
+              <div className="w-4 h-4 bg-destructive/10 border border-destructive/20 rounded"></div>
               <span>Overdue</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-orange-100 border border-orange-200 rounded"></div>
+              <div className="w-4 h-4 bg-warning/10 border border-warning/20 rounded"></div>
               <span>Payment Overdue</span>
             </div>
           </div>

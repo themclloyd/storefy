@@ -389,13 +389,13 @@ export function BusinessAlertsSystem() {
       case 'critical':
         return 'border-l-destructive bg-destructive/5';
       case 'warning':
-        return 'border-l-orange-500 bg-orange-50 dark:bg-orange-950/20';
+        return 'border-l-warning bg-warning/5';
       case 'success':
         return 'border-l-success bg-success/5';
       case 'opportunity':
-        return 'border-l-yellow-500 bg-yellow-50 dark:bg-yellow-950/20';
+        return 'border-l-quaternary bg-quaternary/5';
       default:
-        return 'border-l-blue-500 bg-blue-50 dark:bg-blue-950/20';
+        return 'border-l-primary bg-primary/5';
     }
   };
 
