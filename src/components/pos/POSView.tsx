@@ -684,8 +684,9 @@ export function POSView() {
                               alt={product.name}
                               className="w-full h-full object-cover"
                               onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                                e.currentTarget.nextElementSibling.style.display = 'flex';
+                                (e.currentTarget as HTMLImageElement).style.display = 'none';
+                                const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                                if (nextElement) nextElement.style.display = 'flex';
                               }}
                             />
                           ) : null}
