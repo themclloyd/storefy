@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useStore } from "@/contexts/StoreContext";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { StoreSelector } from "@/components/stores/StoreSelector";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { PanelLeft } from "lucide-react";
@@ -244,25 +245,48 @@ const Index = () => {
   }
 
   return (
-    <SidebarProvider defaultOpen={true}>
-      <Sidebar
-        activeView={activeView}
-        onViewChange={handleViewChange}
-        currentStore={currentStore.name}
-      />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-          <SidebarTrigger className="-ml-1" />
-          <div className="ml-auto">
-            <h1 className="text-lg font-semibold">{currentStore.name}</h1>
-          </div>
-        </header>
-        <div className="flex-1 overflow-auto">
-          <div className="p-6">
-            {renderView()}
-          </div>
+    <SidebarProvider defaultOpen={false}>
+      <div className="flex min-h-screen w-full bg-background">
+        {/* Desktop Sidebar */}
+        <div className="desktop-only">
+          <Sidebar
+            activeView={activeView}
+            onViewChange={handleViewChange}
+            currentStore={currentStore.name}
+          />
         </div>
-      </SidebarInset>
+
+        <SidebarInset className="flex-1">
+          {/* Mobile Header */}
+          <header className="mobile-header md:h-16 flex shrink-0 items-center gap-2 border-b px-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+            <SidebarTrigger className="-ml-1 md:hidden mobile-touch-target" />
+            <div className="flex-1 flex items-center justify-between">
+              <h1 className="text-lg font-semibold truncate">{currentStore.name}</h1>
+            </div>
+          </header>
+
+          {/* Main Content */}
+          <div className="flex-1 overflow-auto mobile-scroll">
+            <div className="p-4 md:p-6 pb-20 md:pb-6">
+              {renderView()}
+            </div>
+          </div>
+
+          {/* Mobile Bottom Navigation */}
+          <div className="mobile-only fixed bottom-0 left-0 right-0 z-50">
+            <MobileBottomNav activeView={activeView} onViewChange={handleViewChange} />
+          </div>
+        </SidebarInset>
+
+        {/* Mobile Sidebar Overlay */}
+        <div className="mobile-only">
+          <Sidebar
+            activeView={activeView}
+            onViewChange={handleViewChange}
+            currentStore={currentStore.name}
+          />
+        </div>
+      </div>
     </SidebarProvider>
   );
 };

@@ -259,3 +259,5 @@ export function StoreShortLinkPage() {
     </div>
   );
 }
+
+export default StoreShortLinkPage;

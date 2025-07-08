@@ -32,6 +32,15 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    
+    /* Mobile app-like experience variables */
+    --mobile-header-height: 3.5rem;
+    --mobile-tab-height: 4rem;
+    --mobile-padding: 1rem;
+    --mobile-card-radius: 0.75rem;
+    --mobile-safe-area-top: env(safe-area-inset-top);
+    --mobile-safe-area-bottom: env(safe-area-inset-bottom);
+    --mobile-touch-target: 44px;
   }
 
   .dark {
@@ -293,6 +302,74 @@
 
   .product-image-fallback {
     background: linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--muted)/0.8) 100%);
+  }
+
+  /* Mobile app-like experience */
+  @media (max-width: 768px) {
+    body {
+      overflow-x: hidden;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    /* Mobile-first touch targets */
+    .mobile-touch-target {
+      min-height: var(--mobile-touch-target);
+      min-width: var(--mobile-touch-target);
+    }
+
+    /* Mobile cards */
+    .mobile-card {
+      border-radius: var(--mobile-card-radius);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Mobile headers */
+    .mobile-header {
+      height: var(--mobile-header-height);
+      padding-top: max(0.5rem, env(safe-area-inset-top));
+    }
+
+    /* Mobile bottom navigation */
+    .mobile-tab-bar {
+      height: calc(var(--mobile-tab-height) + env(safe-area-inset-bottom));
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    /* Prevent zoom on input focus */
+    input, select, textarea {
+      font-size: 16px;
+    }
+
+    /* Full-height mobile layout */
+    .mobile-full-height {
+      height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    }
+
+    /* Mobile scrollable areas */
+    .mobile-scroll {
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+
+    /* Hide desktop elements on mobile */
+    .desktop-only {
+      display: none;
+    }
+  }
+
+  /* Desktop only elements */
+  @media (min-width: 769px) {
+    .mobile-only {
+      display: none;
+    }
+  }
+
+  /* PWA status bar styling */
+  @media (display-mode: standalone) {
+    body {
+      padding-top: env(safe-area-inset-top);
+    }
   }
 }
 

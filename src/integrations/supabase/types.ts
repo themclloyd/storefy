@@ -7,8 +7,63 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instanciate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "12.2.3 (519615d)"
+  }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action_type: string
+          actor_id: string | null
+          actor_name: string
+          created_at: string | null
+          description: string
+          id: string
+          metadata: Json | null
+          store_id: string
+          target_id: string | null
+          target_name: string | null
+          target_type: string
+        }
+        Insert: {
+          action_type: string
+          actor_id?: string | null
+          actor_name: string
+          created_at?: string | null
+          description: string
+          id?: string
+          metadata?: Json | null
+          store_id: string
+          target_id?: string | null
+          target_name?: string | null
+          target_type: string
+        }
+        Update: {
+          action_type?: string
+          actor_id?: string | null
+          actor_name?: string
+          created_at?: string | null
+          description?: string
+          id?: string
+          metadata?: Json | null
+          store_id?: string
+          target_id?: string | null
+          target_name?: string | null
+          target_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_logs_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string
@@ -86,6 +141,406 @@ export type Database = {
             foreignKeyName: "customers_store_id_fkey"
             columns: ["store_id"]
             isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      layby_history: {
+        Row: {
+          action_description: string
+          action_type: string
+          amount_involved: number | null
+          id: string
+          layby_order_id: string
+          new_values: Json | null
+          notes: string | null
+          old_values: Json | null
+          performed_at: string
+          performed_by: string
+        }
+        Insert: {
+          action_description: string
+          action_type: string
+          amount_involved?: number | null
+          id?: string
+          layby_order_id: string
+          new_values?: Json | null
+          notes?: string | null
+          old_values?: Json | null
+          performed_at?: string
+          performed_by: string
+        }
+        Update: {
+          action_description?: string
+          action_type?: string
+          amount_involved?: number | null
+          id?: string
+          layby_order_id?: string
+          new_values?: Json | null
+          notes?: string | null
+          old_values?: Json | null
+          performed_at?: string
+          performed_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "layby_history_layby_order_id_fkey"
+            columns: ["layby_order_id"]
+            isOneToOne: false
+            referencedRelation: "layby_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      layby_items: {
+        Row: {
+          created_at: string | null
+          id: string
+          layby_order_id: string
+          product_id: string
+          quantity: number
+          total_price: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          layby_order_id: string
+          product_id: string
+          quantity: number
+          total_price: number
+          unit_price: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          layby_order_id?: string
+          product_id?: string
+          quantity?: number
+          total_price?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "layby_items_layby_order_id_fkey"
+            columns: ["layby_order_id"]
+            isOneToOne: false
+            referencedRelation: "layby_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "layby_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      layby_notifications: {
+        Row: {
+          created_at: string
+          created_by: string
+          error_message: string | null
+          id: string
+          layby_order_id: string
+          message: string
+          notification_type: string
+          recipient_email: string | null
+          recipient_phone: string | null
+          sent_at: string | null
+          status: string | null
+          subject: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          error_message?: string | null
+          id?: string
+          layby_order_id: string
+          message: string
+          notification_type: string
+          recipient_email?: string | null
+          recipient_phone?: string | null
+          sent_at?: string | null
+          status?: string | null
+          subject?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          error_message?: string | null
+          id?: string
+          layby_order_id?: string
+          message?: string
+          notification_type?: string
+          recipient_email?: string | null
+          recipient_phone?: string | null
+          sent_at?: string | null
+          status?: string | null
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "layby_notifications_layby_order_id_fkey"
+            columns: ["layby_order_id"]
+            isOneToOne: false
+            referencedRelation: "layby_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      layby_orders: {
+        Row: {
+          balance_remaining: number
+          cancellation_reason: string | null
+          completion_date: string | null
+          created_at: string | null
+          created_by: string
+          customer_email: string | null
+          customer_id: string | null
+          customer_name: string
+          customer_phone: string | null
+          deposit_amount: number
+          due_date: string | null
+          id: string
+          interest_amount: number | null
+          interest_rate: number | null
+          inventory_reserved: boolean | null
+          last_reminder_sent: string | null
+          layby_number: string
+          notes: string | null
+          payment_schedule: string | null
+          payment_schedule_type: string | null
+          priority_level: string | null
+          refund_amount: number | null
+          reminder_count: number | null
+          restocking_fee: number | null
+          status: string
+          store_id: string
+          total_amount: number
+          updated_at: string | null
+        }
+        Insert: {
+          balance_remaining: number
+          cancellation_reason?: string | null
+          completion_date?: string | null
+          created_at?: string | null
+          created_by: string
+          customer_email?: string | null
+          customer_id?: string | null
+          customer_name: string
+          customer_phone?: string | null
+          deposit_amount: number
+          due_date?: string | null
+          id?: string
+          interest_amount?: number | null
+          interest_rate?: number | null
+          inventory_reserved?: boolean | null
+          last_reminder_sent?: string | null
+          layby_number: string
+          notes?: string | null
+          payment_schedule?: string | null
+          payment_schedule_type?: string | null
+          priority_level?: string | null
+          refund_amount?: number | null
+          reminder_count?: number | null
+          restocking_fee?: number | null
+          status?: string
+          store_id: string
+          total_amount: number
+          updated_at?: string | null
+        }
+        Update: {
+          balance_remaining?: number
+          cancellation_reason?: string | null
+          completion_date?: string | null
+          created_at?: string | null
+          created_by?: string
+          customer_email?: string | null
+          customer_id?: string | null
+          customer_name?: string
+          customer_phone?: string | null
+          deposit_amount?: number
+          due_date?: string | null
+          id?: string
+          interest_amount?: number | null
+          interest_rate?: number | null
+          inventory_reserved?: boolean | null
+          last_reminder_sent?: string | null
+          layby_number?: string
+          notes?: string | null
+          payment_schedule?: string | null
+          payment_schedule_type?: string | null
+          priority_level?: string | null
+          refund_amount?: number | null
+          reminder_count?: number | null
+          restocking_fee?: number | null
+          status?: string
+          store_id?: string
+          total_amount?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "layby_orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "layby_orders_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      layby_payment_schedules: {
+        Row: {
+          amount_due: number
+          amount_paid: number | null
+          created_at: string
+          due_date: string
+          id: string
+          layby_order_id: string
+          notes: string | null
+          payment_number: number
+          reminder_sent: boolean | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_due: number
+          amount_paid?: number | null
+          created_at?: string
+          due_date: string
+          id?: string
+          layby_order_id: string
+          notes?: string | null
+          payment_number: number
+          reminder_sent?: boolean | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_due?: number
+          amount_paid?: number | null
+          created_at?: string
+          due_date?: string
+          id?: string
+          layby_order_id?: string
+          notes?: string | null
+          payment_number?: number
+          reminder_sent?: boolean | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "layby_payment_schedules_layby_order_id_fkey"
+            columns: ["layby_order_id"]
+            isOneToOne: false
+            referencedRelation: "layby_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      layby_payments: {
+        Row: {
+          amount: number
+          created_at: string | null
+          id: string
+          layby_order_id: string
+          notes: string | null
+          payment_method: string
+          payment_reference: string | null
+          processed_by: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          id?: string
+          layby_order_id: string
+          notes?: string | null
+          payment_method?: string
+          payment_reference?: string | null
+          processed_by: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          id?: string
+          layby_order_id?: string
+          notes?: string | null
+          payment_method?: string
+          payment_reference?: string | null
+          processed_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "layby_payments_layby_order_id_fkey"
+            columns: ["layby_order_id"]
+            isOneToOne: false
+            referencedRelation: "layby_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      layby_settings: {
+        Row: {
+          automatic_reminders_enabled: boolean | null
+          created_at: string
+          default_cancellation_fee_percent: number | null
+          default_interest_rate: number | null
+          id: string
+          inventory_reservation_enabled: boolean | null
+          max_layby_duration_days: number | null
+          max_reminder_count: number | null
+          overdue_grace_period_days: number | null
+          reminder_frequency_days: number | null
+          require_deposit_percent: number | null
+          store_id: string
+          updated_at: string
+        }
+        Insert: {
+          automatic_reminders_enabled?: boolean | null
+          created_at?: string
+          default_cancellation_fee_percent?: number | null
+          default_interest_rate?: number | null
+          id?: string
+          inventory_reservation_enabled?: boolean | null
+          max_layby_duration_days?: number | null
+          max_reminder_count?: number | null
+          overdue_grace_period_days?: number | null
+          reminder_frequency_days?: number | null
+          require_deposit_percent?: number | null
+          store_id: string
+          updated_at?: string
+        }
+        Update: {
+          automatic_reminders_enabled?: boolean | null
+          created_at?: string
+          default_cancellation_fee_percent?: number | null
+          default_interest_rate?: number | null
+          id?: string
+          inventory_reservation_enabled?: boolean | null
+          max_layby_duration_days?: number | null
+          max_reminder_count?: number | null
+          overdue_grace_period_days?: number | null
+          reminder_frequency_days?: number | null
+          require_deposit_percent?: number | null
+          store_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "layby_settings_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: true
             referencedRelation: "stores"
             referencedColumns: ["id"]
           },
@@ -189,6 +644,47 @@ export type Database = {
           },
           {
             foreignKeyName: "orders_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_methods: {
+        Row: {
+          account_number: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          name: string
+          provider: string
+          store_id: string
+          updated_at: string
+        }
+        Insert: {
+          account_number: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          provider: string
+          store_id: string
+          updated_at?: string
+        }
+        Update: {
+          account_number?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          provider?: string
+          store_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_methods_store_id_fkey"
             columns: ["store_id"]
             isOneToOne: false
             referencedRelation: "stores"
@@ -354,45 +850,47 @@ export type Database = {
             referencedRelation: "stores"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "stock_adjustments_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
         ]
       }
       store_members: {
         Row: {
           created_at: string
+          email: string | null
           id: string
           is_active: boolean | null
+          name: string | null
+          phone: string | null
           pin: string | null
           role: Database["public"]["Enums"]["store_role"]
           store_id: string
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
+          email?: string | null
           id?: string
           is_active?: boolean | null
+          name?: string | null
+          phone?: string | null
           pin?: string | null
           role?: Database["public"]["Enums"]["store_role"]
           store_id: string
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
+          email?: string | null
           id?: string
           is_active?: boolean | null
+          name?: string | null
+          phone?: string | null
           pin?: string | null
           role?: Database["public"]["Enums"]["store_role"]
           store_id?: string
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -403,6 +901,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      stores: {
+        Row: {
+          address: string | null
+          created_at: string
+          currency: string | null
+          email: string | null
+          id: string
+          name: string
+          owner_id: string
+          phone: string | null
+          store_code: string
+          tax_rate: number | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          currency?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          owner_id: string
+          phone?: string | null
+          store_code: string
+          tax_rate?: number | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          currency?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          owner_id?: string
+          phone?: string | null
+          store_code?: string
+          tax_rate?: number | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       suppliers: {
         Row: {
@@ -457,53 +997,146 @@ export type Database = {
           },
         ]
       }
-      stores: {
+      transaction_history: {
         Row: {
-          address: string | null
-          created_at: string
-          currency: string | null
-          email: string | null
+          action_description: string | null
+          action_type: string
           id: string
-          name: string
-          owner_id: string
-          phone: string | null
-          store_code: string
-          tax_rate: number | null
-          updated_at: string
+          ip_address: unknown | null
+          new_values: Json | null
+          old_values: Json | null
+          performed_at: string
+          performed_by: string
+          transaction_id: string
+          user_agent: string | null
         }
         Insert: {
-          address?: string | null
-          created_at?: string
-          currency?: string | null
-          email?: string | null
+          action_description?: string | null
+          action_type: string
           id?: string
-          name: string
-          owner_id: string
-          phone?: string | null
-          store_code: string
-          tax_rate?: number | null
-          updated_at?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          performed_at?: string
+          performed_by: string
+          transaction_id: string
+          user_agent?: string | null
         }
         Update: {
-          address?: string | null
-          created_at?: string
-          currency?: string | null
-          email?: string | null
+          action_description?: string | null
+          action_type?: string
           id?: string
-          name?: string
-          owner_id?: string
-          phone?: string | null
-          store_code?: string
-          tax_rate?: number | null
-          updated_at?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          performed_at?: string
+          performed_by?: string
+          transaction_id?: string
+          user_agent?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "transaction_history_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          customer_id: string | null
+          customer_name: string | null
+          description: string | null
+          id: string
+          notes: string | null
+          payment_method: string
+          processed_by: string
+          reference_id: string | null
+          reference_type: string | null
+          store_id: string
+          transaction_number: string
+          transaction_type: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          customer_id?: string | null
+          customer_name?: string | null
+          description?: string | null
+          id?: string
+          notes?: string | null
+          payment_method?: string
+          processed_by: string
+          reference_id?: string | null
+          reference_type?: string | null
+          store_id: string
+          transaction_number: string
+          transaction_type: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          customer_id?: string | null
+          customer_name?: string | null
+          description?: string | null
+          id?: string
+          notes?: string | null
+          payment_method?: string
+          processed_by?: string
+          reference_id?: string | null
+          reference_type?: string | null
+          store_id?: string
+          transaction_number?: string
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      calculate_layby_interest: {
+        Args: { _layby_order_id: string }
+        Returns: number
+      }
+      generate_layby_number: {
+        Args: { store_id_param: string }
+        Returns: string
+      }
+      generate_payment_schedule: {
+        Args: {
+          _layby_order_id: string
+          _schedule_type: string
+          _start_date: string
+          _total_amount: number
+          _deposit_amount: number
+        }
+        Returns: undefined
+      }
+      generate_transaction_number: {
+        Args: { store_id_param: string }
+        Returns: string
+      }
       has_store_access: {
         Args: {
           _store_id: string
@@ -511,9 +1144,17 @@ export type Database = {
         }
         Returns: boolean
       }
-      initialize_sample_data: {
+      initialize_layby_settings: {
         Args: { _store_id: string }
         Returns: undefined
+      }
+      update_overdue_layby_orders: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      update_overdue_laybys: {
+        Args: Record<PropertyKey, never>
+        Returns: number
       }
       user_can_access_store: {
         Args: { _store_id: string }
@@ -533,21 +1174,25 @@ export type Database = {
   }
 }
 
-type DefaultSchema = Database[Extract<keyof Database, "public">]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
@@ -565,14 +1210,16 @@ export type Tables<
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
@@ -588,14 +1235,16 @@ export type TablesInsert<
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
@@ -611,14 +1260,16 @@ export type TablesUpdate<
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
@@ -626,14 +1277,16 @@ export type Enums<
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
