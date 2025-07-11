@@ -1,4 +1,4 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,6 +8,9 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { StoreProvider } from "@/contexts/StoreContext";
 import { MobileAppWrapper } from "@/components/layout/MobileAppWrapper";
 import { ThemeToggleButton } from './components/ui/theme-toggle';
+import { SecurityProvider } from "@/components/security/SecurityProvider";
+import { SecurityHeaders, ConsoleWarning } from "@/components/security/SecurityHeaders";
+import { initializeCSRFProtection } from "@/lib/csrf";
 
 // Lazy load page components
 const LandingPage = lazy(() => import("./pages/LandingPage"));
@@ -31,18 +34,31 @@ const PageLoader = () => (
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <MobileAppWrapper>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <div className="desktop-only" style={{ position: 'fixed', top: 16, right: 16, zIndex: 50 }}>
-          <ThemeToggleButton />
-        </div>
-        <BrowserRouter>
-          <AuthProvider>
-            <StoreProvider>
+const App = () => {
+  useEffect(() => {
+    initializeCSRFProtection();
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <SecurityProvider>
+        <SecurityHeaders />
+        <ConsoleWarning />
+      <MobileAppWrapper>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <div className="desktop-only" style={{ position: 'fixed', top: 16, right: 16, zIndex: 50 }}>
+            <ThemeToggleButton />
+          </div>
+          <BrowserRouter
+            future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true
+            }}
+          >
+            <AuthProvider>
+              <StoreProvider>
               <Suspense fallback={<PageLoader />}>
                 <Routes>
                   <Route path="/" element={<LandingPage />} />
@@ -65,13 +81,15 @@ const App = () => (
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
-              </Suspense>
-            </StoreProvider>
-          </AuthProvider>
-        </BrowserRouter>
-      </TooltipProvider>
-    </MobileAppWrapper>
-  </QueryClientProvider>
-);
+                </Suspense>
+              </StoreProvider>
+            </AuthProvider>
+          </BrowserRouter>
+          </TooltipProvider>
+        </MobileAppWrapper>
+      </SecurityProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

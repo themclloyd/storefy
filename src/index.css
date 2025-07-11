@@ -365,11 +365,6 @@
     }
   }
 
-  /* PWA status bar styling */
-  @media (display-mode: standalone) {
-    body {
-      padding-top: env(safe-area-inset-top);
-    }
-  }
+
 }
 

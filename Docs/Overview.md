@@ -18,6 +18,14 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,  // Development server port
+    hmr: {
+      port: 8080,
+      host: 'localhost'  // Improved HMR reliability
+    },
+    watch: {
+      usePolling: true,  // Better file watching
+      interval: 100
+    }
   },
   plugins: [
     react(),  // Using SWC for faster compilation
