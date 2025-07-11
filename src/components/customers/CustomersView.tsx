@@ -9,6 +9,7 @@ import { useStore } from "@/contexts/StoreContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useTax } from "@/hooks/useTax";
 import { AddCustomerDialog } from "./AddCustomerDialog";
 import { EditCustomerDialog } from "./EditCustomerDialog";
 import { CustomerDetailsModal } from "./CustomerDetailsModal";
@@ -33,6 +34,7 @@ interface Customer {
 export function CustomersView() {
   const { currentStore } = useStore();
   const { user } = useAuth();
+  const { formatCurrency } = useTax();
 
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -272,7 +274,7 @@ export function CustomersView() {
                     </TableCell>
                     <TableCell className="font-medium">{customer.total_orders || 0}</TableCell>
                     <TableCell className="font-medium text-success">
-                      ${(customer.total_spent || 0).toFixed(2)}
+                      {formatCurrency(customer.total_spent || 0)}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
                       {customer.last_order_date

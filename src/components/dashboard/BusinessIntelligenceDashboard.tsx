@@ -35,6 +35,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useTax } from "@/hooks/useTax";
 import {
   SalesVelocityWidget,
   InventoryTurnoverWidget,
@@ -96,6 +97,7 @@ interface BusinessAlert {
 export function BusinessIntelligenceDashboard() {
   const { currentStore } = useStore();
   const { user } = useAuth();
+  const { formatCurrency } = useTax();
   const [metrics, setMetrics] = useState<BusinessMetrics>({
     todaysSales: 0,
     yesterdaysSales: 0,
@@ -438,7 +440,7 @@ export function BusinessIntelligenceDashboard() {
           <CardContent>
             <div className="space-y-2">
               <div className="text-2xl font-bold text-foreground">
-                ${metrics.todaysSales.toFixed(2)}
+                {formatCurrency(metrics.todaysSales)}
               </div>
               <div className="flex items-center gap-2">
                 {metrics.salesVelocity >= 0 ? (
@@ -587,7 +589,7 @@ export function BusinessIntelligenceDashboard() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium text-foreground">${Number(order.total).toFixed(2)}</p>
+                    <p className="font-medium text-foreground">{formatCurrency(Number(order.total))}</p>
                     <p className="text-sm text-muted-foreground">
                       {new Date(order.created_at).toLocaleTimeString()}
                     </p>

@@ -3,6 +3,7 @@ import { useStore } from "@/contexts/StoreContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { usePaymentMethods } from "@/hooks/usePaymentMethods";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,7 @@ interface LaybyPaymentDialogProps {
 export function LaybyPaymentDialog({ open, onOpenChange, layby, onSuccess }: LaybyPaymentDialogProps) {
   const { currentStore } = useStore();
   const { user } = useAuth();
+  const { getPaymentOptions } = usePaymentMethods();
   const [loading, setLoading] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("cash");
@@ -222,10 +224,23 @@ export function LaybyPaymentDialog({ open, onOpenChange, layby, onSuccess }: Lay
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="cash">Cash</SelectItem>
-                  <SelectItem value="card">Card</SelectItem>
-                  <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
+                  {getPaymentOptions().map((option) => (
+                    <SelectItem key={option.id} value={option.id}>
+                      <div className="flex items-center gap-2">
+                        {option.type === 'cash' ? (
+                          <DollarSign className="w-4 h-4" />
+                        ) : (
+                          <CreditCard className="w-4 h-4" />
+                        )}
+                        <div className="flex flex-col items-start">
+                          <span>{option.name}</span>
+                          {option.provider && (
+                            <span className="text-xs text-muted-foreground">{option.provider}</span>
+                          )}
+                        </div>
+                      </div>
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
