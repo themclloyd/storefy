@@ -1,10 +1,9 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig(() => ({
   server: {
     host: "localhost", // changed from "::" to "localhost" for better compatibility
     port: 8080,
@@ -21,9 +20,7 @@ export default defineConfig(({ mode }) => ({
   publicDir: 'public',
   plugins: [
     react(),
-    mode === 'development' &&
-    componentTagger(),
-  ].filter(Boolean),
+  ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -75,7 +72,7 @@ export default defineConfig(({ mode }) => ({
             '@supabase/supabase-js'
           ],
           'chart-vendor': ['recharts'],
-          'pdf-vendor': ['jspdf', 'jspdf-autotable'],
+          'pdf-vendor': ['jspdf', 'jspdf-autotable', 'html2canvas', 'papaparse'],
           'utils-vendor': [
             'lucide-react',
             'date-fns',
@@ -84,7 +81,6 @@ export default defineConfig(({ mode }) => ({
             'tailwind-merge',
             'cmdk',
             'sonner',
-            'vaul',
             'next-themes',
             'input-otp',
             'embla-carousel-react',
