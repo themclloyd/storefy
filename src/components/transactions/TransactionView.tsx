@@ -338,7 +338,7 @@ export function TransactionView() {
                 <SelectContent>
                   <SelectItem value="all">
                     <div className="flex items-center gap-2">
-                      <CreditCard className="w-4 h-4" />
+                      <div className="w-4 h-4" />
                       <span>All Methods</span>
                     </div>
                   </SelectItem>
@@ -348,7 +348,7 @@ export function TransactionView() {
                         {option.type === 'cash' ? (
                           <DollarSign className="w-4 h-4" />
                         ) : (
-                          <CreditCard className="w-4 h-4" />
+                          <div className="w-4 h-4" />
                         )}
                         <div className="flex flex-col items-start">
                           <span>{option.name}</span>

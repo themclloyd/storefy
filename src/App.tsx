@@ -55,7 +55,7 @@ const App = () => {
                 <Route path="/inventory" element={<Index />} />
                 <Route path="/categories" element={<Index />} />
                 <Route path="/suppliers" element={<Index />} />
-                <Route path="/layby" element={<Index />} />
+                
                 <Route path="/transactions" element={<Index />} />
                 <Route path="/customers" element={<Index />} />
                 <Route path="/reports" element={<Index />} />

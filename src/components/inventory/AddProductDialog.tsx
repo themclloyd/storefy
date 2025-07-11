@@ -202,15 +202,20 @@ export function AddProductDialog({ open, onOpenChange, onProductAdded }: AddProd
 
       const { error } = await supabase
         .from('products')
-        .insert([
-          {
-            ...data,
-            store_id: currentStore.id,
-            image_url: finalImageUrl,
-            category_id: data.category_id || null,
-            supplier_id: data.supplier_id || null,
-          }
-        ]);
+        .insert({
+          name: data.name || '',
+          price: data.price || 0,
+          store_id: currentStore.id,
+          image_url: finalImageUrl,
+          category_id: data.category_id || null,
+          supplier_id: data.supplier_id || null,
+          description: data.description || null,
+          cost: data.cost || null,
+          stock_quantity: data.stock_quantity || 0,
+          low_stock_threshold: data.low_stock_threshold || 5,
+          sku: data.sku || null,
+          is_active: data.is_active !== false,
+        });
 
       if (error) throw error;
 

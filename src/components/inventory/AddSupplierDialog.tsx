@@ -74,14 +74,17 @@ export function AddSupplierDialog({ open, onOpenChange, onSupplierAdded }: AddSu
     try {
       const { error } = await supabase
         .from('suppliers')
-        .insert([
-          {
-            ...data,
-            store_id: currentStore.id,
-            email: data.email || null,
-            website: data.website || null,
-          }
-        ]);
+        .insert({
+          name: data.name || '',
+          store_id: currentStore.id,
+          email: data.email || null,
+          website: data.website || null,
+          contact_person: data.contact_person || null,
+          phone: data.phone || null,
+          address: data.address || null,
+          notes: data.notes || null,
+          is_active: data.is_active !== false,
+        });
 
       if (error) throw error;
 

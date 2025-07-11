@@ -254,7 +254,7 @@ export function ProductHistoryModal({ open, onOpenChange, product }: ProductHist
                               <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-2">
                                   <Badge 
-                                    variant={adjustmentTypeColors[adjustment.adjustment_type as keyof typeof adjustmentTypeColors]}
+                                    variant="secondary"
                                   >
                                     {adjustmentTypeLabels[adjustment.adjustment_type as keyof typeof adjustmentTypeLabels]}
                                   </Badge>

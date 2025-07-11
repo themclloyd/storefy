@@ -217,7 +217,7 @@ export function ModernDashboard() {
         <Card className="relative overflow-hidden bg-gradient-to-br from-qb-green-50 to-qb-green-100 dark:from-qb-green-950/20 dark:to-qb-green-900/20 border-0 shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <div>
-              <Badge variant="success" className="mb-2">
+              <Badge variant="secondary" className="mb-2">
                 Update
               </Badge>
               <CardTitle className="text-sm font-medium text-muted-foreground">

@@ -14,7 +14,7 @@ const POSView = lazy(() => import("@/components/pos/POSView").then(module => ({ 
 const InventoryView = lazy(() => import("@/components/inventory/InventoryView").then(module => ({ default: module.InventoryView })));
 const CategoriesView = lazy(() => import("@/components/inventory/CategoriesView").then(module => ({ default: module.CategoriesView })));
 const SuppliersView = lazy(() => import("@/components/inventory/SuppliersView").then(module => ({ default: module.SuppliersView })));
-const LaybyView = lazy(() => import("@/components/layby/LaybyView").then(module => ({ default: module.LaybyView })));
+
 const TransactionView = lazy(() => import("@/components/transactions/TransactionView").then(module => ({ default: module.TransactionView })));
 const CustomersView = lazy(() => import("@/components/customers/CustomersView").then(module => ({ default: module.CustomersView })));
 const ReportsView = lazy(() => import("@/components/reports/ReportsView").then(module => ({ default: module.ReportsView })));
@@ -59,7 +59,7 @@ const Index = () => {
       '/inventory': 'inventory',
       '/categories': 'categories',
       '/suppliers': 'suppliers',
-      '/layby': 'layby',
+      
       '/transactions': 'transactions',
       '/customers': 'customers',
       '/reports': 'reports',
@@ -79,7 +79,7 @@ const Index = () => {
       inventory: "Inventory",
       categories: "Categories",
       suppliers: "Suppliers",
-      layby: "Layby",
+      
       transactions: "Transactions",
       customers: "Customers",
       reports: "Reports",
@@ -102,7 +102,7 @@ const Index = () => {
       'inventory': '/inventory',
       'categories': '/categories',
       'suppliers': '/suppliers',
-      'layby': '/layby',
+      
       'transactions': '/transactions',
       'customers': '/customers',
       'reports': '/reports',
@@ -152,8 +152,6 @@ const Index = () => {
               }}
             />
           );
-        case "layby":
-          return <LaybyView />;
         case "transactions":
           return <TransactionView />;
         case "customers":

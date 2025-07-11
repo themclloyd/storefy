@@ -1,8 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { secureLog, sanitizeError } from '@/lib/security';
-import { secureSignIn, authSecurityManager, validateSessionSecurity } from '@/lib/authSecurity';
 
 interface AuthContextType {
   user: User | null;
@@ -42,15 +40,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
-      secureLog.info('AuthContext: Attempting secure sign in', { email: email.substring(0, 3) + '***' });
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-      // Use enhanced secure sign-in with lockout protection
-      const result = await secureSignIn(email, password);
-
-      secureLog.info('AuthContext: Sign in successful');
+      if (error) throw error;
       return { error: null };
     } catch (error) {
-      secureLog.error('AuthContext: Sign in failed', sanitizeError(error));
       return { error: error instanceof Error ? error : new Error('Sign in failed') };
     }
   };

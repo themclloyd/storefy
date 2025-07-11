@@ -50,9 +50,8 @@ const mainNavItems = [
   { id: "dashboard", label: "Dashboard", icon: Home },
   { id: "pos", label: "POS System", icon: ShoppingCart },
   { id: "inventory", label: "Inventory", icon: Package, hasSubmenu: true },
-  { id: "layby", label: "Layby", icon: Clock },
-  { id: "transactions", label: "Transactions", icon: Receipt },
   { id: "customers", label: "Customers", icon: Users },
+  { id: "transactions", label: "Transactions", icon: Receipt },
 ];
 
 // Secondary navigation items
