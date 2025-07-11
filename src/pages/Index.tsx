@@ -7,8 +7,6 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { StoreSelector } from "@/components/stores/StoreSelector";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { PanelLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 // Lazy load view components for code splitting
 const DashboardView = lazy(() => import("@/components/dashboard/DashboardView").then(module => ({ default: module.DashboardView })));
@@ -245,10 +243,10 @@ const Index = () => {
   }
 
   return (
-    <SidebarProvider defaultOpen={false}>
+    <SidebarProvider defaultOpen={true}>
       <div className="flex min-h-screen w-full bg-background">
-        {/* Desktop Sidebar */}
-        <div className="desktop-only">
+        {/* Sidebar */}
+        <div className="hidden md:block">
           <Sidebar
             activeView={activeView}
             onViewChange={handleViewChange}
@@ -257,29 +255,29 @@ const Index = () => {
         </div>
 
         <SidebarInset className="flex-1">
-          {/* Mobile Header */}
-          <header className="mobile-header md:h-16 flex shrink-0 items-center gap-2 border-b px-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-            <SidebarTrigger className="-ml-1 md:hidden mobile-touch-target" />
+          {/* Header */}
+          <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4 bg-background sticky top-0 z-40">
+            <SidebarTrigger className="-ml-1 md:hidden" />
             <div className="flex-1 flex items-center justify-between">
               <h1 className="text-lg font-semibold truncate">{currentStore.name}</h1>
             </div>
           </header>
 
           {/* Main Content */}
-          <div className="flex-1 overflow-auto mobile-scroll">
+          <div className="flex-1 overflow-auto">
             <div className="p-4 md:p-6 pb-20 md:pb-6">
               {renderView()}
             </div>
           </div>
 
           {/* Mobile Bottom Navigation */}
-          <div className="mobile-only fixed bottom-0 left-0 right-0 z-50">
+          <div className="md:hidden fixed bottom-0 left-0 right-0 z-50">
             <MobileBottomNav activeView={activeView} onViewChange={handleViewChange} />
           </div>
         </SidebarInset>
 
-        {/* Mobile Sidebar Overlay */}
-        <div className="mobile-only">
+        {/* Mobile Sidebar */}
+        <div className="md:hidden">
           <Sidebar
             activeView={activeView}
             onViewChange={handleViewChange}

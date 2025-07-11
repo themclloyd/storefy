@@ -23,8 +23,8 @@ const navigationItems = [
 
 export function MobileBottomNav({ activeView, onViewChange }: MobileBottomNavProps) {
   return (
-    <div className="mobile-tab-bar bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-t">
-      <div className="flex items-center justify-around h-16">
+    <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-t">
+      <div className="flex items-center justify-around h-16 px-2">
         {navigationItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeView === item.id;
@@ -34,7 +34,7 @@ export function MobileBottomNav({ activeView, onViewChange }: MobileBottomNavPro
               key={item.id}
               onClick={() => onViewChange(item.id)}
               className={cn(
-                "mobile-touch-target flex flex-col items-center justify-center px-2 py-1 rounded-lg transition-all duration-200",
+                "flex flex-col items-center justify-center px-2 py-1 rounded-lg transition-all duration-200 min-h-[44px] min-w-[44px]",
                 isActive 
                   ? "text-primary bg-primary/10" 
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/50"

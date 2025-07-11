@@ -33,14 +33,6 @@
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
     
-    /* Mobile app-like experience variables */
-    --mobile-header-height: 3.5rem;
-    --mobile-tab-height: 4rem;
-    --mobile-padding: 1rem;
-    --mobile-card-radius: 0.75rem;
-    --mobile-safe-area-top: env(safe-area-inset-top);
-    --mobile-safe-area-bottom: env(safe-area-inset-bottom);
-    --mobile-touch-target: 44px;
   }
 
   .dark {
