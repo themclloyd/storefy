@@ -31,13 +31,13 @@ interface Product {
   description: string;
   price: number;
   cost: number;
+  created_at: string;
   stock_quantity: number;
   low_stock_threshold: number;
   category_id: string;
   supplier_id: string;
   image_url: string;
   is_active: boolean;
-  created_at?: string;
   categories?: {
     name: string;
   };

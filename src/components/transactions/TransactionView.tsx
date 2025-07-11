@@ -28,6 +28,7 @@ interface Transaction {
   reference_type: string;
   customer_id: string;
   customer_name: string;
+  processed_by: string;
   description: string;
   notes: string;
   created_at: string;

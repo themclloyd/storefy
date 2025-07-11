@@ -764,8 +764,9 @@ export function POSView() {
                               alt={product.name}
                               className="w-full h-full object-cover"
                               onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                                e.currentTarget.nextElementSibling.style.display = 'flex';
+                                (e.currentTarget as HTMLImageElement).style.display = 'none';
+                                const next = e.currentTarget.nextElementSibling as HTMLElement;
+                                if (next) next.style.display = 'flex';
                               }}
                             />
                           ) : null}
@@ -845,8 +846,9 @@ export function POSView() {
                                   alt={product.name}
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
-                                    e.currentTarget.style.display = 'none';
-                                    e.currentTarget.nextElementSibling.style.display = 'flex';
+                                    (e.currentTarget as HTMLImageElement).style.display = 'none';
+                                    const next = e.currentTarget.nextElementSibling as HTMLElement;
+                                    if (next) next.style.display = 'flex';
                                   }}
                                 />
                               ) : null}
@@ -985,7 +987,6 @@ export function POSView() {
                       value={customerSearchTerm}
                       onChange={(e) => setCustomerSearchTerm(e.target.value)}
                       className="pl-7 h-8 text-xs"
-                      size="sm"
                     />
                   </div>
 
@@ -1044,8 +1045,9 @@ export function POSView() {
                               alt={item.name}
                               className="w-full h-full object-cover"
                               onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                                e.currentTarget.nextElementSibling.style.display = 'flex';
+                                (e.currentTarget as HTMLImageElement).style.display = 'none';
+                                const next = e.currentTarget.nextElementSibling as HTMLElement;
+                                if (next) next.style.display = 'flex';
                               }}
                             />
                           ) : null}
@@ -1182,14 +1184,12 @@ export function POSView() {
                           value={discountValue}
                           onChange={(e) => setDiscountValue(e.target.value)}
                           className="flex-1"
-                          size="sm"
                         />
                       </div>
                       <Input
                         placeholder="Discount code (optional)"
                         value={discountCode}
                         onChange={(e) => setDiscountCode(e.target.value)}
-                        size="sm"
                       />
                     </div>
                   </div>
