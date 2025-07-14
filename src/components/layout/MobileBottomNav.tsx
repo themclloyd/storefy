@@ -4,7 +4,9 @@ import {
   Package,
   Users,
   BarChart3,
-  Settings
+  Clock,
+  Settings,
+  DollarSign
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -17,8 +19,8 @@ const navigationItems = [
   { id: "dashboard", label: "Home", icon: Home },
   { id: "pos", label: "POS", icon: ShoppingCart },
   { id: "inventory", label: "Stock", icon: Package },
-  { id: "customers", label: "Customers", icon: Users },
-  { id: "reports", label: "Reports", icon: BarChart3 }
+  { id: "expenses", label: "Expenses", icon: DollarSign },
+  { id: "customers", label: "Customers", icon: Users }
 ];
 
 export function MobileBottomNav({ activeView, onViewChange }: MobileBottomNavProps) {

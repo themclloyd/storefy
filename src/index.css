@@ -7,59 +7,89 @@
 
 @layer base {
   :root {
+    /* Base colors */
     --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
+    --foreground: 220 13% 18%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
+    --card-foreground: 220 13% 18%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
+    --popover-foreground: 220 13% 18%;
+
+    /* Primary - Brand Green #2CA01C */
+    --primary: 111 69% 38%;
     --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
+
+    /* Secondary - Neutral Gray */
+    --secondary: 220 13% 96%;
+    --secondary-foreground: 220 13% 18%;
+
+    /* Muted colors */
+    --muted: 220 13% 96%;
+    --muted-foreground: 220 9% 46%;
+
+    /* Accent - Success Green */
+    --accent: 142 76% 36%;
+    --accent-foreground: 0 0% 98%;
+
+    /* Destructive - Error Red */
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+
+    /* Interactive elements */
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 111 69% 38%;
+
+    /* Chart colors - Professional palette */
+    --chart-1: 111 69% 38%;   /* Primary Green */
+    --chart-2: 210 100% 50%;  /* Blue */
+    --chart-3: 25 95% 53%;    /* Orange */
+    --chart-4: 262 83% 58%;   /* Purple */
+    --chart-5: 346 87% 43%;   /* Red */
+
     --radius: 0.5rem;
-    
   }
 
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    /* Base colors */
+    --background: 220 13% 9%;
+    --foreground: 220 13% 98%;
+    --card: 220 13% 11%;
+    --card-foreground: 220 13% 98%;
+    --popover: 220 13% 11%;
+    --popover-foreground: 220 13% 98%;
+
+    /* Primary - Brand Green #2CA01C (lighter in dark mode) */
+    --primary: 111 69% 45%;
+    --primary-foreground: 220 13% 9%;
+
+    /* Secondary - Dark Gray */
+    --secondary: 220 13% 16%;
+    --secondary-foreground: 220 13% 98%;
+
+    /* Muted colors */
+    --muted: 220 13% 16%;
+    --muted-foreground: 220 9% 64%;
+
+    /* Accent - Success Green (adjusted for dark) */
+    --accent: 142 76% 45%;
+    --accent-foreground: 220 13% 9%;
+
+    /* Destructive - Error Red (adjusted for dark) */
+    --destructive: 0 84% 65%;
+    --destructive-foreground: 220 13% 9%;
+
+    /* Interactive elements */
+    --border: 220 13% 20%;
+    --input: 220 13% 20%;
+    --ring: 111 69% 45%;
+
+    /* Chart colors - Dark mode optimized */
+    --chart-1: 111 69% 45%;   /* Primary Green */
+    --chart-2: 210 100% 60%;  /* Blue */
+    --chart-3: 25 95% 60%;    /* Orange */
+    --chart-4: 262 83% 65%;   /* Purple */
+    --chart-5: 346 87% 50%;   /* Red */
   }
 
   * {

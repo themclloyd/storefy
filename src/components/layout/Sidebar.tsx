@@ -16,7 +16,8 @@ import {
   Receipt,
   Home,
   CreditCard,
-  FileText
+  FileText,
+  DollarSign
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -50,6 +51,8 @@ const mainNavItems = [
   { id: "dashboard", label: "Dashboard", icon: Home },
   { id: "pos", label: "POS System", icon: ShoppingCart },
   { id: "inventory", label: "Inventory", icon: Package, hasSubmenu: true },
+  { id: "expenses", label: "Expenses", icon: DollarSign },
+  { id: "layby", label: "Layby", icon: Clock },
   { id: "customers", label: "Customers", icon: Users },
   { id: "transactions", label: "Transactions", icon: Receipt },
 ];

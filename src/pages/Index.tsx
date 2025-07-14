@@ -15,6 +15,8 @@ const InventoryView = lazy(() => import("@/components/inventory/InventoryView").
 const CategoriesView = lazy(() => import("@/components/inventory/CategoriesView").then(module => ({ default: module.CategoriesView })));
 const SuppliersView = lazy(() => import("@/components/inventory/SuppliersView").then(module => ({ default: module.SuppliersView })));
 
+const ExpenseView = lazy(() => import("@/components/expenses/ExpenseView").then(module => ({ default: module.ExpenseView })));
+const LaybyView = lazy(() => import("@/components/layby/LaybyView").then(module => ({ default: module.LaybyView })));
 const TransactionView = lazy(() => import("@/components/transactions/TransactionView").then(module => ({ default: module.TransactionView })));
 const CustomersView = lazy(() => import("@/components/customers/CustomersView").then(module => ({ default: module.CustomersView })));
 const ReportsView = lazy(() => import("@/components/reports/ReportsView").then(module => ({ default: module.ReportsView })));
@@ -59,7 +61,8 @@ const Index = () => {
       '/inventory': 'inventory',
       '/categories': 'categories',
       '/suppliers': 'suppliers',
-      
+      '/expenses': 'expenses',
+      '/layby': 'layby',
       '/transactions': 'transactions',
       '/customers': 'customers',
       '/reports': 'reports',
@@ -79,7 +82,8 @@ const Index = () => {
       inventory: "Inventory",
       categories: "Categories",
       suppliers: "Suppliers",
-      
+      expenses: "Expenses",
+      layby: "Layby",
       transactions: "Transactions",
       customers: "Customers",
       reports: "Reports",
@@ -102,7 +106,8 @@ const Index = () => {
       'inventory': '/inventory',
       'categories': '/categories',
       'suppliers': '/suppliers',
-      
+      'expenses': '/expenses',
+      'layby': '/layby',
       'transactions': '/transactions',
       'customers': '/customers',
       'reports': '/reports',
@@ -152,6 +157,10 @@ const Index = () => {
               }}
             />
           );
+        case "expenses":
+          return <ExpenseView />;
+        case "layby":
+          return <LaybyView />;
         case "transactions":
           return <TransactionView />;
         case "customers":
@@ -214,12 +223,6 @@ const Index = () => {
           currentStore={pinData.store_name}
         />
         <SidebarInset>
-          <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-            <SidebarTrigger className="-ml-1" />
-            <div className="ml-auto">
-              <h1 className="text-lg font-semibold">{pinData.store_name}</h1>
-            </div>
-          </header>
           <div className="flex-1 overflow-auto">
             <div className="p-6">
               {renderView()}
@@ -253,14 +256,6 @@ const Index = () => {
         </div>
 
         <SidebarInset className="flex-1">
-          {/* Header */}
-          <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4 bg-background sticky top-0 z-40">
-            <SidebarTrigger className="-ml-1 md:hidden" />
-            <div className="flex-1 flex items-center justify-between">
-              <h1 className="text-lg font-semibold truncate">{currentStore.name}</h1>
-            </div>
-          </header>
-
           {/* Main Content */}
           <div className="flex-1 overflow-auto">
             <div className="p-4 md:p-6 pb-20 md:pb-6">
