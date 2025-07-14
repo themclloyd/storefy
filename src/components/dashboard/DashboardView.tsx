@@ -67,6 +67,15 @@ interface DashboardStats {
   monthlyExpenses: number;
   expenseGrowth: number;
   unpaidExpenses: number;
+
+  // Layby Management
+  totalLaybys: number;
+  activeLaybys: number;
+  overdueLaybys: number;
+  completedLaybys: number;
+  totalLaybyValue: number;
+  outstandingLaybyBalance: number;
+  laybyDepositsCollected: number;
 }
 
 interface TopProduct {
@@ -107,6 +116,13 @@ export function DashboardView() {
     monthlyExpenses: 0,
     expenseGrowth: 0,
     unpaidExpenses: 0,
+    totalLaybys: 0,
+    activeLaybys: 0,
+    overdueLaybys: 0,
+    completedLaybys: 0,
+    totalLaybyValue: 0,
+    outstandingLaybyBalance: 0,
+    laybyDepositsCollected: 0,
   });
 
   const [loading, setLoading] = useState(true);
@@ -410,6 +426,47 @@ export function DashboardView() {
     }
   };
 
+  const fetchLaybyMetrics = async () => {
+    if (!currentStore) return;
+
+    try {
+      const { data: laybyOrders, error } = await supabase
+        .from('layby_orders')
+        .select('*')
+        .eq('store_id', currentStore.id);
+
+      if (error) {
+        console.error('Error fetching layby metrics:', error);
+        return;
+      }
+
+      const orders = laybyOrders || [];
+
+      const totalLaybys = orders.length;
+      const activeLaybys = orders.filter(o => o.status === 'active').length;
+      const overdueLaybys = orders.filter(o => o.status === 'overdue').length;
+      const completedLaybys = orders.filter(o => o.status === 'completed').length;
+      const totalLaybyValue = orders.reduce((sum, o) => sum + o.total_amount, 0);
+      const outstandingLaybyBalance = orders
+        .filter(o => o.status === 'active' || o.status === 'overdue')
+        .reduce((sum, o) => sum + o.balance_remaining, 0);
+      const laybyDepositsCollected = orders.reduce((sum, o) => sum + o.deposit_amount, 0);
+
+      setStats(prev => ({
+        ...prev,
+        totalLaybys,
+        activeLaybys,
+        overdueLaybys,
+        completedLaybys,
+        totalLaybyValue,
+        outstandingLaybyBalance,
+        laybyDepositsCollected,
+      }));
+    } catch (error) {
+      console.error('Error fetching layby metrics:', error);
+    }
+  };
+
   const fetchDashboardData = async () => {
     if (!currentStore) return;
 
@@ -422,6 +479,7 @@ export function DashboardView() {
         fetchOperationalMetrics(),
         fetchExpenseMetrics(),
         fetchTopProducts(),
+        fetchLaybyMetrics(),
         calculateFilteredSales(),
       ]);
       setLastUpdated(new Date());
@@ -493,7 +551,7 @@ export function DashboardView() {
       {/* Enhanced Dashboard - 6 Key Business Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* 1. Sales Performance Card */}
-        <Card className="relative overflow-hidden bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="relative overflow-hidden bg-card border shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <div className="flex flex-col gap-1">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -543,11 +601,11 @@ export function DashboardView() {
               <span className="text-xs text-muted-foreground">vs yesterday</span>
               <div className="flex items-center gap-1">
                 {stats.salesGrowth >= 0 ? (
-                  <ArrowUp className="w-3 h-3 text-green-500" />
+                  <ArrowUp className="w-3 h-3 text-accent" />
                 ) : (
-                  <ArrowDown className="w-3 h-3 text-red-500" />
+                  <ArrowDown className="w-3 h-3 text-destructive" />
                 )}
-                <span className={`text-sm font-bold ${stats.salesGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                <span className={`text-sm font-bold ${stats.salesGrowth >= 0 ? 'text-accent' : 'text-destructive'}`}>
                   {stats.salesGrowth >= 0 ? '+' : ''}{stats.salesGrowth.toFixed(1)}%
                 </span>
               </div>
@@ -555,58 +613,68 @@ export function DashboardView() {
           </CardContent>
         </Card>
 
-        {/* 2. Order Fulfillment Card */}
-        <Card className="relative overflow-hidden bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        {/* 2. Layby Management Card */}
+        <Card className="relative overflow-hidden bg-card border shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Order Fulfillment
+              Layby Management
             </CardTitle>
-            <div className="w-10 h-10 bg-orange-500/10 rounded-full flex items-center justify-center">
-              <ShoppingCart className="h-5 w-5 text-orange-600" />
+            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+              <ShoppingCart className="h-5 w-5 text-primary" />
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-2xl font-bold text-foreground">
-                  {stats.totalOrders}
+                  {stats.activeLaybys}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  Orders Today
+                  Active Laybys
                 </div>
               </div>
               <div className="text-right">
                 <div className="text-lg font-semibold text-foreground">
-                  {formatCurrency(stats.averageTransactionValue)}
+                  {formatCurrency(stats.totalLaybyValue)}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  Avg. Value
+                  Total Value
                 </div>
               </div>
             </div>
 
-            {/* Compact Order Status */}
+            {/* Compact Layby Status */}
             <div className="grid grid-cols-2 gap-2">
-              <div className="text-center p-2 bg-green-50 rounded">
-                <div className="text-lg font-bold text-green-600">{stats.ordersFulfilled}</div>
-                <div className="text-xs text-green-600">Completed</div>
+              <div className="text-center p-2 bg-primary/5 rounded">
+                <div className="text-lg font-bold text-primary">{stats.completedLaybys}</div>
+                <div className="text-xs text-primary">Completed</div>
               </div>
-              <div className="text-center p-2 bg-orange-50 rounded">
-                <div className="text-lg font-bold text-orange-600">{stats.pendingOrders}</div>
-                <div className="text-xs text-orange-600">Pending</div>
+              <div className="text-center p-2 bg-destructive/5 rounded">
+                <div className="text-lg font-bold text-destructive">{stats.overdueLaybys}</div>
+                <div className="text-xs text-destructive">Overdue</div>
+              </div>
+            </div>
+
+            {/* Outstanding Balance */}
+            <div className="pt-2 border-t border-border">
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-muted-foreground">Outstanding Balance</span>
+                <span className="text-sm font-semibold text-foreground">
+                  {formatCurrency(stats.outstandingLaybyBalance)}
+                </span>
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* 3. Inventory Health Card */}
-        <Card className="relative overflow-hidden bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="relative overflow-hidden bg-card border shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Inventory Health
             </CardTitle>
-            <div className="w-10 h-10 bg-orange-500/10 rounded-full flex items-center justify-center">
-              <Package className="h-5 w-5 text-orange-600" />
+            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+              <Package className="h-5 w-5 text-primary" />
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -631,32 +699,32 @@ export function DashboardView() {
 
             {/* Compact Inventory Status */}
             <div className="grid grid-cols-3 gap-1">
-              <div className="text-center p-2 bg-green-50 rounded">
-                <div className="text-sm font-bold text-green-600">
+              <div className="text-center p-2 bg-accent/10 rounded">
+                <div className="text-sm font-bold text-accent">
                   {Math.max(0, stats.totalProducts - stats.lowStockItems - stats.outOfStockItems)}
                 </div>
-                <div className="text-xs text-green-600">In Stock</div>
+                <div className="text-xs text-accent">In Stock</div>
               </div>
-              <div className="text-center p-2 bg-orange-50 rounded">
-                <div className="text-sm font-bold text-orange-600">{stats.lowStockItems}</div>
-                <div className="text-xs text-orange-600">Low</div>
+              <div className="text-center p-2 bg-primary/10 rounded">
+                <div className="text-sm font-bold text-primary">{stats.lowStockItems}</div>
+                <div className="text-xs text-primary">Low</div>
               </div>
-              <div className="text-center p-2 bg-red-50 rounded">
-                <div className="text-sm font-bold text-red-600">{stats.outOfStockItems}</div>
-                <div className="text-xs text-red-600">Out</div>
+              <div className="text-center p-2 bg-destructive/10 rounded">
+                <div className="text-sm font-bold text-destructive">{stats.outOfStockItems}</div>
+                <div className="text-xs text-destructive">Out</div>
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* 4. Customer Growth Card */}
-        <Card className="relative overflow-hidden bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <Card className="relative overflow-hidden bg-card border shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Customer Growth
             </CardTitle>
-            <div className="w-10 h-10 bg-purple-500/10 rounded-full flex items-center justify-center">
-              <Users className="h-5 w-5 text-purple-600" />
+            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+              <Users className="h-5 w-5 text-primary" />
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -680,7 +748,7 @@ export function DashboardView() {
                     stroke="currentColor"
                     strokeWidth="8"
                     fill="transparent"
-                    className="text-gray-200"
+                    className="text-muted"
                   />
                   <circle
                     cx="50"
@@ -690,11 +758,11 @@ export function DashboardView() {
                     strokeWidth="8"
                     fill="transparent"
                     strokeDasharray={`${stats.customerRetentionRate * 2.2} ${100 * 2.2}`}
-                    className="text-purple-600"
+                    className="text-primary"
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-sm font-bold text-purple-600">{stats.customerRetentionRate.toFixed(0)}%</span>
+                  <span className="text-sm font-bold text-primary">{stats.customerRetentionRate.toFixed(0)}%</span>
                 </div>
               </div>
             </div>
@@ -704,30 +772,30 @@ export function DashboardView() {
 
             {/* Customer Metrics */}
             <div className="space-y-1.5">
-              <div className="flex items-center justify-between p-1.5 bg-green-50 dark:bg-green-950/20 rounded">
-                <span className="text-xs font-medium text-green-700 dark:text-green-400">New Today</span>
-                <span className="text-sm font-bold text-green-700 dark:text-green-400">{stats.newCustomersToday}</span>
+              <div className="flex items-center justify-between p-1.5 bg-accent/10 rounded">
+                <span className="text-xs font-medium text-accent">New Today</span>
+                <span className="text-sm font-bold text-accent">{stats.newCustomersToday}</span>
               </div>
-              <div className="flex items-center justify-between p-1.5 bg-purple-50 dark:bg-purple-950/20 rounded">
-                <span className="text-xs font-medium text-purple-700 dark:text-purple-400">VIP</span>
-                <span className="text-sm font-bold text-purple-700 dark:text-purple-400">{stats.vipCustomers}</span>
+              <div className="flex items-center justify-between p-1.5 bg-primary/10 rounded">
+                <span className="text-xs font-medium text-primary">VIP</span>
+                <span className="text-sm font-bold text-primary">{stats.vipCustomers}</span>
               </div>
-              <div className="flex items-center justify-between p-1.5 bg-orange-50 dark:bg-orange-950/20 rounded">
-                <span className="text-xs font-medium text-orange-700 dark:text-orange-400">Returning</span>
-                <span className="text-sm font-bold text-orange-700 dark:text-orange-400">{stats.returningCustomers}</span>
+              <div className="flex items-center justify-between p-1.5 bg-secondary/10 rounded">
+                <span className="text-xs font-medium text-secondary-foreground">Returning</span>
+                <span className="text-sm font-bold text-secondary-foreground">{stats.returningCustomers}</span>
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* 5. Profitability & Cash Flow Card */}
-        <Card className="relative overflow-hidden bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <Card className="relative overflow-hidden bg-card border shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Profitability
             </CardTitle>
-            <div className="w-10 h-10 bg-emerald-500/10 rounded-full flex items-center justify-center">
-              <TrendingUp className="h-5 w-5 text-emerald-600" />
+            <div className="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center">
+              <TrendingUp className="h-5 w-5 text-accent" />
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -742,28 +810,28 @@ export function DashboardView() {
 
             {/* Financial Metrics */}
             <div className="space-y-1.5">
-              <div className="flex items-center justify-between p-1.5 bg-green-50 dark:bg-green-950/20 rounded">
-                <span className="text-xs font-medium text-green-700 dark:text-green-400">Gross Margin</span>
-                <span className="text-sm font-bold text-green-700 dark:text-green-400">
+              <div className="flex items-center justify-between p-1.5 bg-accent/10 rounded">
+                <span className="text-xs font-medium text-accent">Gross Margin</span>
+                <span className="text-sm font-bold text-accent">
                   {(stats.profitMargin * 1.3).toFixed(1)}%
                 </span>
               </div>
-              <div className="flex items-center justify-between p-1.5 bg-orange-50 dark:bg-orange-950/20 rounded">
-                <span className="text-xs font-medium text-orange-700 dark:text-orange-400">Refund Rate</span>
-                <span className="text-sm font-bold text-orange-700 dark:text-orange-400">{stats.refundRate.toFixed(1)}%</span>
+              <div className="flex items-center justify-between p-1.5 bg-primary/10 rounded">
+                <span className="text-xs font-medium text-primary">Refund Rate</span>
+                <span className="text-sm font-bold text-primary">{stats.refundRate.toFixed(1)}%</span>
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* 6. Monthly Expenses Card */}
-        <Card className="relative overflow-hidden bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <Card className="relative overflow-hidden bg-card border shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Monthly Expenses pe
+              Monthly Expenses
             </CardTitle>
-            <div className="w-10 h-10 bg-red-500/10 rounded-full flex items-center justify-center">
-              <DollarSign className="h-5 w-5 text-red-600" />
+            <div className="w-10 h-10 bg-destructive/10 rounded-full flex items-center justify-center">
+              <DollarSign className="h-5 w-5 text-destructive" />
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -780,12 +848,12 @@ export function DashboardView() {
             {/* Expense Growth Indicator */}
             <div className="flex items-center gap-1.5 p-2 bg-white/60 dark:bg-gray-800/60 rounded-lg">
               {stats.expenseGrowth >= 0 ? (
-                <ArrowUp className="w-3 h-3 text-red-500" />
+                <ArrowUp className="w-3 h-3 text-destructive" />
               ) : (
-                <ArrowDown className="w-3 h-3 text-green-500" />
+                <ArrowDown className="w-3 h-3 text-accent" />
               )}
               <span className={`text-xs font-medium ${
-                stats.expenseGrowth >= 0 ? 'text-red-600' : 'text-green-600'
+                stats.expenseGrowth >= 0 ? 'text-destructive' : 'text-accent'
               }`}>
                 {Math.abs(stats.expenseGrowth).toFixed(1)}% vs last month
               </span>
@@ -793,13 +861,13 @@ export function DashboardView() {
 
             {/* Expense Breakdown */}
             <div className="space-y-1.5">
-              <div className="flex items-center justify-between p-1.5 bg-orange-50 dark:bg-orange-950/20 rounded">
-                <span className="text-xs font-medium text-orange-700 dark:text-orange-400">Unpaid</span>
-                <span className="text-sm font-bold text-orange-700 dark:text-orange-400">{stats.unpaidExpenses}</span>
+              <div className="flex items-center justify-between p-1.5 bg-destructive/10 rounded">
+                <span className="text-xs font-medium text-destructive">Unpaid</span>
+                <span className="text-sm font-bold text-destructive">{stats.unpaidExpenses}</span>
               </div>
-              <div className="flex items-center justify-between p-1.5 bg-gray-50 dark:bg-gray-950/20 rounded">
-                <span className="text-xs font-medium text-gray-700 dark:text-gray-400">Daily Avg</span>
-                <span className="text-sm font-bold text-gray-700 dark:text-gray-400">
+              <div className="flex items-center justify-between p-1.5 bg-muted rounded">
+                <span className="text-xs font-medium text-muted-foreground">Daily Avg</span>
+                <span className="text-sm font-bold text-muted-foreground">
                   {formatCurrency(stats.monthlyExpenses / new Date().getDate())}
                 </span>
               </div>

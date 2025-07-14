@@ -16,6 +16,7 @@ const PinLoginPage = lazy(() => import("./pages/PinLoginPage"));
 const StoreLoginPage = lazy(() => import("./pages/StoreLoginPage"));
 const StoreShortLinkPage = lazy(() => import("./pages/StoreShortLinkPage"));
 const TestDemo = lazy(() => import("./pages/TestDemo"));
+const QuickBooksDemo = lazy(() => import("./pages/QuickBooksDemo"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 
@@ -69,6 +70,7 @@ const App = () => {
                 <Route path="/pin-login" element={<PinLoginPage />} />
                 <Route path="/store/:storeCode" element={<StoreShortLinkPage />} />
                 <Route path="/test-demo" element={<TestDemo />} />
+                <Route path="/quickbooks-demo" element={<QuickBooksDemo />} />
 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
