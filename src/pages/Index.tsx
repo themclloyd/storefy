@@ -9,7 +9,7 @@ import { StoreSelector } from "@/components/stores/StoreSelector";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 
 // Lazy load view components for code splitting
-const DashboardView = lazy(() => import("@/components/dashboard/DashboardView").then(module => ({ default: module.DashboardView })));
+const OverviewDashboard = lazy(() => import("@/components/dashboard/OverviewDashboard").then(module => ({ default: module.OverviewDashboard })));
 const POSView = lazy(() => import("@/components/pos/POSView").then(module => ({ default: module.POSView })));
 const InventoryView = lazy(() => import("@/components/inventory/InventoryView").then(module => ({ default: module.InventoryView })));
 const CategoriesView = lazy(() => import("@/components/inventory/CategoriesView").then(module => ({ default: module.CategoriesView })));
@@ -132,7 +132,8 @@ const Index = () => {
     const viewComponent = (() => {
       switch (activeView) {
         case "dashboard":
-          return <DashboardView />;
+        case "analytics":
+          return <OverviewDashboard />;
         case "pos":
           return <POSView />;
         case "inventory":
@@ -172,7 +173,7 @@ const Index = () => {
         case "stores":
           return <StoreManagementView />;
         default:
-          return <DashboardView />;
+          return <OverviewDashboard />;
       }
     })();
 

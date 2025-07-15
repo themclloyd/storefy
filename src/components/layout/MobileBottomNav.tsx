@@ -16,10 +16,9 @@ interface MobileBottomNavProps {
 }
 
 const navigationItems = [
-  { id: "dashboard", label: "Home", icon: Home },
+  { id: "dashboard", label: "Overview", icon: BarChart3 },
   { id: "pos", label: "POS", icon: ShoppingCart },
   { id: "inventory", label: "Stock", icon: Package },
-  { id: "expenses", label: "Expenses", icon: DollarSign },
   { id: "customers", label: "Customers", icon: Users }
 ];
 

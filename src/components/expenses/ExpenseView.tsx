@@ -7,14 +7,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { 
-  Search, 
-  Plus, 
-  DollarSign, 
-  TrendingUp, 
-  Calendar as CalendarIcon, 
-  Download, 
-  Filter, 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Search,
+  Plus,
+  DollarSign,
+  TrendingUp,
+  Calendar as CalendarIcon,
+  Download,
+  Filter,
   Eye,
   Edit,
   Trash2,
@@ -23,7 +24,8 @@ import {
   CheckCircle,
   Clock,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  Repeat
 } from "lucide-react";
 import { format } from "date-fns";
 import { useStore } from "@/contexts/StoreContext";
@@ -35,6 +37,7 @@ import { AddExpenseDialog } from "./AddExpenseDialog";
 import { EditExpenseDialog } from "./EditExpenseDialog";
 import { ExpenseCategoriesView } from "./ExpenseCategoriesView";
 import { ExpenseDetailsModal } from "./ExpenseDetailsModal";
+import { RecurringExpensesView } from "./RecurringExpensesView";
 
 interface Expense {
   id: string;
@@ -86,6 +89,7 @@ export function ExpenseView() {
   const [showCategoriesView, setShowCategoriesView] = useState(false);
   const [showExpenseDetails, setShowExpenseDetails] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
+  const [activeTab, setActiveTab] = useState("expenses");
 
   // Summary stats
   const [totalExpenses, setTotalExpenses] = useState(0);
@@ -298,7 +302,21 @@ export function ExpenseView() {
         </div>
       </div>
 
-      {/* Summary Cards */}
+      {/* Tabs */}
+      <Tabs defaultValue="expenses" value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsTrigger value="expenses">
+            <Receipt className="w-4 h-4 mr-2" />
+            Expenses
+          </TabsTrigger>
+          <TabsTrigger value="recurring">
+            <Repeat className="w-4 h-4 mr-2" />
+            Recurring Expenses
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="expenses" className="space-y-6">
+          {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="card-professional">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -529,6 +547,15 @@ export function ExpenseView() {
           )}
         </CardContent>
       </Card>
+        </TabsContent>
+
+        <TabsContent value="recurring">
+          <RecurringExpensesView
+            categories={categories}
+            onExpenseAdded={fetchExpenses}
+          />
+        </TabsContent>
+      </Tabs>
 
       {/* Dialogs */}
       <AddExpenseDialog
