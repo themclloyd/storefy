@@ -15,9 +15,7 @@ import {
   FileText, 
   FileSpreadsheet, 
   Loader2,
-  Users,
-  Calendar,
-  DollarSign
+  Users
 } from "lucide-react";
 import { useStore } from "@/contexts/StoreContext";
 import { useStoreData } from "@/hooks/useSupabaseClient";
@@ -57,7 +55,7 @@ export function CustomerExportDialog({
   customers
 }: CustomerExportDialogProps) {
   const { currentStore } = useStore();
-  const { from, currentStoreId, isPinSession } = useStoreData();
+  const { from: _from, currentStoreId: _currentStoreId, isPinSession: _isPinSession } = useStoreData();
   const [loading, setLoading] = useState(false);
   const [exportOptions, setExportOptions] = useState<ExportOptions>({
     includeContactInfo: true,

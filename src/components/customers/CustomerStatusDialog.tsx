@@ -59,7 +59,7 @@ export function CustomerStatusDialog({
   onStatusUpdated
 }: CustomerStatusDialogProps) {
   const { currentStore } = useStore();
-  const { from, currentStoreId, isPinSession } = useStoreData();
+  const { from, currentStoreId, isPinSession: _isPinSession } = useStoreData();
   const [loading, setLoading] = useState(false);
   const [newStatus, setNewStatus] = useState<string>("");
 

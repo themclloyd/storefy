@@ -1,9 +1,9 @@
-import { Suspense, lazy, useEffect } from "react";
+import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { StoreProvider } from "@/contexts/StoreContext";
 import { PermissionProvider } from "@/contexts/PermissionContext";
@@ -15,7 +15,7 @@ const LandingPage = lazy(() => import("./pages/LandingPage"));
 const Index = lazy(() => import("./pages/Index"));
 const AuthPage = lazy(() => import("./pages/AuthPage"));
 const PinLoginPage = lazy(() => import("./pages/PinLoginPage"));
-const StoreLoginPage = lazy(() => import("./pages/StoreLoginPage"));
+
 const StoreShortLinkPage = lazy(() => import("./pages/StoreShortLinkPage"));
 const StoreSelectionPage = lazy(() => import("./pages/StoreSelectionPage"));
 

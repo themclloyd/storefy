@@ -37,7 +37,7 @@ export function AuthPage() {
           .from('profiles')
           .select('count')
           .limit(1);
-      } catch (err) {
+      } catch {
         // Connection test failed - will be handled by auth flow
       }
     };
@@ -88,7 +88,7 @@ export function AuthPage() {
         toast.success('Password reset email sent! Check your inbox.');
         setError('');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to send reset email');
     } finally {
       setForgotPasswordLoading(false);

@@ -75,7 +75,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
 
 // Hook version for functional components
 export function useErrorHandler() {
-  return (error: Error, errorInfo?: React.ErrorInfo) => {
+  return (_error: Error, _errorInfo?: React.ErrorInfo) => {
     // Handle error silently or send to monitoring service
     // TODO: Implement error monitoring service integration
   };

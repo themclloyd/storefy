@@ -1,36 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   ResponsiveContainer,
   PieChart,
   Pie,
-  Cell,
-  LineChart,
-  Line
+  Cell
 } from 'recharts';
-import { 
-  TrendingUp, 
-  Users, 
-  DollarSign, 
+import {
+  TrendingUp,
+  DollarSign,
   ShoppingCart,
-  Calendar,
   Crown,
-  UserCheck,
-  UserX,
-  Loader2,
   BarChart3
 } from "lucide-react";
-import { useStore } from "@/contexts/StoreContext";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 
 interface Customer {
   id: string;
@@ -54,20 +43,12 @@ interface MonthlyData {
   averageOrderValue: number;
 }
 
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
+
 
 export function CustomerAnalytics({ customers }: CustomerAnalyticsProps) {
-  const { currentStore } = useStore();
-  const [loading, setLoading] = useState(false);
   const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
 
-  useEffect(() => {
-    if (customers.length > 0) {
-      generateMonthlyData();
-    }
-  }, [customers]);
-
-  const generateMonthlyData = () => {
+  const generateMonthlyData = useCallback(() => {
     const last6Months = [];
     const now = new Date();
     
@@ -91,9 +72,15 @@ export function CustomerAnalytics({ customers }: CustomerAnalyticsProps) {
         averageOrderValue: totalOrders > 0 ? totalRevenue / totalOrders : 0
       });
     }
-    
+
     setMonthlyData(last6Months);
-  };
+  }, [customers]);
+
+  useEffect(() => {
+    if (customers.length > 0) {
+      generateMonthlyData();
+    }
+  }, [customers, generateMonthlyData]);
 
   // Calculate analytics
   const totalCustomers = customers.length;

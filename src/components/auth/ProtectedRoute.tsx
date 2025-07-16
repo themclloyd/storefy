@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useStore } from '@/contexts/StoreContext';
@@ -23,7 +23,7 @@ export function ProtectedRoute({
 }: ProtectedRouteProps) {
   const { user, loading: authLoading } = useAuth();
   const { currentStore, loading: storeLoading, hasValidStoreSelection } = useStore();
-  const { canAccessPage, loading: permissionLoading, userRole } = usePermissions();
+  const { canAccessPage, loading: permissionLoading } = usePermissions();
   const location = useLocation();
 
   // Check for PIN session

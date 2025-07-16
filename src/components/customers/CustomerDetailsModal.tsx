@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -70,13 +70,7 @@ export function CustomerDetailsModal({
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
 
-  useEffect(() => {
-    if (open && customer && ((currentStore && !isPinSession) || (currentStoreId && isPinSession))) {
-      fetchCustomerOrders();
-    }
-  }, [open, customer, currentStore, currentStoreId, isPinSession]);
-
-  const fetchCustomerOrders = async () => {
+  const fetchCustomerOrders = useCallback(async () => {
     const storeId = currentStoreId || currentStore?.id;
     if (!customer || !storeId) return;
 
@@ -108,7 +102,13 @@ export function CustomerDetailsModal({
     } finally {
       setLoading(false);
     }
-  };
+  }, [customer, currentStore, currentStoreId, from]);
+
+  useEffect(() => {
+    if (open && customer && ((currentStore && !isPinSession) || (currentStoreId && isPinSession))) {
+      fetchCustomerOrders();
+    }
+  }, [open, customer, currentStore, currentStoreId, isPinSession, fetchCustomerOrders]);
 
   if (!customer) return null;
 
