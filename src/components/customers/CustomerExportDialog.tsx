@@ -20,7 +20,7 @@ import {
   DollarSign
 } from "lucide-react";
 import { useStore } from "@/contexts/StoreContext";
-import { supabase } from "@/integrations/supabase/client";
+import { useStoreData } from "@/hooks/useSupabaseClient";
 import { toast } from "sonner";
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
@@ -51,12 +51,13 @@ interface ExportOptions {
   format: 'pdf' | 'csv';
 }
 
-export function CustomerExportDialog({ 
-  open, 
-  onOpenChange, 
-  customers 
+export function CustomerExportDialog({
+  open,
+  onOpenChange,
+  customers
 }: CustomerExportDialogProps) {
   const { currentStore } = useStore();
+  const { from, currentStoreId, isPinSession } = useStoreData();
   const [loading, setLoading] = useState(false);
   const [exportOptions, setExportOptions] = useState<ExportOptions>({
     includeContactInfo: true,

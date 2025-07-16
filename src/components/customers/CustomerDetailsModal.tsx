@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -10,20 +11,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Calendar, 
-  ShoppingCart, 
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  ShoppingCart,
   DollarSign,
   TrendingUp,
   Edit,
   Loader2
 } from "lucide-react";
 import { useStore } from "@/contexts/StoreContext";
-import { supabase } from "@/integrations/supabase/client";
+import { useStoreData } from "@/hooks/useSupabaseClient";
 import { toast } from "sonner";
 import { useTax } from "@/hooks/useTax";
 
@@ -56,31 +57,32 @@ interface CustomerDetailsModalProps {
   onEditCustomer: (customer: Customer) => void;
 }
 
-export function CustomerDetailsModal({ 
-  open, 
-  onOpenChange, 
+export function CustomerDetailsModal({
+  open,
+  onOpenChange,
   customer,
-  onEditCustomer 
+  onEditCustomer
 }: CustomerDetailsModalProps) {
   const { currentStore } = useStore();
+  const { from, currentStoreId, isPinSession } = useStoreData();
   const { formatCurrency } = useTax();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
-    if (open && customer && currentStore) {
+    if (open && customer && ((currentStore && !isPinSession) || (currentStoreId && isPinSession))) {
       fetchCustomerOrders();
     }
-  }, [open, customer, currentStore]);
+  }, [open, customer, currentStore, currentStoreId, isPinSession]);
 
   const fetchCustomerOrders = async () => {
-    if (!customer || !currentStore) return;
+    const storeId = currentStoreId || currentStore?.id;
+    if (!customer || !storeId) return;
 
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('orders')
+      const { data, error } = await from('orders')
         .select(`
           id,
           order_number,
@@ -90,7 +92,7 @@ export function CustomerDetailsModal({
           created_at
         `)
         .eq('customer_id', customer.id)
-        .eq('store_id', currentStore.id)
+        .eq('store_id', storeId)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -168,6 +170,9 @@ export function CustomerDetailsModal({
               Edit
             </Button>
           </DialogTitle>
+          <DialogDescription>
+            View detailed customer information, order history, and analytics.
+          </DialogDescription>
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

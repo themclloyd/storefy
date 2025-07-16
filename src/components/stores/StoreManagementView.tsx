@@ -1,11 +1,11 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useStore } from '@/contexts/StoreContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Building2, Plus, Users, Crown, UserCheck, Settings, BarChart3, Eye, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,6 +29,15 @@ export function StoreManagementView() {
   const [creating, setCreating] = useState(false);
   const [storeStats, setStoreStats] = useState<StoreStats[]>([]);
 
+  // Reset form when dialog is closed
+  useEffect(() => {
+    if (!showCreateDialog) {
+      setNewStoreName('');
+      setNewStoreAddress('');
+      setCreating(false);
+    }
+  }, [showCreateDialog]);
+
   // Generate a unique store code
   const generateStoreCode = (storeName: string) => {
     const prefix = storeName.replace(/[^A-Za-z0-9]/g, '').slice(0, 4).toUpperCase();
@@ -36,7 +45,7 @@ export function StoreManagementView() {
     return prefix + suffix;
   };
 
-  const handleCreateStore = async (e: React.FormEvent) => {
+  const handleCreateStore = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !newStoreName.trim()) return;
 
@@ -62,7 +71,7 @@ export function StoreManagementView() {
       setNewStoreName('');
       setNewStoreAddress('');
       await refreshStores();
-      
+
       // Auto-select the new store
       if (data) {
         selectStore(data.id);
@@ -73,7 +82,7 @@ export function StoreManagementView() {
     } finally {
       setCreating(false);
     }
-  };
+  }, [user, newStoreName, newStoreAddress, refreshStores, selectStore]);
 
   const fetchStoreStats = async () => {
     if (stores.length === 0) return;
@@ -175,12 +184,15 @@ export function StoreManagementView() {
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Create New Store</DialogTitle>
+                  <DialogDescription>
+                    Enter your store details to get started with Storefy
+                  </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleCreateStore} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="storeName">Store Name *</Label>
+                    <Label htmlFor="firstStoreName">Store Name *</Label>
                     <Input
-                      id="storeName"
+                      id="firstStoreName"
                       placeholder="Enter store name"
                       value={newStoreName}
                       onChange={(e) => setNewStoreName(e.target.value)}
@@ -188,9 +200,9 @@ export function StoreManagementView() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="storeAddress">Address (Optional)</Label>
+                    <Label htmlFor="firstStoreAddress">Address (Optional)</Label>
                     <Input
-                      id="storeAddress"
+                      id="firstStoreAddress"
                       placeholder="Enter store address"
                       value={newStoreAddress}
                       onChange={(e) => setNewStoreAddress(e.target.value)}
@@ -324,12 +336,15 @@ export function StoreManagementView() {
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Create New Store</DialogTitle>
+                  <DialogDescription>
+                    Enter your store details to get started with Storefy
+                  </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleCreateStore} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="storeName">Store Name *</Label>
+                    <Label htmlFor="newStoreName">Store Name *</Label>
                     <Input
-                      id="storeName"
+                      id="newStoreName"
                       placeholder="Enter store name"
                       value={newStoreName}
                       onChange={(e) => setNewStoreName(e.target.value)}
@@ -337,9 +352,9 @@ export function StoreManagementView() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="storeAddress">Address (Optional)</Label>
+                    <Label htmlFor="newStoreAddress">Address (Optional)</Label>
                     <Input
-                      id="storeAddress"
+                      id="newStoreAddress"
                       placeholder="Enter store address"
                       value={newStoreAddress}
                       onChange={(e) => setNewStoreAddress(e.target.value)}

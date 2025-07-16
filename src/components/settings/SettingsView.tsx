@@ -13,6 +13,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Settings, Users, Shield, Eye, EyeOff, Edit, Trash2, UserCheck, UserX, Crown, UserCog, HelpCircle, UserPlus, Store, Globe, CreditCard, Bell, Activity, Copy } from "lucide-react";
 import { useStore } from "@/contexts/StoreContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { SecureAction, SecureButton } from "@/components/auth/SecureAction";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { teamMemberLogs, logActivity } from "@/lib/activityLogger";
@@ -691,7 +692,7 @@ export function SettingsView() {
                     Loading...
                   </div>
                 )}
-                {isOwner && (
+                <SecureAction permission="manage_team">
                   <Dialog open={showAddMemberDialog} onOpenChange={setShowAddMemberDialog}>
                     <DialogTrigger asChild>
                       <Button size="sm">
@@ -815,7 +816,7 @@ export function SettingsView() {
                       </div>
                     </DialogContent>
                   </Dialog>
-                )}
+                </SecureAction>
               </div>
             </div>
 
@@ -982,14 +983,15 @@ export function SettingsView() {
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
-                          <Button
+                          <SecureButton
+                            permission="manage_team"
                             variant="ghost"
                             size="sm"
                             onClick={() => handleDeleteMember(member)}
                             className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                           >
                             <Trash2 className="w-4 h-4" />
-                          </Button>
+                          </SecureButton>
                         </div>
                       )}
                     </div>

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useStore } from '@/contexts/StoreContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface LaybyWidgetProps {
   onViewMore: () => void;
@@ -48,39 +49,71 @@ export function LaybyWidget({ onViewMore }: LaybyWidgetProps) {
   }, [currentStore]);
 
   const fetchLaybyData = async () => {
+    if (!currentStore) return;
+
     try {
       setLoading(true);
-      // Mock data for now - replace with actual Supabase queries
+
+      // Fetch layby orders
+      const { data: laybys } = await supabase
+        .from('layby_orders')
+        .select(`
+          id,
+          total_amount,
+          balance_remaining,
+          due_date,
+          status,
+          customers (name)
+        `)
+        .eq('store_id', currentStore.id)
+        .in('status', ['active', 'partial'])
+        .order('created_at', { ascending: false });
+
+      if (!laybys || laybys.length === 0) {
+        setLaybyData({
+          activeLaybys: 0,
+          laybyValue: 0,
+          overdueLaybys: 0,
+          recentLaybys: []
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Calculate layby metrics
+      const activeLaybys = laybys.length;
+      const laybyValue = laybys.reduce((sum, layby) => sum + Number(layby.balance_remaining), 0);
+
+      // Check for overdue laybys
+      const today = new Date().toISOString().split('T')[0];
+      const overdueLaybys = laybys.filter(layby =>
+        layby.due_date && layby.due_date < today && layby.balance_remaining > 0
+      ).length;
+
+      // Format recent laybys
+      const recentLaybys = laybys.slice(0, 3).map(layby => {
+        let status = layby.status;
+
+        // Check if overdue
+        if (layby.due_date && layby.due_date < today && layby.balance_remaining > 0) {
+          status = 'overdue';
+        }
+
+        return {
+          id: layby.id,
+          customer: layby.customers?.name || 'Unknown Customer',
+          totalAmount: Number(layby.total_amount),
+          balanceRemaining: Number(layby.balance_remaining),
+          dueDate: layby.due_date,
+          status
+        };
+      });
+
       setLaybyData({
-        activeLaybys: 8,
-        laybyValue: 2450.00,
-        overdueLaybys: 2,
-        recentLaybys: [
-          {
-            id: '1',
-            customer: 'David Miller',
-            totalAmount: 599.99,
-            balanceRemaining: 350.00,
-            dueDate: '2023-06-15',
-            status: 'active'
-          },
-          {
-            id: '2',
-            customer: 'Lisa Wong',
-            totalAmount: 899.50,
-            balanceRemaining: 450.00,
-            dueDate: '2023-05-30',
-            status: 'overdue'
-          },
-          {
-            id: '3',
-            customer: 'Robert Johnson',
-            totalAmount: 1250.00,
-            balanceRemaining: 800.00,
-            dueDate: '2023-07-10',
-            status: 'partial'
-          }
-        ]
+        activeLaybys,
+        laybyValue,
+        overdueLaybys,
+        recentLaybys
       });
     } catch (error) {
       console.error('Error fetching layby data:', error);

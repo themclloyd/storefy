@@ -30,6 +30,7 @@ import {
 import { format } from "date-fns";
 import { useStore } from "@/contexts/StoreContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { SecureAction, SecureButton } from "@/components/auth/SecureAction";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useTax } from "@/hooks/useTax";
@@ -295,10 +296,13 @@ export function ExpenseView() {
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
-          <Button onClick={() => setShowAddExpenseDialog(true)}>
+          <SecureButton
+            permission="create_expense"
+            onClick={() => setShowAddExpenseDialog(true)}
+          >
             <Plus className="w-4 h-4 mr-2" />
             Add Expense
-          </Button>
+          </SecureButton>
         </div>
       </div>
 
@@ -461,10 +465,13 @@ export function ExpenseView() {
                   : "Get started by adding your first expense"}
               </p>
               {!searchTerm && !selectedCategory && !selectedStatus && !dateRange.from && (
-                <Button onClick={() => setShowAddExpenseDialog(true)}>
+                <SecureButton
+                  permission="create_expense"
+                  onClick={() => setShowAddExpenseDialog(true)}
+                >
                   <Plus className="w-4 h-4 mr-2" />
                   Add First Expense
-                </Button>
+                </SecureButton>
               )}
             </div>
           ) : (
@@ -522,21 +529,23 @@ export function ExpenseView() {
                           >
                             <Eye className="w-4 h-4" />
                           </Button>
-                          <Button
+                          <SecureButton
+                            permission="manage_expenses"
                             variant="ghost"
                             size="sm"
                             onClick={() => handleEditExpense(expense)}
                           >
                             <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
+                          </SecureButton>
+                          <SecureButton
+                            permission="manage_expenses"
                             variant="ghost"
                             size="sm"
                             onClick={() => handleDeleteExpense(expense)}
                             className="text-destructive hover:text-destructive"
                           >
                             <Trash2 className="w-4 h-4" />
-                          </Button>
+                          </SecureButton>
                         </div>
                       </TableCell>
                     </TableRow>

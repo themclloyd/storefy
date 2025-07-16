@@ -27,7 +27,7 @@ import {
   ShoppingCart
 } from "lucide-react";
 import { useStore } from "@/contexts/StoreContext";
-import { supabase } from "@/integrations/supabase/client";
+import { useStoreData } from "@/hooks/useSupabaseClient";
 import { toast } from "sonner";
 
 interface Customer {
@@ -52,13 +52,14 @@ interface CustomerStatusDialogProps {
 const VIP_THRESHOLD = 500; // Minimum spending to qualify for VIP
 const ACTIVE_ORDER_THRESHOLD = 5; // Minimum orders to maintain active status
 
-export function CustomerStatusDialog({ 
-  open, 
-  onOpenChange, 
+export function CustomerStatusDialog({
+  open,
+  onOpenChange,
   customer,
-  onStatusUpdated 
+  onStatusUpdated
 }: CustomerStatusDialogProps) {
   const { currentStore } = useStore();
+  const { from, currentStoreId, isPinSession } = useStoreData();
   const [loading, setLoading] = useState(false);
   const [newStatus, setNewStatus] = useState<string>("");
 
@@ -108,21 +109,21 @@ export function CustomerStatusDialog({
   const isRecommendationDifferent = recommendedStatus !== currentStatus;
 
   const handleStatusUpdate = async () => {
-    if (!currentStore || !customer || !newStatus) {
+    const storeId = currentStoreId || currentStore?.id;
+    if (!storeId || !customer || !newStatus) {
       toast.error("Please select a status");
       return;
     }
 
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from('customers')
+      const { error } = await from('customers')
         .update({
           status: newStatus,
           updated_at: new Date().toISOString(),
         })
         .eq('id', customer.id)
-        .eq('store_id', currentStore.id);
+        .eq('store_id', storeId);
 
       if (error) {
         console.error('Error updating customer status:', error);

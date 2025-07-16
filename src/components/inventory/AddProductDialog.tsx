@@ -47,6 +47,7 @@ const productSchema = z.object({
   category_id: z.string().optional(),
   supplier_id: z.string().optional(),
   is_active: z.boolean().default(true),
+  image_url: z.string().optional(),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -88,7 +89,10 @@ export function AddProductDialog({ open, onOpenChange, onProductAdded }: AddProd
       cost: 0,
       stock_quantity: 0,
       low_stock_threshold: 5,
+      category_id: "",
+      supplier_id: "",
       is_active: true,
+      image_url: "",
     },
   });
 
@@ -196,8 +200,8 @@ export function AddProductDialog({ open, onOpenChange, onProductAdded }: AddProd
 
       if (imageFile) {
         finalImageUrl = await uploadImage(imageFile);
-      } else if (imageUrl) {
-        finalImageUrl = imageUrl;
+      } else if (data.image_url) {
+        finalImageUrl = data.image_url;
       }
 
       const { error } = await supabase
@@ -220,7 +224,19 @@ export function AddProductDialog({ open, onOpenChange, onProductAdded }: AddProd
       if (error) throw error;
 
       toast.success('Product added successfully!');
-      form.reset();
+      form.reset({
+        name: "",
+        sku: "",
+        description: "",
+        price: 0,
+        cost: 0,
+        stock_quantity: 0,
+        low_stock_threshold: 5,
+        category_id: "",
+        supplier_id: "",
+        is_active: true,
+        image_url: "",
+      });
       setImageFile(null);
       setImagePreview(null);
       setImageUrl("");
@@ -316,17 +332,28 @@ export function AddProductDialog({ open, onOpenChange, onProductAdded }: AddProd
                       </p>
                     </div>
                   ) : (
-                    <div>
-                      <Input
-                        type="url"
-                        placeholder="https://example.com/image.jpg"
-                        value={imageUrl}
-                        onChange={(e) => handleImageUrlChange(e.target.value)}
-                      />
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Enter image URL (optional)
-                      </p>
-                    </div>
+                    <FormField
+                      control={form.control}
+                      name="image_url"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input
+                              type="url"
+                              placeholder="https://example.com/image.jpg"
+                              {...field}
+                              onChange={(e) => {
+                                field.onChange(e.target.value);
+                                handleImageUrlChange(e.target.value);
+                              }}
+                            />
+                          </FormControl>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Enter image URL (optional)
+                          </p>
+                        </FormItem>
+                      )}
+                    />
                   )}
                 </div>
               </div>
@@ -475,7 +502,7 @@ export function AddProductDialog({ open, onOpenChange, onProductAdded }: AddProd
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Category</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value || ""}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a category" />
@@ -500,7 +527,7 @@ export function AddProductDialog({ open, onOpenChange, onProductAdded }: AddProd
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Supplier</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value || ""}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a supplier" />

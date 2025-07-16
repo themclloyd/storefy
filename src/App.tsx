@@ -6,7 +6,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { StoreProvider } from "@/contexts/StoreContext";
-import { ThemeToggleButton } from './components/ui/theme-toggle';
+import { PermissionProvider } from "@/contexts/PermissionContext";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+
 
 // Lazy load page components
 const LandingPage = lazy(() => import("./pages/LandingPage"));
@@ -15,8 +17,8 @@ const AuthPage = lazy(() => import("./pages/AuthPage"));
 const PinLoginPage = lazy(() => import("./pages/PinLoginPage"));
 const StoreLoginPage = lazy(() => import("./pages/StoreLoginPage"));
 const StoreShortLinkPage = lazy(() => import("./pages/StoreShortLinkPage"));
-const TestDemo = lazy(() => import("./pages/TestDemo"));
-const QuickBooksDemo = lazy(() => import("./pages/QuickBooksDemo"));
+const StoreSelectionPage = lazy(() => import("./pages/StoreSelectionPage"));
+
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 
@@ -38,9 +40,7 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <div className="fixed top-4 right-4 z-50 hidden md:block">
-          <ThemeToggleButton />
-        </div>
+
         <BrowserRouter
           future={{
             v7_startTransition: true,
@@ -49,33 +49,33 @@ const App = () => {
         >
           <AuthProvider>
             <StoreProvider>
-            <Suspense fallback={<PageLoader />}>
+              <PermissionProvider>
+                <Suspense fallback={<PageLoader />}>
               <Routes>
                 <Route path="/" element={<LandingPage />} />
-                <Route path="/dashboard" element={<Index />} />
-                <Route path="/pos" element={<Index />} />
-                <Route path="/inventory" element={<Index />} />
-                <Route path="/categories" element={<Index />} />
-                <Route path="/suppliers" element={<Index />} />
-                <Route path="/expenses" element={<Index />} />
+                <Route path="/dashboard" element={<ProtectedRoute requiredPage="dashboard"><Index /></ProtectedRoute>} />
+                <Route path="/pos" element={<ProtectedRoute requiredPage="pos"><Index /></ProtectedRoute>} />
+                <Route path="/inventory" element={<ProtectedRoute requiredPage="inventory"><Index /></ProtectedRoute>} />
+                <Route path="/categories" element={<ProtectedRoute requiredPage="categories"><Index /></ProtectedRoute>} />
+                <Route path="/suppliers" element={<ProtectedRoute requiredPage="suppliers"><Index /></ProtectedRoute>} />
+                <Route path="/expenses" element={<ProtectedRoute requiredPage="expenses"><Index /></ProtectedRoute>} />
 
-                <Route path="/layby" element={<Index />} />
-                <Route path="/transactions" element={<Index />} />
-                <Route path="/customers" element={<Index />} />
-                <Route path="/reports" element={<Index />} />
-                <Route path="/settings" element={<Index />} />
-                <Route path="/stores" element={<Index />} />
-                <Route path="/app" element={<Index />} />
+                <Route path="/layby" element={<ProtectedRoute requiredPage="layby"><Index /></ProtectedRoute>} />
+                <Route path="/transactions" element={<ProtectedRoute requiredPage="transactions"><Index /></ProtectedRoute>} />
+                <Route path="/customers" element={<ProtectedRoute requiredPage="customers"><Index /></ProtectedRoute>} />
+                <Route path="/reports" element={<ProtectedRoute requiredPage="reports"><Index /></ProtectedRoute>} />
+                <Route path="/settings" element={<ProtectedRoute requiredPage="settings"><Index /></ProtectedRoute>} />
+                <Route path="/stores" element={<StoreSelectionPage />} />
+                <Route path="/app" element={<ProtectedRoute><Index /></ProtectedRoute>} />
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="/pin-login" element={<PinLoginPage />} />
                 <Route path="/store/:storeCode" element={<StoreShortLinkPage />} />
-                <Route path="/test-demo" element={<TestDemo />} />
-                <Route path="/quickbooks-demo" element={<QuickBooksDemo />} />
 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
-              </Suspense>
+                </Suspense>
+              </PermissionProvider>
             </StoreProvider>
           </AuthProvider>
         </BrowserRouter>

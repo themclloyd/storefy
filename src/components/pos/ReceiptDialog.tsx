@@ -2,6 +2,7 @@ import { useRef } from "react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -235,6 +236,9 @@ export function ReceiptDialog({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Order Receipt</DialogTitle>
+          <DialogDescription>
+            Print or download your order receipt.
+          </DialogDescription>
         </DialogHeader>
         
         <OrderReceipt

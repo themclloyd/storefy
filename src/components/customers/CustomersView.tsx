@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Search, Plus, Users, Phone, Mail, Edit, Eye, Loader2, Download, BarChart3 } from "lucide-react";
 import { useStore } from "@/contexts/StoreContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { useStoreData } from "@/hooks/useSupabaseClient";
 import { toast } from "sonner";
 import { useTax } from "@/hooks/useTax";
 import { AddCustomerDialog } from "./AddCustomerDialog";
@@ -34,6 +34,7 @@ interface Customer {
 export function CustomersView() {
   const { currentStore } = useStore();
   const { user } = useAuth();
+  const { from, currentStoreId, isPinSession } = useStoreData();
   const { formatCurrency } = useTax();
 
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -50,17 +51,17 @@ export function CustomersView() {
 
 
   useEffect(() => {
-    if (currentStore && user) {
+    if ((currentStore && user) || (currentStoreId && isPinSession)) {
       fetchCustomers();
     }
-  }, [currentStore, user]);
+  }, [currentStore, user, currentStoreId, isPinSession]);
 
   const fetchCustomers = async () => {
-    if (!currentStore) return;
+    const storeId = currentStoreId || currentStore?.id;
+    if (!storeId) return;
 
     try {
-      const { data, error } = await supabase
-        .from('customers')
+      const { data, error } = await from('customers')
         .select(`
           id,
           name,
@@ -72,7 +73,7 @@ export function CustomersView() {
           status,
           created_at
         `)
-        .eq('store_id', currentStore.id)
+        .eq('store_id', storeId)
         .order('name');
 
       if (error) {
@@ -84,8 +85,7 @@ export function CustomersView() {
       // For each customer, get their last order date
       const customersWithLastOrder = await Promise.all(
         (data || []).map(async (customer) => {
-          const { data: lastOrder } = await supabase
-            .from('orders')
+          const { data: lastOrder } = await from('orders')
             .select('created_at')
             .eq('customer_id', customer.id)
             .order('created_at', { ascending: false })

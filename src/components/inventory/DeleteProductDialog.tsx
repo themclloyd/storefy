@@ -51,7 +51,6 @@ export function DeleteProductDialog({
       onProductDeleted();
       onOpenChange(false);
     } catch (error) {
-      console.error('Error deleting product:', error);
       toast.error('Failed to delete product');
     } finally {
       setLoading(false);

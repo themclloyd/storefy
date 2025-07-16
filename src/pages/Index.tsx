@@ -2,21 +2,21 @@
 import { useEffect, useState, Suspense, lazy } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useStore } from "@/contexts/StoreContext";
-import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
+import { usePermissions } from "@/contexts/PermissionContext";
+import { useNavigate, useSearchParams, useLocation, Navigate } from "react-router-dom";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { StoreSelector } from "@/components/stores/StoreSelector";
+import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import { ThemeToggleButton } from "@/components/ui/theme-toggle";
 
 // Lazy load view components for code splitting
-const OverviewDashboard = lazy(() => import("@/components/dashboard/OverviewDashboard").then(module => ({ default: module.OverviewDashboard })));
+const SimpleDashboard = lazy(() => import("@/components/dashboard/SimpleDashboard").then(module => ({ default: module.SimpleDashboard })));
 const POSView = lazy(() => import("@/components/pos/POSView").then(module => ({ default: module.POSView })));
 const InventoryView = lazy(() => import("@/components/inventory/InventoryView").then(module => ({ default: module.InventoryView })));
-const CategoriesView = lazy(() => import("@/components/inventory/CategoriesView").then(module => ({ default: module.CategoriesView })));
-const SuppliersView = lazy(() => import("@/components/inventory/SuppliersView").then(module => ({ default: module.SuppliersView })));
 
 const ExpenseView = lazy(() => import("@/components/expenses/ExpenseView").then(module => ({ default: module.ExpenseView })));
-const LaybyView = lazy(() => import("@/components/layby/LaybyView").then(module => ({ default: module.LaybyView })));
 const TransactionView = lazy(() => import("@/components/transactions/TransactionView").then(module => ({ default: module.TransactionView })));
 const CustomersView = lazy(() => import("@/components/customers/CustomersView").then(module => ({ default: module.CustomersView })));
 const ReportsView = lazy(() => import("@/components/reports/ReportsView").then(module => ({ default: module.ReportsView })));
@@ -132,36 +132,14 @@ const Index = () => {
     const viewComponent = (() => {
       switch (activeView) {
         case "dashboard":
-        case "analytics":
-          return <OverviewDashboard />;
+          return <SimpleDashboard onViewChange={handleViewChange} />;
         case "pos":
           return <POSView />;
         case "inventory":
           return <InventoryView />;
-        case "categories":
-          return (
-            <CategoriesView
-              onClose={() => handleViewChange("inventory")}
-              onViewCategoryProducts={(categoryId, categoryName) => {
-                // This will be handled by the InventoryView's filtered view
-                handleViewChange("inventory");
-              }}
-            />
-          );
-        case "suppliers":
-          return (
-            <SuppliersView
-              onClose={() => handleViewChange("inventory")}
-              onViewSupplierProducts={(supplierId, supplierName) => {
-                // This will be handled by the InventoryView's filtered view
-                handleViewChange("inventory");
-              }}
-            />
-          );
         case "expenses":
           return <ExpenseView />;
         case "layby":
-          return <LaybyView />;
         case "transactions":
           return <TransactionView />;
         case "customers":
@@ -173,7 +151,7 @@ const Index = () => {
         case "stores":
           return <StoreManagementView />;
         default:
-          return <OverviewDashboard />;
+          return <SimpleDashboard onViewChange={handleViewChange} />;
       }
     })();
 
@@ -219,6 +197,7 @@ const Index = () => {
     return (
       <SidebarProvider defaultOpen={true}>
         <Sidebar
+          collapsible="icon"
           activeView={activeView}
           onViewChange={handleViewChange}
           currentStore={pinData.store_name}
@@ -234,51 +213,73 @@ const Index = () => {
     );
   }
 
-  // Show store management for owners with multiple stores by default
-  if (isOwner && stores.length > 1 && !currentStore) {
-    return <StoreManagementView />;
+  // Show store selector if no current store for main users
+  if (storeLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="w-8 h-8 bg-primary rounded-full animate-pulse mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading store...</p>
+        </div>
+      </div>
+    );
   }
 
-  // Show store selector if no current store or still loading stores
-  if (storeLoading || (!currentStore && stores.length <= 1)) {
+  // Main users must select a store - no exceptions
+  if (!currentStore && !hasPinSession) {
     return <StoreSelector />;
+  }
+
+  // PIN users should never see store selector - they belong to a specific store
+  if (!currentStore && hasPinSession) {
+    // This should not happen, but redirect to PIN login if it does
+    return <Navigate to="/pin-login" replace />;
+  }
+
+  // If PIN user but no current store, there's an issue - redirect to PIN login
+  if (!currentStore && hasPinSession) {
+    localStorage.removeItem('pin_session');
+    window.location.href = '/pin-login';
+    return null;
   }
 
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="flex min-h-screen w-full bg-background">
-        {/* Sidebar */}
-        <div className="hidden md:block">
-          <Sidebar
-            activeView={activeView}
-            onViewChange={handleViewChange}
-            currentStore={currentStore.name}
-          />
-        </div>
+      {/* Sidebar */}
+      <Sidebar
+        collapsible="icon"
+        activeView={activeView}
+        onViewChange={handleViewChange}
+        currentStore={currentStore.name}
+      />
 
-        <SidebarInset className="flex-1">
-          {/* Main Content */}
-          <div className="flex-1 overflow-auto">
-            <div className="p-4 md:p-6 pb-20 md:pb-6">
-              {renderView()}
-            </div>
+      <SidebarInset>
+        {/* Header with Breadcrumbs */}
+        <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="flex items-center gap-4 px-4">
+            <SidebarTrigger className="h-8 w-8" />
+            <div className="h-4 w-px bg-border" />
+            <Breadcrumbs activeView={activeView} />
           </div>
 
-          {/* Mobile Bottom Navigation */}
-          <div className="md:hidden fixed bottom-0 left-0 right-0 z-50">
-            <MobileBottomNav activeView={activeView} onViewChange={handleViewChange} />
+          {/* Theme Toggle in Top Right */}
+          <div className="flex items-center gap-2 px-4 ml-auto">
+            <ThemeToggleButton />
           </div>
-        </SidebarInset>
+        </header>
 
-        {/* Mobile Sidebar */}
-        <div className="md:hidden">
-          <Sidebar
-            activeView={activeView}
-            onViewChange={handleViewChange}
-            currentStore={currentStore.name}
-          />
+        {/* Main Content */}
+        <div className="flex-1 overflow-auto">
+          <div className="p-4 md:p-6 pb-20 md:pb-6">
+            {renderView()}
+          </div>
         </div>
-      </div>
+
+        {/* Mobile Bottom Navigation */}
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50">
+          <MobileBottomNav activeView={activeView} onViewChange={handleViewChange} />
+        </div>
+      </SidebarInset>
     </SidebarProvider>
   );
 };

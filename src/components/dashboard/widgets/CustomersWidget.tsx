@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useStore } from '@/contexts/StoreContext';
+import { useStoreData } from '@/hooks/useSupabaseClient';
+import { useTax } from '@/hooks/useTax';
 
 interface CustomersWidgetProps {
   onViewMore: () => void;
@@ -35,6 +37,8 @@ interface CustomerData {
 
 export function CustomersWidget({ onViewMore }: CustomersWidgetProps) {
   const { currentStore } = useStore();
+  const { from, currentStoreId, isPinSession } = useStoreData();
+  const { formatCurrency } = useTax();
   const [loading, setLoading] = useState(true);
   const [customerData, setCustomerData] = useState<CustomerData>({
     totalCustomers: 0,
@@ -46,47 +50,91 @@ export function CustomersWidget({ onViewMore }: CustomersWidgetProps) {
   });
 
   useEffect(() => {
-    if (currentStore) {
+    if ((currentStore && !isPinSession) || (currentStoreId && isPinSession)) {
       fetchCustomerData();
     }
-  }, [currentStore]);
+  }, [currentStore, currentStoreId, isPinSession]);
 
   const fetchCustomerData = async () => {
+    const storeId = currentStoreId || currentStore?.id;
+    if (!storeId) return;
+
     try {
       setLoading(true);
-      // Mock data for now - replace with actual Supabase queries
+
+      const today = new Date().toISOString().split('T')[0];
+      const lastMonth = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+      // Fetch all customers
+      const { data: customers } = await from('customers')
+        .select(`
+          id,
+          name,
+          email,
+          created_at,
+          status,
+          total_orders,
+          total_spent
+        `)
+        .eq('store_id', storeId)
+        .order('created_at', { ascending: false });
+
+      if (!customers || customers.length === 0) {
+        setLoading(false);
+        return;
+      }
+
+      // Calculate customer metrics
+      const totalCustomers = customers.length;
+      const newCustomersToday = customers.filter(c => c.created_at.startsWith(today)).length;
+
+      // Calculate customer growth (comparing to last month)
+      const lastMonthCustomers = customers.filter(c => c.created_at < lastMonth).length;
+      const newLastMonth = totalCustomers - lastMonthCustomers;
+      const customerGrowth = lastMonthCustomers > 0 ? (newLastMonth / lastMonthCustomers) * 100 : 0;
+
+      // Count VIP customers
+      const vipCustomers = customers.filter(c => c.status === 'vip').length;
+
+      // Calculate average order value from customer data
+      const totalOrders = customers.reduce((sum, c) => sum + (c.total_orders || 0), 0);
+      const totalSpent = customers.reduce((sum, c) => sum + (c.total_spent || 0), 0);
+      const averageOrderValue = totalOrders > 0 ? totalSpent / totalOrders : 0;
+
+      // Format recent customers with their spending data
+      const recentCustomers = customers.slice(0, 3).map(customer => {
+        const customerTotalSpent = customer.total_spent || 0;
+
+        // Calculate last visit (simplified - using created_at as approximation)
+        const createdDate = new Date(customer.created_at);
+        const timeDiff = Date.now() - createdDate.getTime();
+        const hoursAgo = Math.floor(timeDiff / (1000 * 60 * 60));
+
+        let lastVisit = 'Never';
+        if (hoursAgo < 24) {
+          lastVisit = `${hoursAgo} hour${hoursAgo !== 1 ? 's' : ''} ago`;
+        } else {
+          const daysAgo = Math.floor(hoursAgo / 24);
+          lastVisit = `${daysAgo} day${daysAgo !== 1 ? 's' : ''} ago`;
+        }
+
+        return {
+          id: customer.id,
+          name: customer.name,
+          email: customer.email || '',
+          totalSpent: customerTotalSpent,
+          lastVisit,
+          isVip: customer.status === 'vip'
+        };
+      });
+
       setCustomerData({
-        totalCustomers: 87,
-        newCustomersToday: 3,
-        customerGrowth: 15.2,
-        vipCustomers: 12,
-        averageOrderValue: 69.49,
-        recentCustomers: [
-          {
-            id: '1',
-            name: 'Sarah Johnson',
-            email: 'sarah@email.com',
-            totalSpent: 1250.00,
-            lastVisit: '2 hours ago',
-            isVip: true
-          },
-          {
-            id: '2',
-            name: 'Mike Chen',
-            email: 'mike@email.com',
-            totalSpent: 450.75,
-            lastVisit: '1 day ago',
-            isVip: false
-          },
-          {
-            id: '3',
-            name: 'Emma Wilson',
-            email: 'emma@email.com',
-            totalSpent: 890.25,
-            lastVisit: '3 days ago',
-            isVip: true
-          }
-        ]
+        totalCustomers,
+        newCustomersToday,
+        customerGrowth,
+        vipCustomers,
+        averageOrderValue,
+        recentCustomers
       });
     } catch (error) {
       console.error('Error fetching customer data:', error);

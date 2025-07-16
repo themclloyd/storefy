@@ -31,18 +31,14 @@ export function AuthPage() {
   useEffect(() => {
     const testConnection = async () => {
       try {
-        console.log('Testing Supabase connection...');
-        const { data, error } = await supabase.auth.getSession();
-        console.log('Supabase session test:', { data, error });
-
-        // Test a simple query
-        const { data: testData, error: testError } = await supabase
+        // Test connection silently in production
+        await supabase.auth.getSession();
+        await supabase
           .from('profiles')
           .select('count')
           .limit(1);
-        console.log('Supabase query test:', { testData, testError });
       } catch (err) {
-        console.error('Supabase connection test failed:', err);
+        // Connection test failed - will be handled by auth flow
       }
     };
     testConnection();
@@ -53,30 +49,21 @@ export function AuthPage() {
     setLoading(true);
     setError('');
 
-    console.log('Attempting login with:', { email, password: '***' });
-
     try {
       if (isLogin) {
         const { error } = await signIn(email, password);
-        console.log('Sign in result:', { error });
         if (error) {
-          console.error('Sign in error:', error);
           setError(`Login failed: ${error.message}`);
-        } else {
-          console.log('Sign in successful');
         }
       } else {
         const { error } = await signUp(email, password, displayName);
-        console.log('Sign up result:', { error });
         if (error) {
-          console.error('Sign up error:', error);
           setError(`Sign up failed: ${error.message}`);
         } else {
           setError('Check your email for the confirmation link!');
         }
       }
     } catch (err) {
-      console.error('Unexpected error:', err);
       setError(`An unexpected error occurred: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
@@ -111,32 +98,32 @@ export function AuthPage() {
   return (
     <div className="min-h-screen flex bg-background">
       {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-primary flex-col justify-center items-center p-12 text-primary-foreground">
-        <div className="max-w-md text-center space-y-8">
-          <div className="w-20 h-20 bg-primary-foreground/20 rounded-3xl flex items-center justify-center mx-auto">
-            <Store className="w-10 h-10 text-primary-foreground" />
+      <div className="hidden lg:flex lg:w-1/2 bg-primary flex-col justify-center items-center p-8 text-primary-foreground">
+        <div className="max-w-sm text-center space-y-6">
+          <div className="w-16 h-16 bg-primary-foreground/20 rounded-2xl flex items-center justify-center mx-auto">
+            <Store className="w-8 h-8 text-primary-foreground" />
           </div>
-          <div className="space-y-4">
-            <h1 className="text-4xl font-bold">Welcome to Storefy</h1>
-            <p className="text-xl text-primary-foreground/90 leading-relaxed">
-              Your complete retail management solution. Streamline your business operations with our powerful tools.
+          <div className="space-y-3">
+            <h1 className="text-2xl font-bold">Welcome to Storefy</h1>
+            <p className="text-base text-primary-foreground/90 leading-relaxed">
+              Your complete retail management solution. Streamline operations with powerful tools.
             </p>
           </div>
-          <div className="space-y-3 text-primary-foreground/80">
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 bg-primary-foreground/60 rounded-full"></div>
+          <div className="space-y-2 text-sm text-primary-foreground/80">
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 bg-primary-foreground/60 rounded-full"></div>
               <span>Inventory Management</span>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 bg-primary-foreground/60 rounded-full"></div>
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 bg-primary-foreground/60 rounded-full"></div>
               <span>Point of Sale System</span>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 bg-primary-foreground/60 rounded-full"></div>
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 bg-primary-foreground/60 rounded-full"></div>
               <span>Customer Management</span>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 bg-primary-foreground/60 rounded-full"></div>
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 bg-primary-foreground/60 rounded-full"></div>
               <span>Analytics & Reports</span>
             </div>
           </div>
@@ -144,22 +131,22 @@ export function AuthPage() {
       </div>
 
       {/* Right Side - Form */}
-      <div className="flex-1 flex flex-col justify-center px-8 sm:px-12 lg:px-16 xl:px-20">
-        <div className="w-full max-w-md mx-auto">
+      <div className="flex-1 flex flex-col justify-center px-6 sm:px-8 lg:px-12 xl:px-16">
+        <div className="w-full max-w-sm mx-auto">
           {/* Mobile Logo */}
-          <div className="lg:hidden text-center mb-8">
-            <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Store className="w-8 h-8 text-primary-foreground" />
+          <div className="lg:hidden text-center mb-6">
+            <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mx-auto mb-3">
+              <Store className="w-6 h-6 text-primary-foreground" />
             </div>
-            <h1 className="text-2xl font-bold text-foreground">Storefy</h1>
+            <h1 className="text-xl font-bold text-foreground">Storefy</h1>
           </div>
 
           {/* Form Header */}
-          <div className="text-center lg:text-left mb-8">
-            <h2 className="text-3xl font-bold text-foreground mb-2">
+          <div className="text-center lg:text-left mb-6">
+            <h2 className="text-2xl font-bold text-foreground mb-2">
               {isLogin ? 'Sign in to your account' : 'Create your account'}
             </h2>
-            <p className="text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               {isLogin
                 ? 'Welcome back! Please enter your details.'
                 : 'Get started with your retail management journey.'
@@ -168,9 +155,9 @@ export function AuthPage() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <Label htmlFor="displayName" className="text-sm font-medium text-foreground">
                   Display Name
                 </Label>
@@ -181,11 +168,12 @@ export function AuthPage() {
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   required={!isLogin}
+                  className="h-10"
                 />
               </div>
             )}
 
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label htmlFor="email" className="text-sm font-medium text-foreground">
                 Email
               </Label>
@@ -196,10 +184,11 @@ export function AuthPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="h-10"
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password" className="text-sm font-medium text-foreground">
                   Password
@@ -225,7 +214,7 @@ export function AuthPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={6}
-                  className="pr-10"
+                  className="pr-10 h-10"
                 />
                 <Button
                   type="button"
@@ -244,15 +233,15 @@ export function AuthPage() {
             </div>
 
             {error && (
-              <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+              <div className="flex items-center gap-2 p-2 bg-destructive/10 border border-destructive/20 rounded-lg">
                 <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0" />
-                <p className="text-sm text-destructive">{error}</p>
+                <p className="text-xs text-destructive">{error}</p>
               </div>
             )}
 
             <Button
               type="submit"
-              className="w-full h-12"
+              className="w-full h-10"
               disabled={loading}
             >
               {loading ? (
@@ -276,15 +265,15 @@ export function AuthPage() {
           </form>
 
           {/* Additional Options */}
-          <div className="mt-8 space-y-4">
+          <div className="mt-6 space-y-3">
             {isLogin && (
               <>
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-border"></div>
                   </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="px-4 bg-background text-muted-foreground">Or continue with</span>
+                  <div className="relative flex justify-center text-xs">
+                    <span className="px-3 bg-background text-muted-foreground">Or continue with</span>
                   </div>
                 </div>
 
@@ -292,7 +281,7 @@ export function AuthPage() {
                 <Button
                   variant="outline"
                   onClick={() => navigate('/pin-login')}
-                  className="w-full"
+                  className="w-full h-9 text-sm"
                 >
                   <KeyRound className="w-4 h-4 mr-2" />
                   Team Member PIN Login
@@ -308,6 +297,7 @@ export function AuthPage() {
                   setError('');
                   setShowPassword(false);
                 }}
+                className="text-sm"
               >
                 {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
               </Button>

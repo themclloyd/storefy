@@ -30,7 +30,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loader2, User, Mail, Phone, MapPin, Save, Trash2 } from "lucide-react";
 import { useStore } from "@/contexts/StoreContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { SecureAction } from "@/components/auth/SecureAction";
+import { useStoreData } from "@/hooks/useSupabaseClient";
 import { toast } from "sonner";
 
 const customerSchema = z.object({
@@ -73,6 +74,7 @@ export function EditCustomerDialog({
 }: EditCustomerDialogProps) {
   const { currentStore } = useStore();
   const { user } = useAuth();
+  const { from, currentStoreId, isPinSession } = useStoreData();
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -113,15 +115,15 @@ export function EditCustomerDialog({
   }, [open]);
 
   const onSubmit = async (data: CustomerFormData) => {
-    if (!currentStore || !user || !customer) {
+    const storeId = currentStoreId || currentStore?.id;
+    if (!storeId || (!user && !isPinSession) || !customer) {
       toast.error("Store, user, or customer information not available");
       return;
     }
 
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from('customers')
+      const { error } = await from('customers')
         .update({
           name: data.name,
           email: data.email || null,
@@ -131,7 +133,7 @@ export function EditCustomerDialog({
           updated_at: new Date().toISOString(),
         })
         .eq('id', customer.id)
-        .eq('store_id', currentStore.id);
+        .eq('store_id', storeId);
 
       if (error) {
         console.error('Error updating customer:', error);
@@ -151,7 +153,8 @@ export function EditCustomerDialog({
   };
 
   const handleDelete = async () => {
-    if (!currentStore || !customer) {
+    const storeId = currentStoreId || currentStore?.id;
+    if (!storeId || !customer) {
       toast.error("Store or customer information not available");
       return;
     }
@@ -159,8 +162,7 @@ export function EditCustomerDialog({
     setDeleteLoading(true);
     try {
       // First, check if customer has any orders
-      const { data: orders, error: ordersError } = await supabase
-        .from('orders')
+      const { data: orders, error: ordersError } = await from('orders')
         .select('id')
         .eq('customer_id', customer.id)
         .limit(1);
@@ -177,11 +179,10 @@ export function EditCustomerDialog({
       }
 
       // Delete the customer
-      const { error } = await supabase
-        .from('customers')
+      const { error } = await from('customers')
         .delete()
         .eq('id', customer.id)
-        .eq('store_id', currentStore.id);
+        .eq('store_id', storeId);
 
       if (error) {
         console.error('Error deleting customer:', error);
@@ -345,19 +346,20 @@ export function EditCustomerDialog({
             )}
 
             <div className="flex justify-between pt-4">
-              {/* Delete Button */}
-              <div>
-                {!showDeleteConfirm ? (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowDeleteConfirm(true)}
-                    disabled={loading || deleteLoading}
-                    className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Delete Customer
-                  </Button>
+              {/* Delete Button - Only for Managers+ */}
+              <SecureAction permission="manage_customers">
+                <div>
+                  {!showDeleteConfirm ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowDeleteConfirm(true)}
+                      disabled={loading || deleteLoading}
+                      className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete Customer
+                    </Button>
                 ) : (
                   <div className="space-y-3">
                     <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3">
@@ -405,7 +407,8 @@ export function EditCustomerDialog({
                     </div>
                   </div>
                 )}
-              </div>
+                </div>
+              </SecureAction>
 
               {/* Action Buttons */}
               <div className="flex gap-3">

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useStore } from '@/contexts/StoreContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface InventoryWidgetProps {
   onViewMore: () => void;
@@ -61,54 +62,93 @@ export function InventoryWidget({ onViewMore }: InventoryWidgetProps) {
   }, [currentStore]);
 
   const fetchInventoryData = async () => {
+    if (!currentStore) return;
+
     try {
       setLoading(true);
-      // Mock data for now - replace with actual Supabase queries
+
+      // Fetch products with their sales data
+      const { data: products } = await supabase
+        .from('products')
+        .select(`
+          id,
+          name,
+          stock_quantity,
+          cost_price,
+          selling_price,
+          transaction_items (quantity)
+        `)
+        .eq('store_id', currentStore.id)
+        .order('stock_quantity', { ascending: true });
+
+      if (!products || products.length === 0) {
+        setLoading(false);
+        return;
+      }
+
+      // Calculate inventory metrics
+      const totalProducts = products.length;
+      const lowStockItems = products.filter(p => p.stock_quantity > 0 && p.stock_quantity <= 10).length;
+      const outOfStockItems = products.filter(p => p.stock_quantity === 0).length;
+      const inventoryValue = products.reduce((sum, p) => sum + (Number(p.cost_price) * p.stock_quantity), 0);
+
+      // Calculate sales for each product
+      const productsWithSales = products.map(product => {
+        const sales = product.transaction_items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+        let status = 'good';
+        if (product.stock_quantity === 0) status = 'out';
+        else if (product.stock_quantity <= 10) status = 'low';
+
+        return {
+          id: product.id,
+          name: product.name,
+          stock: product.stock_quantity,
+          status,
+          sales
+        };
+      });
+
+      // Sort by sales for top products
+      const topProducts = [...productsWithSales].sort((a, b) => b.sales - a.sales).slice(0, 3);
+
+      // Fetch recent inventory activity
+      const { data: recentActivity } = await supabase
+        .from('inventory_transactions')
+        .select(`
+          id,
+          type,
+          quantity,
+          created_at,
+          products (name)
+        `)
+        .eq('store_id', currentStore.id)
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      const formattedActivity = recentActivity?.map(activity => {
+        const timeDiff = Date.now() - new Date(activity.created_at).getTime();
+        const hoursAgo = Math.floor(timeDiff / (1000 * 60 * 60));
+        const timeString = hoursAgo < 24
+          ? `${hoursAgo} hour${hoursAgo !== 1 ? 's' : ''} ago`
+          : `${Math.floor(hoursAgo / 24)} day${Math.floor(hoursAgo / 24) !== 1 ? 's' : ''} ago`;
+
+        return {
+          id: activity.id,
+          type: activity.type,
+          product: activity.products?.name || 'Unknown Product',
+          quantity: activity.quantity,
+          time: timeString
+        };
+      }) || [];
+
       setInventoryData({
-        totalProducts: 156,
-        lowStockItems: 12,
-        outOfStockItems: 3,
-        inventoryValue: 15750.25,
-        inventoryGrowth: 8.2,
-        topProducts: [
-          {
-            id: '1',
-            name: 'Wireless Headphones',
-            stock: 25,
-            status: 'good',
-            sales: 45
-          },
-          {
-            id: '2',
-            name: 'Phone Case',
-            stock: 5,
-            status: 'low',
-            sales: 32
-          },
-          {
-            id: '3',
-            name: 'USB Cable',
-            stock: 0,
-            status: 'out',
-            sales: 28
-          }
-        ],
-        recentActivity: [
-          {
-            id: '1',
-            type: 'restock',
-            product: 'Wireless Headphones',
-            quantity: 20,
-            time: '1 hour ago'
-          },
-          {
-            id: '2',
-            type: 'sale',
-            product: 'Phone Case',
-            quantity: -2,
-            time: '2 hours ago'
-          }
-        ]
+        totalProducts,
+        lowStockItems,
+        outOfStockItems,
+        inventoryValue,
+        inventoryGrowth: 0, // We don't have historical data for growth calculation
+        topProducts,
+        recentActivity: formattedActivity
       });
     } catch (error) {
       console.error('Error fetching inventory data:', error);

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useStore } from '@/contexts/StoreContext';
+import { useStoreData } from '@/hooks/useSupabaseClient';
 
 interface SalesWidgetProps {
   onViewMore: () => void;
@@ -34,6 +35,7 @@ interface SalesData {
 
 export function SalesWidget({ onViewMore }: SalesWidgetProps) {
   const { currentStore } = useStore();
+  const { from, currentStoreId, isPinSession } = useStoreData();
   const [loading, setLoading] = useState(true);
   const [salesData, setSalesData] = useState<SalesData>({
     todaysSales: 0,
@@ -45,44 +47,89 @@ export function SalesWidget({ onViewMore }: SalesWidgetProps) {
   });
 
   useEffect(() => {
-    if (currentStore) {
+    if (currentStore || (currentStoreId && isPinSession)) {
       fetchSalesData();
     }
-  }, [currentStore]);
+  }, [currentStore, currentStoreId, isPinSession]);
 
   const fetchSalesData = async () => {
+    const storeId = currentStoreId || currentStore?.id;
+    if (!storeId) return;
+
     try {
       setLoading(true);
-      // Mock data for now - replace with actual Supabase queries
+
+      const today = new Date().toISOString().split('T')[0];
+      const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+      // Fetch today's transactions with error handling
+      const { data: todayTransactions, error: todayError } = await from('transactions')
+        .select(`
+          id,
+          total_amount,
+          created_at,
+          customers (name),
+          transaction_items (quantity)
+        `)
+        .eq('store_id', storeId)
+        .eq('status', 'completed')
+        .gte('created_at', today)
+        .order('created_at', { ascending: false });
+
+      if (todayError) {
+        console.error('Error fetching today transactions:', todayError);
+        // Set default values and continue
+        setSalesData({
+          todaysSales: 0,
+          yesterdaysSales: 0,
+          salesGrowth: 0,
+          totalOrders: 0,
+          averageOrderValue: 0,
+          recentSales: []
+        });
+        return;
+      }
+
+      // Fetch yesterday's transactions for comparison
+      const { data: yesterdayTransactions, error: yesterdayError } = await from('transactions')
+        .select('total_amount')
+        .eq('store_id', storeId)
+        .eq('status', 'completed')
+        .gte('created_at', yesterday)
+        .lt('created_at', today);
+
+      if (yesterdayError) {
+        console.error('Error fetching yesterday transactions:', yesterdayError);
+      }
+
+      const todayTotal = todayTransactions?.reduce((sum, t) => sum + Number(t.total_amount), 0) || 0;
+      const yesterdayTotal = yesterdayTransactions?.reduce((sum, t) => sum + Number(t.total_amount), 0) || 0;
+      const growth = yesterdayTotal > 0 ? ((todayTotal - yesterdayTotal) / yesterdayTotal) * 100 : 0;
+      const totalOrders = todayTransactions?.length || 0;
+      const averageOrderValue = totalOrders > 0 ? todayTotal / totalOrders : 0;
+
+      // Format recent sales
+      const recentSales = todayTransactions?.slice(0, 3).map(transaction => {
+        const timeDiff = Date.now() - new Date(transaction.created_at).getTime();
+        const minutesAgo = Math.floor(timeDiff / (1000 * 60));
+        const timeString = minutesAgo < 60 ? `${minutesAgo} min ago` : `${Math.floor(minutesAgo / 60)} hour${Math.floor(minutesAgo / 60) > 1 ? 's' : ''} ago`;
+
+        return {
+          id: transaction.id,
+          amount: Number(transaction.total_amount),
+          customer: transaction.customers?.name || 'Walk-in Customer',
+          time: timeString,
+          items: transaction.transaction_items?.reduce((sum, item) => sum + item.quantity, 0) || 1
+        };
+      }) || [];
+
       setSalesData({
-        todaysSales: 1250.75,
-        yesterdaysSales: 1100.50,
-        salesGrowth: 13.6,
-        totalOrders: 18,
-        averageOrderValue: 69.49,
-        recentSales: [
-          {
-            id: '1',
-            amount: 89.99,
-            customer: 'John Doe',
-            time: '2 min ago',
-            items: 3
-          },
-          {
-            id: '2',
-            amount: 45.50,
-            customer: 'Jane Smith',
-            time: '15 min ago',
-            items: 2
-          },
-          {
-            id: '3',
-            amount: 125.00,
-            customer: 'Mike Johnson',
-            time: '32 min ago',
-            items: 5
-          }
-        ]
+        todaysSales: todayTotal,
+        yesterdaysSales: yesterdayTotal,
+        salesGrowth: growth,
+        totalOrders,
+        averageOrderValue,
+        recentSales
       });
     } catch (error) {
       console.error('Error fetching sales data:', error);

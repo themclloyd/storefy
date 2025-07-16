@@ -3,12 +3,15 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
 // Use environment variables for security
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://irmuaqhwmtgbkftqlohx.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlybXVhcWh3bXRnYmtmdHFsb2h4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NTU2NzQsImV4cCI6MjA2NzMzMTY3NH0.6DX_aLCLCy__18IGOG2DW1vJGkWSw4TJ4gm2eNdn35U";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // Validate environment variables
 if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-  throw new Error('Missing Supabase environment variables. Please check your .env file.');
+  throw new Error(
+    'Missing Supabase environment variables. Please ensure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set in your .env file. ' +
+    'Copy .env.example to .env and fill in your Supabase project details.'
+  );
 }
 
 // Import the supabase client like this:
@@ -19,5 +22,12 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     storage: localStorage,
     persistSession: true,
     autoRefreshToken: true,
-  }
+    detectSessionInUrl: true,
+    flowType: 'pkce', // Use PKCE flow for better security
+  },
+  global: {
+    headers: {
+      'X-Client-Info': 'storefy-web-app',
+    },
+  },
 });

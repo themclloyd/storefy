@@ -217,7 +217,7 @@ export function TransactionDetailsModal({
       }
     }
 
-    console.log('Order details fetched:', data);
+    // Order details fetched successfully
     setOrderDetails(data);
   };
 
@@ -266,7 +266,7 @@ export function TransactionDetailsModal({
       }
     }
 
-    console.log('Layby details fetched:', data);
+    // Layby details fetched successfully
     setLaybyDetails(data);
   };
 

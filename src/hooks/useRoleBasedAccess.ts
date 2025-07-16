@@ -1,0 +1,222 @@
+import { usePermissions, Permission, ProtectedPage } from '@/contexts/PermissionContext';
+import { useStore } from '@/contexts/StoreContext';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  BarChart3, ShoppingCart, Package, FolderOpen, Truck, Users,
+  Receipt, Clock, CreditCard, Settings
+} from 'lucide-react';
+
+/**
+ * Hook for checking if user has specific permission
+ */
+export function usePermission(permission: Permission) {
+  const { hasPermission, loading } = usePermissions();
+  
+  return {
+    hasPermission: hasPermission(permission),
+    loading
+  };
+}
+
+/**
+ * Hook for checking if user can access a specific page
+ */
+export function usePageAccess(page: ProtectedPage) {
+  const { canAccessPage, loading, logSecurityEvent } = usePermissions();
+  const navigate = useNavigate();
+  const { currentStore } = useStore();
+  
+  const canAccess = canAccessPage(page);
+  
+  useEffect(() => {
+    if (!loading && !canAccess && currentStore) {
+      // Log unauthorized access attempt
+      logSecurityEvent('unauthorized_page_access', {
+        attempted_page: page,
+        store_id: currentStore.id,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Redirect to dashboard or show error
+      navigate('/dashboard', { replace: true });
+    }
+  }, [loading, canAccess, page, currentStore, navigate, logSecurityEvent]);
+  
+  return {
+    canAccess,
+    loading
+  };
+}
+
+/**
+ * Hook for role-based component rendering
+ */
+export function useRoleBasedRendering() {
+  const { userRole, hasPermission, canAccessPage } = usePermissions();
+  
+  const renderIfPermission = (permission: Permission, component: React.ReactNode) => {
+    return hasPermission(permission) ? component : null;
+  };
+  
+  const renderIfRole = (allowedRoles: Array<'owner' | 'manager' | 'cashier'>, component: React.ReactNode) => {
+    return userRole && allowedRoles.includes(userRole.role) ? component : null;
+  };
+  
+  const renderIfPageAccess = (page: ProtectedPage, component: React.ReactNode) => {
+    return canAccessPage(page) ? component : null;
+  };
+  
+  const renderIfOwner = (component: React.ReactNode) => {
+    return userRole?.isOwner ? component : null;
+  };
+  
+  const renderIfManager = (component: React.ReactNode) => {
+    return userRole && ['owner', 'manager'].includes(userRole.role) ? component : null;
+  };
+  
+  return {
+    userRole,
+    renderIfPermission,
+    renderIfRole,
+    renderIfPageAccess,
+    renderIfOwner,
+    renderIfManager
+  };
+}
+
+/**
+ * Hook for secure action execution with permission checking
+ */
+export function useSecureAction() {
+  const { checkPermission, logSecurityEvent } = usePermissions();
+  const { currentStore } = useStore();
+  
+  const executeWithPermission = async (
+    permission: Permission,
+    action: () => Promise<void> | void,
+    onUnauthorized?: () => void
+  ) => {
+    const hasPermission = await checkPermission(permission);
+    
+    if (!hasPermission) {
+      // Log unauthorized action attempt
+      await logSecurityEvent('unauthorized_action_attempt', {
+        attempted_action: permission,
+        store_id: currentStore?.id,
+        timestamp: new Date().toISOString()
+      });
+      
+      if (onUnauthorized) {
+        onUnauthorized();
+      } else {
+        throw new Error(`Unauthorized: Missing permission ${permission}`);
+      }
+      return;
+    }
+    
+    // Log successful action
+    await logSecurityEvent('authorized_action', {
+      action: permission,
+      store_id: currentStore?.id,
+      timestamp: new Date().toISOString()
+    });
+    
+    await action();
+  };
+  
+  return { executeWithPermission };
+}
+
+/**
+ * Hook for route protection
+ */
+export function useRouteProtection(requiredPage: ProtectedPage) {
+  const { canAccessPage, loading, userRole } = usePermissions();
+  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
+  
+  useEffect(() => {
+    if (!loading) {
+      setIsAuthorized(canAccessPage(requiredPage));
+    }
+  }, [loading, canAccessPage, requiredPage]);
+  
+  return {
+    isAuthorized,
+    loading,
+    userRole
+  };
+}
+
+/**
+ * Hook for getting role-specific navigation items
+ */
+export function useRoleBasedNavigation() {
+  const { userRole, canAccessPage } = usePermissions();
+  
+  const getAvailablePages = (): ProtectedPage[] => {
+    const allPages: ProtectedPage[] = [
+      'dashboard', 'pos', 'inventory', 'products', 'categories', 'suppliers',
+      'customers', 'transactions', 'layby', 'reports', 'expenses', 'settings'
+    ];
+    
+    return allPages.filter(page => canAccessPage(page));
+  };
+  
+  const getNavigationItems = () => {
+    const availablePages = getAvailablePages();
+    
+    const navigationMap = {
+      dashboard: { label: 'Overview', icon: BarChart3 },
+      pos: { label: 'POS', icon: ShoppingCart },
+      inventory: { label: 'Inventory', icon: Package },
+      products: { label: 'Products', icon: Package },
+      customers: { label: 'Customers', icon: Users },
+      transactions: { label: 'Transactions', icon: Receipt },
+      reports: { label: 'Reports', icon: BarChart3 },
+      expenses: { label: 'Expenses', icon: CreditCard },
+      settings: { label: 'Settings', icon: Settings }
+    };
+    
+    return availablePages.map(page => ({
+      id: page,
+      ...navigationMap[page]
+    }));
+  };
+  
+  return {
+    userRole,
+    getAvailablePages,
+    getNavigationItems
+  };
+}
+
+/**
+ * Hook for permission-based form field access
+ */
+export function useFieldPermissions() {
+  const { hasPermission, userRole } = usePermissions();
+  
+  const canEditField = (fieldPermission: Permission) => {
+    return hasPermission(fieldPermission);
+  };
+  
+  const getFieldProps = (fieldPermission: Permission) => {
+    const canEdit = hasPermission(fieldPermission);
+    return {
+      disabled: !canEdit,
+      readOnly: !canEdit
+    };
+  };
+  
+  const isFieldVisible = (fieldPermission: Permission) => {
+    return hasPermission(fieldPermission);
+  };
+  
+  return {
+    userRole,
+    canEditField,
+    getFieldProps,
+    isFieldVisible
+  };
+}

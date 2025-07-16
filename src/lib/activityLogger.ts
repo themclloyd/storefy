@@ -28,11 +28,9 @@ export const logActivity = async (entry: ActivityLogEntry) => {
         metadata: entry.metadata
       });
 
-    if (error) {
-      console.error('Failed to log activity:', error);
-    }
+    // Silently handle errors to avoid disrupting user experience
   } catch (error) {
-    console.error('Error logging activity:', error);
+    // Silently handle errors to avoid disrupting user experience
   }
 };
 

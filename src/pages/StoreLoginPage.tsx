@@ -90,34 +90,34 @@ export default function StoreLoginPage() {
   return (
     <div className="min-h-screen flex bg-background">
       {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-primary flex-col justify-center items-center p-12 text-primary-foreground">
-        <div className="max-w-md text-center space-y-8">
-          <div className="w-20 h-20 bg-primary-foreground/20 rounded-3xl flex items-center justify-center mx-auto">
-            <Building2 className="w-10 h-10 text-primary-foreground" />
+      <div className="hidden lg:flex lg:w-1/2 bg-primary flex-col justify-center items-center p-8 text-primary-foreground">
+        <div className="max-w-sm text-center space-y-6">
+          <div className="w-16 h-16 bg-primary-foreground/20 rounded-2xl flex items-center justify-center mx-auto">
+            <Building2 className="w-8 h-8 text-primary-foreground" />
           </div>
-          <div className="space-y-4">
-            <h1 className="text-4xl font-bold">Store Access</h1>
-            <p className="text-xl text-primary-foreground/90 leading-relaxed">
+          <div className="space-y-3">
+            <h1 className="text-2xl font-bold">Store Access</h1>
+            <p className="text-base text-primary-foreground/90 leading-relaxed">
               Access your specific store location with your personal credentials.
             </p>
             {storeCode && (
-              <div className="bg-primary-foreground/10 rounded-xl p-4 border border-primary-foreground/20">
-                <p className="text-sm text-primary-foreground/80 mb-1">Store Code</p>
-                <p className="text-2xl font-bold text-primary-foreground">{storeCode.toUpperCase()}</p>
+              <div className="bg-primary-foreground/10 rounded-lg p-3 border border-primary-foreground/20">
+                <p className="text-xs text-primary-foreground/80 mb-1">Store Code</p>
+                <p className="text-lg font-bold text-primary-foreground">{storeCode.toUpperCase()}</p>
               </div>
             )}
           </div>
-          <div className="space-y-3 text-white/80">
-            <div className="flex items-center gap-3">
-              <Shield className="w-5 h-5 text-white/60" />
+          <div className="space-y-2 text-sm text-white/80">
+            <div className="flex items-center gap-2">
+              <Shield className="w-4 h-4 text-white/60" />
               <span>Store-Specific Access</span>
             </div>
-            <div className="flex items-center gap-3">
-              <User className="w-5 h-5 text-white/60" />
+            <div className="flex items-center gap-2">
+              <User className="w-4 h-4 text-white/60" />
               <span>Personal Authentication</span>
             </div>
-            <div className="flex items-center gap-3">
-              <KeyRound className="w-5 h-5 text-white/60" />
+            <div className="flex items-center gap-2">
+              <KeyRound className="w-4 h-4 text-white/60" />
               <span>Secure PIN Login</span>
             </div>
           </div>
@@ -125,34 +125,34 @@ export default function StoreLoginPage() {
       </div>
 
       {/* Right Side - Form */}
-      <div className="flex-1 flex flex-col justify-center px-8 sm:px-12 lg:px-16 xl:px-20">
-        <div className="w-full max-w-md mx-auto">
+      <div className="flex-1 flex flex-col justify-center px-6 sm:px-8 lg:px-12 xl:px-16">
+        <div className="w-full max-w-sm mx-auto">
           {/* Mobile Logo */}
-          <div className="lg:hidden text-center mb-8">
-            <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Building2 className="w-8 h-8 text-primary-foreground" />
+          <div className="lg:hidden text-center mb-6">
+            <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mx-auto mb-3">
+              <Building2 className="w-6 h-6 text-primary-foreground" />
             </div>
-            <h1 className="text-2xl font-bold text-foreground">Store Access</h1>
+            <h1 className="text-xl font-bold text-foreground">Store Access</h1>
             {storeCode && (
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Store: <span className="font-medium">{storeCode.toUpperCase()}</span>
               </p>
             )}
           </div>
 
           {/* Form Header */}
-          <div className="text-center lg:text-left mb-8">
-            <h2 className="text-3xl font-bold text-foreground mb-2">
+          <div className="text-center lg:text-left mb-6">
+            <h2 className="text-2xl font-bold text-foreground mb-2">
               Access Store
             </h2>
-            <p className="text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Enter your name and PIN to access {storeCode?.toUpperCase()}
             </p>
           </div>
 
           {/* Form */}
-          <form onSubmit={handlePinLogin} className="space-y-6">
-            <div className="space-y-2">
+          <form onSubmit={handlePinLogin} className="space-y-4">
+            <div className="space-y-1">
               <Label htmlFor="memberName" className="text-sm font-medium text-foreground">
                 Your Name
               </Label>
@@ -163,11 +163,11 @@ export default function StoreLoginPage() {
                 value={memberName}
                 onChange={(e) => setMemberName(e.target.value)}
                 required
-                className="h-12 rounded-xl border-border"
+                className="h-10 rounded-lg border-border"
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label htmlFor="pin" className="text-sm font-medium text-foreground">
                 4-Digit PIN
               </Label>
@@ -180,13 +180,13 @@ export default function StoreLoginPage() {
                 maxLength={4}
                 pattern="[0-9]{4}"
                 required
-                className="h-12 rounded-xl border-border text-center text-lg tracking-widest"
+                className="h-10 rounded-lg border-border text-center text-base tracking-widest"
               />
             </div>
 
             <Button
               type="submit"
-              className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary-dark rounded-xl font-medium"
+              className="w-full h-10 bg-primary text-primary-foreground hover:bg-primary-dark rounded-lg font-medium"
               disabled={loading}
             >
               {loading ? (
@@ -201,13 +201,13 @@ export default function StoreLoginPage() {
           </form>
 
           {/* Additional Options */}
-          <div className="mt-8 space-y-4">
-            <div className="bg-muted/30 rounded-xl p-4 border border-border/50">
-              <div className="flex items-center gap-2 mb-3">
+          <div className="mt-6 space-y-3">
+            <div className="bg-muted/30 rounded-lg p-3 border border-border/50">
+              <div className="flex items-center gap-2 mb-2">
                 <AlertCircle className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm font-medium text-foreground">Need Help?</span>
+                <span className="text-xs font-medium text-foreground">Need Help?</span>
               </div>
-              <div className="space-y-2 text-sm text-muted-foreground">
+              <div className="space-y-1 text-xs text-muted-foreground">
                 <p>• Contact your store manager for your PIN</p>
                 <p>• Use your full name as registered</p>
                 <p>• Store code: <span className="font-medium text-foreground">{storeCode?.toUpperCase()}</span></p>
@@ -218,7 +218,7 @@ export default function StoreLoginPage() {
               <Button
                 variant="ghost"
                 onClick={() => navigate('/auth')}
-                className="text-primary hover:text-primary/80 hover:bg-transparent"
+                className="text-primary hover:text-primary/80 hover:bg-transparent text-sm"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Store Manager Login

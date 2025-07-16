@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
+import { pinSessionClient } from '@/lib/pinSessionClient';
 import { toast } from 'sonner';
 import { Store, Users, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 
@@ -72,7 +73,13 @@ export function StoreShortLinkPage() {
       const { data: memberData, error } = await supabase
         .from('store_members')
         .select(`
-          *,
+          id,
+          store_id,
+          user_id,
+          role,
+          pin,
+          name,
+          is_active,
           stores (name, id)
         `)
         .eq('pin', pin)
@@ -85,15 +92,22 @@ export function StoreShortLinkPage() {
         return;
       }
 
-      // Get the user's profile separately
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('display_name')
-        .eq('user_id', memberData.user_id)
-        .maybeSingle();
+      // Check name - use store_members.name for team members, or profile.display_name for users
+      let displayName = '';
+      if (memberData.user_id) {
+        // This is a full user - get display name from profile
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('display_name')
+          .eq('user_id', memberData.user_id)
+          .maybeSingle();
+        displayName = profileData?.display_name || '';
+      } else {
+        // This is a team member - use name from store_members
+        displayName = memberData.name || '';
+      }
 
-      // Check if the name matches
-      const displayName = profileData?.display_name || '';
+      // Check if the name matches (case insensitive)
       if (displayName.toLowerCase() !== memberName.toLowerCase()) {
         toast.error('Invalid name or PIN');
         return;
@@ -110,7 +124,15 @@ export function StoreShortLinkPage() {
         login_time: new Date().toISOString()
       }));
 
+      // Refresh PIN session client to load new session
+      pinSessionClient.refreshPinSession();
+
+      // Trigger custom event to notify contexts of PIN session change
+      window.dispatchEvent(new CustomEvent('pin-session-changed'));
+
       toast.success(`Welcome back, ${displayName}!`);
+
+      // Use navigate for better UX, fallback to reload if needed
       navigate('/dashboard');
     } catch (error) {
       console.error('Login error:', error);
@@ -183,13 +205,13 @@ export function StoreShortLinkPage() {
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="member-name">Full Name</Label>
+              <Label htmlFor="member-name">Name</Label>
               <div className="relative">
                 <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
                   id="member-name"
                   type="text"
-                  placeholder="Enter your full name"
+                  placeholder="Enter your name"
                   value={memberName}
                   onChange={(e) => setMemberName(e.target.value)}
                   className="pl-10"

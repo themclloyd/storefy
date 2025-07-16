@@ -30,7 +30,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loader2, User, Mail, Phone, MapPin } from "lucide-react";
 import { useStore } from "@/contexts/StoreContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { useStoreData } from "@/hooks/useSupabaseClient";
 import { toast } from "sonner";
 
 const customerSchema = z.object({
@@ -53,6 +53,7 @@ interface AddCustomerDialogProps {
 export function AddCustomerDialog({ open, onOpenChange, onCustomerAdded }: AddCustomerDialogProps) {
   const { currentStore } = useStore();
   const { user } = useAuth();
+  const { from, currentStoreId, isPinSession } = useStoreData();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<CustomerFormData>({
@@ -68,17 +69,17 @@ export function AddCustomerDialog({ open, onOpenChange, onCustomerAdded }: AddCu
   });
 
   const onSubmit = async (data: CustomerFormData) => {
-    if (!currentStore || !user) {
+    const storeId = currentStoreId || currentStore?.id;
+    if (!storeId || (!user && !isPinSession)) {
       toast.error("Store or user information not available");
       return;
     }
 
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from('customers')
+      const { error } = await from('customers')
         .insert({
-          store_id: currentStore.id,
+          store_id: storeId,
           name: data.name,
           email: data.email || null,
           phone: data.phone || null,

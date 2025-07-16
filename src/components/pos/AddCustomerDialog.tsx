@@ -5,6 +5,7 @@ import * as z from "zod";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -133,6 +134,9 @@ export function AddCustomerDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Add New Customer</DialogTitle>
+          <DialogDescription>
+            Quickly add a new customer to your store directory.
+          </DialogDescription>
         </DialogHeader>
         
         <Form {...form}>
@@ -199,7 +203,7 @@ export function AddCustomerDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Status</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value || ""}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select status" />

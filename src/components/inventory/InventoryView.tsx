@@ -7,7 +7,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Search, Plus, Package, AlertTriangle, Edit, Trash2, Loader2, Settings, TrendingUp, Download, CheckSquare, FolderOpen, History } from "lucide-react";
 import { useStore } from "@/contexts/StoreContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { SecureAction, SecureButton } from "@/components/auth/SecureAction";
+import { useStoreData } from "@/hooks/useSupabaseClient";
 import { toast } from "sonner";
 import { AddProductDialog } from "./AddProductDialog";
 import { EditProductDialog } from "./EditProductDialog";
@@ -49,6 +50,7 @@ interface Product {
 export function InventoryView() {
   const { currentStore } = useStore();
   const { user } = useAuth();
+  const { from, currentStoreId, isPinSession } = useStoreData();
   const { formatCurrency } = useTax();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -88,18 +90,18 @@ export function InventoryView() {
   });
 
   useEffect(() => {
-    if (currentStore && user) {
+    if ((currentStore && user) || (currentStoreId && isPinSession)) {
       fetchProducts();
       fetchCategories();
     }
-  }, [currentStore, user]);
+  }, [currentStore, user, currentStoreId, isPinSession]);
 
   const fetchProducts = async () => {
-    if (!currentStore) return;
+    const storeId = currentStoreId || currentStore?.id;
+    if (!storeId) return;
 
     try {
-      const { data, error } = await supabase
-        .from('products')
+      const { data, error } = await from('products')
         .select(`
           id,
           name,
@@ -117,7 +119,7 @@ export function InventoryView() {
           categories (name),
           suppliers (name)
         `)
-        .eq('store_id', currentStore.id)
+        .eq('store_id', storeId)
         .eq('is_active', true)
         .order('name');
 
@@ -137,13 +139,13 @@ export function InventoryView() {
   };
 
   const fetchCategories = async () => {
-    if (!currentStore) return;
+    const storeId = currentStoreId || currentStore?.id;
+    if (!storeId) return;
 
     try {
-      const { data, error } = await supabase
-        .from('categories')
+      const { data, error } = await from('categories')
         .select('name')
-        .eq('store_id', currentStore.id)
+        .eq('store_id', storeId)
         .order('name');
 
       if (error) {
@@ -378,12 +380,13 @@ export function InventoryView() {
             <Settings className="w-4 h-4 mr-2" />
             Manage Suppliers
           </Button>
-          <Button
+          <SecureButton
+            permission="manage_inventory"
             onClick={() => setShowAddDialog(true)}
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Product
-          </Button>
+          </SecureButton>
         </div>
       </div>
 
@@ -549,15 +552,17 @@ export function InventoryView() {
                         >
                           <TrendingUp className="w-3 h-3" />
                         </Button>
-                        <Button
+                        <SecureButton
+                          permission="manage_inventory"
                           size="sm"
                           variant="outline"
                           onClick={() => handleEditProduct(item)}
                           title="Edit Product"
                         >
                           <Edit className="w-3 h-3" />
-                        </Button>
-                        <Button
+                        </SecureButton>
+                        <SecureButton
+                          permission="manage_inventory"
                           size="sm"
                           variant="outline"
                           className="text-destructive hover:text-destructive"
@@ -565,7 +570,7 @@ export function InventoryView() {
                           title="Delete Product"
                         >
                           <Trash2 className="w-3 h-3" />
-                        </Button>
+                        </SecureButton>
                       </div>
                     </TableCell>
                   </TableRow>

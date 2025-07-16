@@ -32,6 +32,7 @@ import {
 import { format, isAfter, isBefore, addDays } from "date-fns";
 import { useStore } from "@/contexts/StoreContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { SecureAction, SecureButton } from "@/components/auth/SecureAction";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useTax } from "@/hooks/useTax";
@@ -257,10 +258,13 @@ export function RecurringExpensesView({ categories, onExpenseAdded }: RecurringE
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Recurring Expenses ({recurringExpenses.length})</CardTitle>
-            <Button onClick={() => setShowAddDialog(true)}>
+            <SecureButton
+              permission="manage_expenses"
+              onClick={() => setShowAddDialog(true)}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Add Recurring Expense
-            </Button>
+            </SecureButton>
           </div>
         </CardHeader>
         <CardContent>
@@ -271,10 +275,13 @@ export function RecurringExpensesView({ categories, onExpenseAdded }: RecurringE
               <p className="text-sm text-muted-foreground mb-4">
                 Add recurring expenses like rent, salaries, or subscriptions
               </p>
-              <Button onClick={() => setShowAddDialog(true)}>
+              <SecureButton
+                permission="manage_expenses"
+                onClick={() => setShowAddDialog(true)}
+              >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Your First Recurring Expense
-              </Button>
+              </SecureButton>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -345,10 +352,12 @@ export function RecurringExpensesView({ categories, onExpenseAdded }: RecurringE
                                 </>
                               )}
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleDelete(expense)}>
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Delete
-                            </DropdownMenuItem>
+                            <SecureAction permission="manage_expenses">
+                              <DropdownMenuItem onClick={() => handleDelete(expense)}>
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete
+                              </DropdownMenuItem>
+                            </SecureAction>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>

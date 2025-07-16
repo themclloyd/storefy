@@ -104,6 +104,8 @@ export function EditProductDialog({ open, onOpenChange, product, onProductUpdate
       cost: 0,
       stock_quantity: 0,
       low_stock_threshold: 5,
+      category_id: "",
+      supplier_id: "",
       is_active: true,
     },
   });
@@ -116,25 +118,44 @@ export function EditProductDialog({ open, onOpenChange, product, onProductUpdate
   }, [open, currentStore]);
 
   useEffect(() => {
-    if (product) {
+    if (product && open) {
+      // Ensure all values are properly defined to avoid controlled/uncontrolled warnings
       form.reset({
         name: product.name || "",
         sku: product.sku || "",
         description: product.description || "",
-        price: product.price || 0,
-        cost: product.cost || 0,
-        stock_quantity: product.stock_quantity || 0,
-        low_stock_threshold: product.low_stock_threshold || 5,
+        price: Number(product.price) || 0,
+        cost: Number(product.cost) || 0,
+        stock_quantity: Number(product.stock_quantity) || 0,
+        low_stock_threshold: Number(product.low_stock_threshold) || 5,
         category_id: product.category_id || "",
         supplier_id: product.supplier_id || "",
-        is_active: product.is_active ?? true,
+        is_active: Boolean(product.is_active ?? true),
       });
       setImagePreview(product.image_url || null);
       setImageUrl(product.image_url || "");
       setImageFile(null);
       setImageMethod(product.image_url ? 'url' : 'upload');
+    } else if (!open) {
+      // Reset form when dialog closes
+      form.reset({
+        name: "",
+        sku: "",
+        description: "",
+        price: 0,
+        cost: 0,
+        stock_quantity: 0,
+        low_stock_threshold: 5,
+        category_id: "",
+        supplier_id: "",
+        is_active: true,
+      });
+      setImagePreview(null);
+      setImageUrl("");
+      setImageFile(null);
+      setImageMethod('upload');
     }
-  }, [product, form]);
+  }, [product, open, form]);
 
   const fetchCategories = async () => {
     if (!currentStore) return;
