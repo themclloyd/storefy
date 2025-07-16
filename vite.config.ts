@@ -103,8 +103,7 @@ export default defineConfig(() => ({
 
           // Analytics and monitoring
           'analytics-vendor': [
-            '@vercel/analytics',
-            '@vercel/speed-insights'
+            '@vercel/analytics'
           ],
 
           // UI Enhancement libraries
