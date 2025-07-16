@@ -15,6 +15,7 @@ import { TaxDisplay } from "@/components/common/TaxDisplay";
 import { ReceiptDialog } from "./ReceiptDialog";
 import { OrderHistoryDialog } from "./OrderHistoryDialog";
 import { AddCustomerDialog } from "./AddCustomerDialog";
+import { useAnalytics } from "@/hooks/useAnalyticsTracking";
 
 interface CartItem {
   id: string;
@@ -58,6 +59,7 @@ export function POSView() {
   const { user } = useAuth();
   const { getPaymentOptions, isValidPaymentMethod, formatPaymentMethodDisplay } = usePaymentMethods();
   const { calculateItemsTax, formatCurrency } = useTax();
+  const { trackTransaction, trackSearch, trackFeatureUsage } = useAnalytics();
 
   const [cart, setCart] = useState<CartItem[]>([]);
   const [discountType, setDiscountType] = useState<"percent" | "fixed">("percent");
@@ -243,6 +245,9 @@ export function POSView() {
         image_url: product.image_url
       }]);
     }
+
+    // Track feature usage
+    trackFeatureUsage('pos_add_to_cart', `product_${product.id}`);
   };
 
   const updateQuantity = (id: string, quantity: number) => {
@@ -334,6 +339,17 @@ export function POSView() {
     const matchesCategory = !selectedCategory || product.category_id === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  // Track product search with debouncing
+  useEffect(() => {
+    if (searchTerm.length > 2) {
+      const timeoutId = setTimeout(() => {
+        trackSearch('product', searchTerm, filteredProducts.length);
+      }, 500); // Debounce search tracking
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [searchTerm, filteredProducts.length, trackSearch]);
 
   // Filter customers based on search
   const filteredCustomers = customers.filter(customer =>
@@ -547,6 +563,15 @@ export function POSView() {
 
       setLastOrder(receiptData);
       setShowReceipt(true);
+
+      // Track successful transaction
+      trackTransaction({
+        amount: total,
+        itemsCount: cart.length,
+        paymentMethod: paymentMethod,
+        customerType: selectedCustomer?.status === 'vip' ? 'vip' :
+                     selectedCustomer?.total_orders === 0 ? 'new' : 'returning'
+      });
 
       // Reset cart and form
       setCart([]);

@@ -101,6 +101,12 @@ export default defineConfig(() => ({
             'tailwind-merge'
           ],
 
+          // Analytics and monitoring
+          'analytics-vendor': [
+            '@vercel/analytics',
+            '@vercel/speed-insights'
+          ],
+
           // UI Enhancement libraries
           'ui-enhancement': [
             'cmdk',

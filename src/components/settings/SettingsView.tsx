@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { teamMemberLogs, logActivity } from "@/lib/activityLogger";
 import { clearTaxCache, percentageToDecimal, isValidTaxRate, WORLD_CURRENCIES } from "@/lib/taxUtils";
 import { PaymentMethodsSettings } from "./PaymentMethodsSettings";
+import { PrivacySettings } from "@/components/analytics/ConsentBanner";
 
 interface TeamMember {
   id: string;
@@ -571,7 +572,7 @@ export function SettingsView() {
         </div>
 
         <Tabs defaultValue="team" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="team" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
               Team
@@ -591,6 +592,10 @@ export function SettingsView() {
             <TabsTrigger value="activity" className="flex items-center gap-2" disabled={!isOwner && userRole !== 'manager'}>
               <Activity className="w-4 h-4" />
               Activity
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-2">
+              <Shield className="w-4 h-4" />
+              Analytics
             </TabsTrigger>
           </TabsList>
 
@@ -1302,6 +1307,66 @@ export function SettingsView() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Analytics & Privacy Tab */}
+          <TabsContent value="analytics" className="space-y-6">
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="w-5 h-5" />
+                    Privacy & Analytics Settings
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Manage your data collection preferences and privacy settings
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <PrivacySettings />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Analytics Information</CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Learn about the data we collect and how it helps improve your experience
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <h4 className="font-medium">What We Track</h4>
+                      <ul className="text-sm text-muted-foreground space-y-1">
+                        <li>• Page views and navigation patterns</li>
+                        <li>• Feature usage and interactions</li>
+                        <li>• Performance metrics and load times</li>
+                        <li>• Error tracking for improvements</li>
+                        <li>• Business metrics (sales, inventory)</li>
+                      </ul>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Privacy Protection</h4>
+                      <ul className="text-sm text-muted-foreground space-y-1">
+                        <li>• No personal data without consent</li>
+                        <li>• Anonymized user identifiers</li>
+                        <li>• Secure data transmission (HTTPS)</li>
+                        <li>• GDPR compliant data handling</li>
+                        <li>• Easy consent withdrawal</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t">
+                    <p className="text-xs text-muted-foreground">
+                      Analytics data helps us understand how Storefy is used, identify areas for improvement,
+                      and ensure optimal performance. All data is processed securely and never shared with third parties.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
 

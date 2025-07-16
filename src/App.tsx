@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { StoreProvider } from "@/contexts/StoreContext";
 import { PermissionProvider } from "@/contexts/PermissionContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { AnalyticsProvider } from "@/components/analytics/AnalyticsProvider";
 
 
 // Lazy load page components
@@ -41,17 +42,13 @@ const App = () => {
         <Toaster />
         <Sonner />
 
-        <BrowserRouter
-          future={{
-            v7_startTransition: true,
-            v7_relativeSplatPath: true
-          }}
-        >
+        <BrowserRouter>
           <AuthProvider>
             <StoreProvider>
               <PermissionProvider>
-                <Suspense fallback={<PageLoader />}>
-              <Routes>
+                <AnalyticsProvider>
+                  <Suspense fallback={<PageLoader />}>
+                <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/dashboard" element={<ProtectedRoute requiredPage="dashboard"><Index /></ProtectedRoute>} />
                 <Route path="/pos" element={<ProtectedRoute requiredPage="pos"><Index /></ProtectedRoute>} />
@@ -74,7 +71,8 @@ const App = () => {
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
-                </Suspense>
+                  </Suspense>
+                </AnalyticsProvider>
               </PermissionProvider>
             </StoreProvider>
           </AuthProvider>
