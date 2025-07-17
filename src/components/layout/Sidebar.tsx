@@ -1,29 +1,5 @@
 
-import {
-  Building2,
-  BarChart3,
-  Package,
-  Users,
-  ShoppingCart,
-  Settings,
-  LogOut,
-  Store,
-  Clock,
-  Receipt,
-  FileText,
-  DollarSign,
-  ChevronLeft,
-  PanelLeft,
-  Home,
-  LayoutDashboard,
-  CircleDollarSign,
-  ShoppingBag,
-  BarChart4,
-  BarChart2
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useAuth } from "@/contexts/AuthContext";
-import { useStore } from "@/contexts/StoreContext";
+import { Store } from "lucide-react";
 import { useRoleBasedNavigation } from "@/hooks/useRoleBasedAccess";
 import { CompactStoreSelector } from "@/components/stores/CompactStoreSelector";
 import { UserMenu } from "@/components/layout/UserMenu";
@@ -38,63 +14,25 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarGroupContent,
-  useSidebar,
-  SidebarTrigger
+  useSidebar
 } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface SidebarProps {
   activeView: string;
   onViewChange: (view: string) => void;
-  currentStore?: string;
 }
 
-// Main navigation items - these will now be integrated into the main dashboard
-const mainNavItems = [
-  { id: "dashboard", label: "Overview", icon: LayoutDashboard },
-  { id: "pos", label: "POS System", icon: ShoppingCart },
-  { id: "inventory", label: "Inventory", icon: Package },
-  { id: "expenses", label: "Expenses", icon: CircleDollarSign },
-  { id: "transactions", label: "Transactions", icon: Receipt },
-  { id: "customers", label: "Customers", icon: Users },
-];
 
-// Secondary navigation items
-const secondaryNavItems = [
-  { id: "reports", label: "Reports", icon: BarChart2 },
-  { id: "settings", label: "Settings", icon: Settings },
-];
 
-export function Sidebar({ activeView, onViewChange, currentStore }: SidebarProps) {
-  const { signOut } = useAuth();
-  const { stores } = useStore();
+export function Sidebar({ activeView, onViewChange }: SidebarProps) {
   const { state } = useSidebar();
-  const { userRole, getNavigationItems } = useRoleBasedNavigation();
-
-  // Check for PIN session
-  const pinSession = localStorage.getItem('pin_session');
-  const pinData = pinSession ? JSON.parse(pinSession) : null;
+  const { getNavigationItems } = useRoleBasedNavigation();
 
   // Get role-based navigation items
   const navigationItems = getNavigationItems();
 
-  const handleSignOut = async () => {
-    // Clear PIN session if exists
-    if (pinSession) {
-      localStorage.removeItem('pin_session');
-      window.location.href = '/pin-login';
-      return;
-    }
-
-    await signOut();
-  };
-
   // Get filtered navigation items based on role permissions
   const filteredMainNav = [
-    ...(userRole?.isOwner && stores && stores.length > 1
-      ? [{ id: "stores", label: "Stores", icon: Building2 }]
-      : []),
     ...navigationItems.filter(item =>
       ['dashboard', 'pos', 'inventory', 'expenses', 'customers', 'transactions', 'settings'].includes(item.id)
     )
@@ -118,7 +56,7 @@ export function Sidebar({ activeView, onViewChange, currentStore }: SidebarProps
                   </div>
                   <div className="grid flex-1 text-left text-sm leading-tight min-w-0">
                     <span className="truncate font-bold text-foreground">Storefy</span>
-                    <span className="truncate text-xs text-muted-foreground">Retail Management</span>
+                    
                   </div>
                 </a>
               </SidebarMenuButton>

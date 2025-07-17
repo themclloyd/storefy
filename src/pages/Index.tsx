@@ -200,7 +200,6 @@ const Index = () => {
           collapsible="icon"
           activeView={activeView}
           onViewChange={handleViewChange}
-          currentStore={pinData.store_name}
         />
         <SidebarInset>
           <div className="flex-1 overflow-auto">
@@ -250,7 +249,6 @@ const Index = () => {
         collapsible="icon"
         activeView={activeView}
         onViewChange={handleViewChange}
-        currentStore={currentStore.name}
       />
 
       <SidebarInset>
