@@ -24,7 +24,7 @@ export function SessionActivityTracker({
 
     const events = [
       'mousedown',
-      'mousemove', 
+      'mousemove',
       'keypress',
       'scroll',
       'touchstart',
@@ -33,6 +33,8 @@ export function SessionActivityTracker({
       'blur'
     ];
 
+    let throttleTimer: NodeJS.Timeout | null = null;
+
     const handleActivity = () => {
       const now = Date.now();
       const timeSinceLastActivity = now - lastActivityRef.current;
@@ -40,7 +42,7 @@ export function SessionActivityTracker({
       // Only update if enough time has passed to avoid excessive calls
       if (timeSinceLastActivity >= activityThreshold) {
         lastActivityRef.current = now;
-        
+
         // Extend session if user has a valid PIN session
         const pinSession = sessionManager.getPinSession();
         if (pinSession) {
@@ -60,9 +62,19 @@ export function SessionActivityTracker({
       }, activityThreshold);
     };
 
+    // Throttled version to prevent excessive calls
+    const throttledHandleActivity = () => {
+      if (throttleTimer) return;
+
+      throttleTimer = setTimeout(() => {
+        handleActivity();
+        throttleTimer = null;
+      }, 1000); // Throttle to at most once per second
+    };
+
     // Add event listeners with passive option for better performance
     events.forEach(event => {
-      document.addEventListener(event, handleActivity, { passive: true });
+      document.addEventListener(event, throttledHandleActivity, { passive: true });
     });
 
     // Initial activity registration
@@ -71,11 +83,17 @@ export function SessionActivityTracker({
     // Cleanup
     return () => {
       events.forEach(event => {
-        document.removeEventListener(event, handleActivity);
+        document.removeEventListener(event, throttledHandleActivity);
       });
-      
+
       if (activityTimerRef.current) {
         clearTimeout(activityTimerRef.current);
+        activityTimerRef.current = null;
+      }
+
+      if (throttleTimer) {
+        clearTimeout(throttleTimer);
+        throttleTimer = null;
       }
     };
   }, [activityThreshold, extendOnActivity]);

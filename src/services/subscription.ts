@@ -59,6 +59,47 @@ export interface SubscriptionUsage {
   usage_by_store: Record<string, any>;
 }
 
+export interface SubscriptionPayment {
+  id: string;
+  subscription_id: string;
+  paychangu_tx_ref: string | null;
+  paychangu_charge_id: string | null;
+  amount: number;
+  currency: string;
+  status: 'pending' | 'completed' | 'failed' | 'cancelled';
+  payment_method: string | null;
+  payment_channel: string | null;
+  billing_period_start: string;
+  billing_period_end: string;
+  created_at: string;
+  completed_at: string | null;
+  failed_at: string | null;
+}
+
+export interface BillingCycle {
+  id: string;
+  subscription_id: string;
+  cycle_start: string;
+  cycle_end: string;
+  amount_due: number;
+  status: 'upcoming' | 'processing' | 'paid' | 'failed' | 'cancelled';
+  payment_id: string | null;
+  payment_attempted_at: string | null;
+  payment_completed_at: string | null;
+  created_at: string;
+}
+
+export interface SubscriptionHistoryItem {
+  id: string;
+  type: 'payment' | 'plan_change' | 'status_change' | 'billing_cycle';
+  title: string;
+  description: string;
+  amount?: number;
+  status: string;
+  date: string;
+  details?: Record<string, any>;
+}
+
 export class SubscriptionService {
   /**
    * Get all available subscription plans
@@ -575,6 +616,101 @@ export class SubscriptionService {
     }
 
     return { allowed: true };
+  }
+
+  /**
+   * Get subscription payment history
+   */
+  async getSubscriptionPayments(subscriptionId: string): Promise<SubscriptionPayment[]> {
+    const { data, error } = await supabase
+      .from('subscription_payments')
+      .select('*')
+      .eq('subscription_id', subscriptionId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching subscription payments:', error);
+      return [];
+    }
+
+    return data || [];
+  }
+
+  /**
+   * Get billing cycles history
+   */
+  async getBillingCycles(subscriptionId: string): Promise<BillingCycle[]> {
+    const { data, error } = await supabase
+      .from('billing_cycles')
+      .select('*')
+      .eq('subscription_id', subscriptionId)
+      .order('cycle_start', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching billing cycles:', error);
+      return [];
+    }
+
+    return data || [];
+  }
+
+  /**
+   * Get comprehensive subscription history
+   */
+  async getSubscriptionHistory(subscriptionId: string): Promise<SubscriptionHistoryItem[]> {
+    const [payments, cycles] = await Promise.all([
+      this.getSubscriptionPayments(subscriptionId),
+      this.getBillingCycles(subscriptionId)
+    ]);
+
+    const history: SubscriptionHistoryItem[] = [];
+
+    // Add payment history
+    payments.forEach(payment => {
+      history.push({
+        id: payment.id,
+        type: 'payment',
+        title: payment.status === 'completed' ? 'Payment Successful' :
+               payment.status === 'failed' ? 'Payment Failed' :
+               payment.status === 'pending' ? 'Payment Pending' : 'Payment Cancelled',
+        description: `${payment.status === 'completed' ? 'Received' : 'Attempted'} payment of $${payment.amount}`,
+        amount: payment.amount,
+        status: payment.status,
+        date: payment.completed_at || payment.failed_at || payment.created_at,
+        details: {
+          payment_method: payment.payment_method,
+          payment_channel: payment.payment_channel,
+          tx_ref: payment.paychangu_tx_ref,
+          billing_period: {
+            start: payment.billing_period_start,
+            end: payment.billing_period_end
+          }
+        }
+      });
+    });
+
+    // Add billing cycle history
+    cycles.forEach(cycle => {
+      history.push({
+        id: cycle.id,
+        type: 'billing_cycle',
+        title: cycle.status === 'paid' ? 'Billing Cycle Completed' :
+               cycle.status === 'failed' ? 'Billing Cycle Failed' :
+               cycle.status === 'upcoming' ? 'Upcoming Billing Cycle' : 'Billing Cycle Processing',
+        description: `Billing cycle from ${new Date(cycle.cycle_start).toLocaleDateString()} to ${new Date(cycle.cycle_end).toLocaleDateString()}`,
+        amount: cycle.amount_due,
+        status: cycle.status,
+        date: cycle.payment_completed_at || cycle.payment_attempted_at || cycle.created_at,
+        details: {
+          cycle_start: cycle.cycle_start,
+          cycle_end: cycle.cycle_end,
+          payment_id: cycle.payment_id
+        }
+      });
+    });
+
+    // Sort by date (most recent first)
+    return history.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }
 }
 

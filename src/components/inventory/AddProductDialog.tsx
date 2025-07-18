@@ -173,6 +173,9 @@ export function AddProductDialog({ open, onOpenChange, onProductAdded }: AddProd
     const fileName = `${currentStore.id}/${Date.now()}.${fileExt}`;
 
     try {
+      // Show specific upload progress
+      toast.loading('Uploading image...', { id: 'image-upload' });
+
       const { error: uploadError } = await supabase.storage
         .from('product-images')
         .upload(fileName, file);
@@ -183,10 +186,11 @@ export function AddProductDialog({ open, onOpenChange, onProductAdded }: AddProd
         .from('product-images')
         .getPublicUrl(fileName);
 
+      toast.success('Image uploaded successfully', { id: 'image-upload' });
       return data.publicUrl;
     } catch (error) {
       console.error('Error uploading image:', error);
-      toast.error('Failed to upload image');
+      toast.error('Failed to upload image', { id: 'image-upload' });
       return null;
     }
   };

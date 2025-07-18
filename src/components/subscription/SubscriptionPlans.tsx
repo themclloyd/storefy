@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Star, Loader2, Calendar, Lock, Zap, Crown, Gift } from 'lucide-react';
+import { Check, Star, Loader2, Calendar, Lock, Zap, Crown, Gift, CreditCard } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { subscriptionService, SubscriptionPlan } from '@/services/subscription';
 import { useSubscription } from '@/hooks/useSubscription';
@@ -171,37 +171,37 @@ export function SubscriptionPlans({ onPlanSelected, currentPlanId }: Subscriptio
   }
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-7xl mx-auto">
       {/* Trial Upgrade Banner */}
       {isTrialing && (
-        <div className="mb-8 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg">
+        <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl">
           <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Gift className="w-5 h-5 text-blue-600" />
-              <h3 className="text-lg font-semibold text-blue-900">
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <Gift className="w-6 h-6 text-blue-600" />
+              <h3 className="text-xl font-semibold text-blue-900">
                 {getTrialPhase() === 'late'
                   ? `Trial Ending Soon - ${trialDaysRemaining} Days Left!`
                   : `You're on a Free Trial - ${trialDaysRemaining} Days Remaining`
                 }
               </h3>
             </div>
-            <p className="text-blue-700 text-sm mb-3">
+            <p className="text-blue-700 mb-4 max-w-2xl mx-auto">
               {getTrialPhase() === 'late'
-                ? 'Upgrade now to continue with full access after your trial ends'
-                : 'Upgrade anytime during your trial - unused trial days will be credited to your account'
+                ? 'Upgrade now to continue with full access after your trial ends. Choose the plan that best fits your business needs.'
+                : 'Upgrade anytime during your trial - unused trial days will be credited to your account. No commitment required.'
               }
             </p>
-            <div className="flex items-center justify-center gap-4 text-xs text-blue-600">
-              <div className="flex items-center gap-1">
-                <Check className="w-3 h-3" />
+            <div className="flex items-center justify-center gap-6 text-sm text-blue-600">
+              <div className="flex items-center gap-2">
+                <Check className="w-4 h-4" />
                 <span>No commitment during trial</span>
               </div>
-              <div className="flex items-center gap-1">
-                <Check className="w-3 h-3" />
+              <div className="flex items-center gap-2">
+                <Check className="w-4 h-4" />
                 <span>Trial days credited on upgrade</span>
               </div>
-              <div className="flex items-center gap-1">
-                <Check className="w-3 h-3" />
+              <div className="flex items-center gap-2">
+                <Check className="w-4 h-4" />
                 <span>Cancel anytime</span>
               </div>
             </div>
@@ -209,102 +209,132 @@ export function SubscriptionPlans({ onPlanSelected, currentPlanId }: Subscriptio
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Plan Comparison Header */}
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold text-foreground mb-3">
+          Choose the Perfect Plan for Your Business
+        </h2>
+        <p className="text-muted-foreground text-lg max-w-3xl mx-auto">
+          Start with our free trial and upgrade when you're ready. All plans include core POS features,
+          inventory management, and sales reporting.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {plans.map((plan) => (
         <Card
           key={plan.id}
-          className={`relative ${plan.is_popular ? 'border-primary shadow-lg' : ''} ${
+          className={`relative transition-all duration-200 hover:shadow-lg ${
+            plan.is_popular
+              ? 'border-primary shadow-lg scale-105 bg-gradient-to-b from-primary/5 to-background'
+              : 'border-border hover:border-primary/50'
+          } ${
             isCurrentPlan(plan.id) ? 'ring-2 ring-primary' : ''
           }`}
         >
           {plan.is_popular && (
-            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-              <Badge className="bg-primary text-primary-foreground px-3 py-1">
-                <Star className="w-3 h-3 mr-1" />
+            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+              <Badge className="bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold shadow-lg">
+                <Star className="w-4 h-4 mr-2" />
                 Most Popular
               </Badge>
             </div>
           )}
-          
+
           {isCurrentPlan(plan.id) && (
-            <div className="absolute -top-3 right-4">
-              <Badge variant="secondary" className="bg-primary/10 text-primary">
+            <div className="absolute -top-4 right-4 z-10">
+              <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
                 Current Plan
               </Badge>
             </div>
           )}
 
-          <CardHeader className="text-center pb-4">
-            <CardTitle className="text-2xl font-bold flex items-center justify-center gap-2">
-              {plan.display_name}
-              {plan.display_name === 'Enterprise' && <Crown className="w-5 h-5 text-yellow-500" />}
-              {plan.display_name === 'Professional' && <Zap className="w-5 h-5 text-blue-500" />}
-            </CardTitle>
-            <CardDescription className="text-sm text-muted-foreground">
-              {plan.description}
-            </CardDescription>
+          <CardHeader className="text-center pb-6">
+            <div className="mb-4">
+              <CardTitle className="text-2xl font-bold flex items-center justify-center gap-2 mb-2">
+                {plan.display_name}
+                {plan.display_name === 'Enterprise' && <Crown className="w-6 h-6 text-yellow-500" />}
+                {plan.display_name === 'Professional' && <Zap className="w-6 h-6 text-blue-500" />}
+              </CardTitle>
+              <CardDescription className="text-base text-muted-foreground leading-relaxed">
+                {plan.description}
+              </CardDescription>
+            </div>
 
-            {/* Trial Benefit Banner */}
-            {isTrialing && !isCurrentPlan(plan.id) && (
-              <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
-                <div className="flex items-center justify-center gap-2 text-blue-700">
-                  <Gift className="w-4 h-4" />
-                  <span className="text-xs font-medium">{getTrialBenefit()}</span>
-                </div>
+            {/* Pricing */}
+            <div className="mb-4">
+              <div className="flex items-baseline justify-center gap-1">
+                <span className="text-4xl font-bold text-foreground">{formatPrice(plan.price_monthly)}</span>
+                <span className="text-muted-foreground text-lg">/month</span>
               </div>
-            )}
-
-            <div className="mt-4">
-              <span className="text-4xl font-bold">{formatPrice(plan.price_monthly)}</span>
-              <span className="text-muted-foreground">/month</span>
-
-              {/* Trial Credit Notice */}
-              {isTrialing && !isCurrentPlan(plan.id) && (
-                <div className="mt-2 text-xs text-green-600">
-                  <Calendar className="w-3 h-3 inline mr-1" />
-                  Remaining trial days will be credited
+              {plan.price_yearly && parseFloat(plan.price_yearly) > 0 && (
+                <div className="mt-2 text-sm text-muted-foreground">
+                  <span className="line-through">{formatPrice(parseFloat(plan.price_yearly) / 12)}</span>
+                  <span className="ml-2 text-green-600 font-medium">
+                    Save {Math.round((1 - (parseFloat(plan.price_yearly) / 12) / plan.price_monthly) * 100)}% yearly
+                  </span>
                 </div>
               )}
             </div>
+
+            {/* Trial Benefit Banner */}
+            {isTrialing && !isCurrentPlan(plan.id) && (
+              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center justify-center gap-2 text-blue-700">
+                  <Gift className="w-4 h-4" />
+                  <span className="text-sm font-medium">{getTrialBenefit()}</span>
+                </div>
+                <div className="mt-1 text-xs text-blue-600">
+                  <Calendar className="w-3 h-3 inline mr-1" />
+                  Remaining trial days will be credited
+                </div>
+              </div>
+            )}
           </CardHeader>
 
-          <CardContent className="space-y-4">
-            {/* Plan Limits */}
-            <div className="space-y-2">
-              <div className="flex items-center text-sm">
-                <Check className="w-4 h-4 text-primary mr-2" />
-                <span>
-                  {plan.max_stores === 999999 ? 'Unlimited' : plan.max_stores} Store{plan.max_stores !== 1 ? 's' : ''}
-                </span>
-              </div>
-              <div className="flex items-center text-sm">
-                <Check className="w-4 h-4 text-primary mr-2" />
-                <span>
-                  {plan.max_pin_users_per_store === 999999 ? 'Unlimited' : plan.max_pin_users_per_store} PIN User{plan.max_pin_users_per_store !== 1 ? 's' : ''} per Store
-                </span>
-              </div>
-              <div className="flex items-center text-sm">
-                <Check className="w-4 h-4 text-primary mr-2" />
-                <span>
-                  {plan.max_inventory_items_per_store === 999999 ? 'Unlimited' : plan.max_inventory_items_per_store} Inventory Items per Store
-                </span>
+          <CardContent className="space-y-6">
+            {/* Key Limits - Highlighted */}
+            <div className="bg-muted/50 rounded-lg p-4 space-y-3">
+              <h4 className="font-semibold text-sm text-foreground mb-3">Plan Limits</h4>
+              <div className="grid grid-cols-1 gap-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Stores</span>
+                  <span className="font-medium">
+                    {plan.max_stores === 999999 ? 'Unlimited' : plan.max_stores}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">PIN Users per Store</span>
+                  <span className="font-medium">
+                    {plan.max_pin_users_per_store === 999999 ? 'Unlimited' : plan.max_pin_users_per_store}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Inventory Items per Store</span>
+                  <span className="font-medium">
+                    {plan.max_inventory_items_per_store === 999999 ? 'Unlimited' : plan.max_inventory_items_per_store}
+                  </span>
+                </div>
               </div>
             </div>
 
             {/* Features */}
-            <div className="space-y-2">
-              {plan.features.map((feature, index) => (
-                <div key={index} className="flex items-center text-sm">
-                  <Check className="w-4 h-4 text-primary mr-2 flex-shrink-0" />
-                  <span>{feature}</span>
-                </div>
-              ))}
+            <div className="space-y-3">
+              <h4 className="font-semibold text-sm text-foreground">What's Included</h4>
+              <div className="space-y-2">
+                {plan.features.map((feature, index) => (
+                  <div key={index} className="flex items-start gap-3 text-sm">
+                    <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                    <span className="text-muted-foreground leading-relaxed">{feature}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Action Button */}
-            <div className="pt-4 space-y-2">
+            <div className="pt-6 space-y-3">
               {isCurrentPlan(plan.id) ? (
-                <Button disabled className="w-full">
+                <Button disabled className="w-full h-12 bg-green-100 text-green-800 border-green-200">
                   <Check className="w-4 h-4 mr-2" />
                   Current Plan
                 </Button>
@@ -313,29 +343,34 @@ export function SubscriptionPlans({ onPlanSelected, currentPlanId }: Subscriptio
                   <Button
                     onClick={() => handleSelectPlan(plan.id)}
                     disabled={processingPlan === plan.id}
-                    variant={getUpgradeUrgency(plan.display_name).variant}
-                    className={`w-full ${
-                      plan.is_popular ? 'bg-primary hover:bg-primary/90 text-white' : ''
+                    size="lg"
+                    className={`w-full h-12 font-semibold transition-all duration-200 ${
+                      plan.is_popular
+                        ? 'bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-xl'
+                        : 'bg-background border-2 border-primary text-primary hover:bg-primary hover:text-white'
                     } ${
                       getUpgradeUrgency(plan.display_name).urgency === 'high'
-                        ? 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white'
+                        ? 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white animate-pulse'
                         : ''
                     }`}
                   >
                     {processingPlan === plan.id ? (
                       <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                         Processing...
                       </>
                     ) : (
                       <>
                         {isTrialing ? (
                           <>
-                            <Zap className="w-4 h-4 mr-2" />
-                            {getTrialPhase() === 'late' ? 'Upgrade Now' : 'Upgrade Early'}
+                            <Zap className="w-5 h-5 mr-2" />
+                            {getTrialPhase() === 'late' ? 'Upgrade Now' : 'Upgrade to ' + plan.display_name}
                           </>
                         ) : (
-                          'Select Plan'
+                          <>
+                            <CreditCard className="w-5 h-5 mr-2" />
+                            Choose {plan.display_name}
+                          </>
                         )}
                       </>
                     )}
@@ -343,8 +378,17 @@ export function SubscriptionPlans({ onPlanSelected, currentPlanId }: Subscriptio
 
                   {/* Upgrade Message */}
                   {isTrialing && (
-                    <p className="text-xs text-center text-muted-foreground">
+                    <p className="text-sm text-center text-muted-foreground leading-relaxed">
                       {getUpgradeMessage(plan.display_name)}
+                    </p>
+                  )}
+
+                  {/* Value Proposition */}
+                  {!isTrialing && (
+                    <p className="text-xs text-center text-muted-foreground">
+                      {plan.display_name === 'Starter' && 'Perfect for getting started'}
+                      {plan.display_name === 'Professional' && 'Best value for growing businesses'}
+                      {plan.display_name === 'Enterprise' && 'Complete solution for large operations'}
                     </p>
                   )}
                 </>

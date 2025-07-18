@@ -5,6 +5,7 @@ import { useStore } from '@/contexts/StoreContext';
 import { usePermissions, ProtectedPage } from '@/contexts/PermissionContext';
 import { useAccessControl, AccessControlWrapper } from '@/middleware/accessControlNew';
 import { sessionManager } from '@/lib/sessionManager';
+import { usePageLoading } from '@/contexts/LoadingContext';
 import { Loader2, Mail } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Shield, AlertTriangle } from 'lucide-react';
@@ -29,6 +30,7 @@ export function ProtectedRoute({
   const { user, loading: authLoading } = useAuth();
   const { currentStore, loading: storeLoading, hasValidStoreSelection } = useStore();
   const { canAccessPage, loading: permissionLoading } = usePermissions();
+  const setPageLoading = usePageLoading();
   const location = useLocation();
   const [sessionChecked, setSessionChecked] = useState(false);
 
@@ -57,16 +59,22 @@ export function ProtectedRoute({
   // For main users, wait for store loading to complete before making decisions
   const isLoading = authLoading || (user && !hasPinSession && storeLoading) || !sessionChecked;
 
-  // Show minimal loading only for critical auth/store checks
+  // Use unified loading system instead of local loading UI
+  useEffect(() => {
+    if (isLoading) {
+      setPageLoading(true, 'Authenticating...');
+    } else {
+      setPageLoading(false);
+    }
+
+    return () => {
+      setPageLoading(false);
+    };
+  }, [isLoading, setPageLoading]);
+
+  // Don't render anything while loading - the LoadingProvider will handle the UI
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <Loader2 className="w-6 h-6 animate-spin text-primary mx-auto mb-2" />
-          <p className="text-sm text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   // More graceful authentication check - only redirect if we're sure there's no valid session

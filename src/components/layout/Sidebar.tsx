@@ -3,7 +3,7 @@ import { Store, CreditCard } from "lucide-react";
 import { useRoleBasedNavigation } from "@/hooks/useRoleBasedAccess";
 import { CompactStoreSelector } from "@/components/stores/CompactStoreSelector";
 import { UserMenu } from "@/components/layout/UserMenu";
-import { SidebarSubscriptionStatus } from "@/components/subscription/SidebarSubscriptionStatus";
+
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePermissions } from "@/contexts/PermissionContext";
@@ -38,32 +38,34 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
   // Get role-based navigation items
   const navigationItems = getNavigationItems();
 
-  // Get filtered navigation items based on role permissions
-  const filteredMainNav = [
-    ...navigationItems.filter(item =>
-      ['dashboard', 'pos', 'inventory', 'layby', 'expenses', 'customers', 'transactions', 'settings'].includes(item.id)
-    )
-  ];
+  // Get all navigation items (already filtered by role permissions)
+  const filteredMainNav = navigationItems;
 
   return (
-    <SidebarPrimitive side="left" variant="sidebar" collapsible="icon" className="border-r border-border/40 bg-sidebar">
+    <SidebarPrimitive
+      side="left"
+      variant="sidebar"
+      collapsible="icon"
+      className="border-r border-border/40 bg-sidebar"
+    >
       <SidebarHeader className="border-b border-border/40 bg-sidebar">
-        {/* Logo Section Only */}
-        <div className="flex items-center px-4 py-4">
+        {/* Logo Section - Responsive */}
+        <div className="flex items-center px-3 md:px-4 py-3 md:py-4">
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton
                 size="lg"
                 asChild
                 tooltip={state === "collapsed" ? "Storefy - Retail Management" : undefined}
+                className="h-12 md:h-auto"
               >
-                <a href="#" className="flex items-center gap-3 px-3 justify-start">
-                  <div className="flex aspect-square size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg shrink-0">
-                    <Store className="size-5" />
+                <a href="#" className="flex items-center gap-2 md:gap-3 px-2 md:px-3 justify-start">
+                  <div className="flex aspect-square size-8 md:size-10 items-center justify-center rounded-lg md:rounded-xl bg-primary text-primary-foreground shadow-lg shrink-0">
+                    <Store className="size-4 md:size-5" />
                   </div>
                   <div className="grid flex-1 text-left text-sm leading-tight min-w-0">
-                    <span className="truncate font-bold text-foreground">Storefy</span>
-                    
+                    <span className="truncate font-bold text-foreground text-sm md:text-base">Storefy</span>
+                    <span className="truncate text-xs text-muted-foreground hidden md:block">Retail Management</span>
                   </div>
                 </a>
               </SidebarMenuButton>
@@ -72,14 +74,20 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="px-4 py-4">
+      <SidebarContent className="px-3 md:px-4 py-3 md:py-4">
         {/* Main Navigation */}
         <SidebarGroup>
-          <SidebarGroupLabel>Main</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-xs md:text-sm">Main</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
               {filteredMainNav.map((item) => {
                 const Icon = item.icon;
+
+                // Skip items without valid icons
+                if (!Icon) {
+                  console.warn(`Navigation item ${item.id} has no icon`);
+                  return null;
+                }
 
                 return (
                   <SidebarMenuItem key={item.id}>
@@ -87,10 +95,10 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
                       isActive={activeView === item.id}
                       onClick={() => onViewChange(item.id)}
                       tooltip={state === "collapsed" ? item.label : undefined}
-                      className="h-10 px-3 justify-start gap-3"
+                      className="h-11 md:h-10 px-2 md:px-3 justify-start gap-2 md:gap-3 text-sm md:text-base"
                     >
-                      <Icon className="size-4 shrink-0" />
-                      <span className="truncate">{item.label}</span>
+                      <Icon className="size-5 md:size-4 shrink-0" />
+                      <span className="truncate font-medium md:font-normal">{item.label}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
@@ -122,10 +130,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
       </SidebarContent>
 
       <SidebarFooter className="border-t border-border/40 bg-sidebar">
-        <div className="p-4 space-y-3">
-          {/* Subscription Status */}
-          <SidebarSubscriptionStatus />
-
+        <div className="p-3 md:p-4 space-y-2 md:space-y-3">
           {/* User Menu - Big and Prominent */}
           <UserMenu onViewChange={onViewChange} />
 

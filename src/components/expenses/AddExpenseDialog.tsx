@@ -142,13 +142,16 @@ export function AddExpenseDialog({
         const fileName = `${expenseData.id}-${Date.now()}.${fileExt}`;
         const filePath = `expense-receipts/${currentStore.id}/${fileName}`;
 
+        // Show specific upload progress
+        toast.loading('Uploading receipt...', { id: 'receipt-upload' });
+
         const { error: uploadError } = await supabase.storage
           .from('receipts')
           .upload(filePath, receiptFile);
 
         if (uploadError) {
           console.error('Error uploading receipt:', uploadError);
-          toast.error('Expense created but receipt upload failed');
+          toast.error('Expense created but receipt upload failed', { id: 'receipt-upload' });
         } else {
           // Get public URL
           const { data: { publicUrl } } = supabase.storage
@@ -166,6 +169,8 @@ export function AddExpenseDialog({
               file_size: receiptFile.size,
               uploaded_by: user.id
             });
+
+          toast.success('Receipt uploaded successfully', { id: 'receipt-upload' });
         }
       }
 

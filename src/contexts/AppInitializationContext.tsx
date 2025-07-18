@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { useAuth } from './AuthContext';
 import { sessionManager } from '@/lib/sessionManager';
 
@@ -62,10 +62,28 @@ export function AppInitializationProvider({ children }: { children: React.ReactN
     error: null,
   });
 
-  // Main initialization sequence
+  // Main initialization sequence - use refs to prevent excessive re-runs
+  const initializationRef = useRef(false);
+  const lastUserIdRef = useRef<string | null>(null);
+  const lastPinSessionRef = useRef<boolean>(false);
+
   useEffect(() => {
+    // Only re-initialize if there's a meaningful change
+    const currentUserId = user?.id || null;
+    const hasUserChanged = lastUserIdRef.current !== currentUserId;
+    const hasPinSessionChanged = lastPinSessionRef.current !== hasPinSession;
+
+    // Skip if already initialized and no meaningful changes
+    if (initializationRef.current && !hasUserChanged && !hasPinSessionChanged && !authLoading) {
+      return;
+    }
+
+    // Update refs
+    lastUserIdRef.current = currentUserId;
+    lastPinSessionRef.current = hasPinSession;
+
     initializeApp();
-  }, [user, authLoading, hasPinSession]);
+  }, [user?.id, authLoading, hasPinSession]); // Only depend on user ID, not full user object
 
   const initializeApp = async () => {
     try {
@@ -137,6 +155,9 @@ export function AppInitializationProvider({ children }: { children: React.ReactN
       // Phase 4: App is ready
       setPhase('ready');
       console.log('🎉 App initialization complete!');
+
+      // Mark as initialized
+      initializationRef.current = true;
 
       // Update final app state
       setAppState({

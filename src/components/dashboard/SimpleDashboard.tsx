@@ -200,43 +200,44 @@ export function SimpleDashboard({ onViewChange }: DashboardProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Overview</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Overview</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Welcome back! Here's what's happening at your store today.
           </p>
         </div>
         <Button
           onClick={() => onViewChange('reports')}
           variant="outline"
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 w-full sm:w-auto"
+          size="sm"
         >
           <BarChart3 className="w-4 h-4" />
           Full Report
         </Button>
       </div>
 
-      {/* Stats Cards - Modern 6-Card Layout */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {/* Stats Cards - Mobile 2x2 Grid, Desktop 3 columns */}
+      <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
         {/* Revenue Card */}
         <Card className="relative overflow-hidden">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
+          <CardHeader className="pb-2 px-3 sm:px-4 md:px-6 pt-3 sm:pt-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <div className="flex items-center space-x-2">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <DollarSign className="h-5 w-5 text-primary" />
+                <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
+                  <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 text-primary" />
                 </div>
-                <CardTitle className="text-sm font-medium text-muted-foreground">Total Revenue</CardTitle>
+                <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Revenue</CardTitle>
               </div>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground hidden sm:block" />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{formatCurrency(stats.totalRevenue)}</div>
-            <p className="text-sm text-muted-foreground mt-1">
+          <CardContent className="px-3 sm:px-4 md:px-6 pb-3 sm:pb-4">
+            <div className="text-lg sm:text-2xl md:text-3xl font-bold">{formatCurrency(stats.totalRevenue)}</div>
+            <p className="text-xs text-muted-foreground mt-1">
               {formatCurrency(stats.todayRevenue)} today
             </p>
           </CardContent>
@@ -244,20 +245,20 @@ export function SimpleDashboard({ onViewChange }: DashboardProps) {
 
         {/* Orders Card */}
         <Card className="relative overflow-hidden">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
+          <CardHeader className="pb-2 px-3 sm:px-4 md:px-6 pt-3 sm:pt-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <div className="flex items-center space-x-2">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <ShoppingCart className="h-5 w-5 text-primary" />
+                <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
+                  <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 text-primary" />
                 </div>
-                <CardTitle className="text-sm font-medium text-muted-foreground">Total Orders</CardTitle>
+                <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Orders</CardTitle>
               </div>
-              <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+              <ArrowUpRight className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground hidden sm:block" />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{stats.totalOrders}</div>
-            <p className="text-sm text-muted-foreground mt-1">
+          <CardContent className="px-3 sm:px-4 md:px-6 pb-3 sm:pb-4">
+            <div className="text-lg sm:text-2xl md:text-3xl font-bold">{stats.totalOrders}</div>
+            <p className="text-xs text-muted-foreground mt-1">
               {stats.todayOrders} today
             </p>
           </CardContent>
@@ -265,20 +266,20 @@ export function SimpleDashboard({ onViewChange }: DashboardProps) {
 
         {/* Customers Card */}
         <Card className="relative overflow-hidden">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
+          <CardHeader className="pb-2 px-3 sm:px-4 md:px-6 pt-3 sm:pt-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <div className="flex items-center space-x-2">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <Users className="h-5 w-5 text-primary" />
+                <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
+                  <Users className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 text-primary" />
                 </div>
-                <CardTitle className="text-sm font-medium text-muted-foreground">Customers</CardTitle>
+                <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Customers</CardTitle>
               </div>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground hidden sm:block" />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{stats.totalCustomers}</div>
-            <p className="text-sm text-muted-foreground mt-1">
+          <CardContent className="px-3 sm:px-4 md:px-6 pb-3 sm:pb-4">
+            <div className="text-lg sm:text-2xl md:text-3xl font-bold">{stats.totalCustomers}</div>
+            <p className="text-xs text-muted-foreground mt-1">
               Total registered
             </p>
           </CardContent>
@@ -286,27 +287,27 @@ export function SimpleDashboard({ onViewChange }: DashboardProps) {
 
         {/* Products Card */}
         <Card className="relative overflow-hidden">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
+          <CardHeader className="pb-2 px-3 sm:px-4 md:px-6 pt-3 sm:pt-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <div className="flex items-center space-x-2">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <Package className="h-5 w-5 text-primary" />
+                <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
+                  <Package className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 text-primary" />
                 </div>
-                <CardTitle className="text-sm font-medium text-muted-foreground">Products</CardTitle>
+                <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Products</CardTitle>
               </div>
               {stats.lowStockItems > 0 ? (
-                <AlertTriangle className="h-4 w-4 text-destructive" />
+                <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 text-destructive hidden sm:block" />
               ) : (
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground hidden sm:block" />
               )}
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{stats.totalProducts}</div>
-            <p className="text-sm text-muted-foreground mt-1">
+          <CardContent className="px-3 sm:px-4 md:px-6 pb-3 sm:pb-4">
+            <div className="text-lg sm:text-2xl md:text-3xl font-bold">{stats.totalProducts}</div>
+            <p className="text-xs text-muted-foreground mt-1">
               {stats.lowStockItems > 0 ? (
                 <span className="flex items-center gap-1 text-destructive">
-                  <AlertTriangle className="h-3 w-3" />
+                  <AlertTriangle className="h-2 w-2 sm:h-3 sm:w-3" />
                   {stats.lowStockItems} low stock
                 </span>
               ) : (
@@ -315,7 +316,10 @@ export function SimpleDashboard({ onViewChange }: DashboardProps) {
             </p>
           </CardContent>
         </Card>
+      </div>
 
+      {/* Additional Charts and Analytics */}
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {/* Sales by Category - Pie Chart Card */}
         <Card className="relative overflow-hidden">
           <CardHeader className="pb-3">
@@ -372,30 +376,33 @@ export function SimpleDashboard({ onViewChange }: DashboardProps) {
         </Card>
 
         {/* Weekly Revenue - Bar Chart Card */}
-        <Card className="relative overflow-hidden">
+        <Card className="relative overflow-hidden md:col-span-2">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <div className="p-2 bg-primary/10 rounded-lg">
                   <BarChart3 className="h-5 w-5 text-primary" />
                 </div>
-                <CardTitle className="text-sm font-medium text-muted-foreground">Weekly Revenue</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">Weekly Revenue Trend</CardTitle>
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="h-48">
+            <div className="h-48 sm:h-56 lg:h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={stats.weeklyRevenue}>
+                <BarChart data={stats.weeklyRevenue} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                   <XAxis
                     dataKey="day"
                     tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
                     axisLine={false}
+                    tickLine={false}
                   />
                   <YAxis
                     tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
                     axisLine={false}
+                    tickLine={false}
+                    tickFormatter={(value) => `$${value}`}
                   />
                   <Tooltip
                     formatter={(value: number) => [formatCurrency(value), 'Revenue']}
@@ -404,59 +411,66 @@ export function SimpleDashboard({ onViewChange }: DashboardProps) {
                       border: '1px solid hsl(var(--border))',
                       borderRadius: '8px',
                       fontSize: '12px',
-                      color: 'hsl(var(--foreground))'
+                      color: 'hsl(var(--foreground))',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                     }}
                   />
                   <Bar
                     dataKey="revenue"
                     fill="hsl(var(--primary))"
                     radius={[4, 4, 0, 0]}
+                    maxBarSize={60}
                   />
                 </BarChart>
               </ResponsiveContainer>
             </div>
-            <div className="mt-2 flex justify-between text-xs text-muted-foreground">
-              <span>Last 7 days</span>
-              <span>{stats.weeklyRevenue.reduce((sum, day) => sum + day.orders, 0)} total orders</span>
+            <div className="mt-3 flex justify-between items-center text-xs text-muted-foreground">
+              <span>Last 7 days performance</span>
+              <div className="flex items-center gap-4">
+                <span>{stats.weeklyRevenue.reduce((sum, day) => sum + day.orders, 0)} total orders</span>
+                <span className="text-primary font-medium">
+                  {formatCurrency(stats.weeklyRevenue.reduce((sum, day) => sum + day.revenue, 0))} total
+                </span>
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {/* Quick Actions - Responsive Grid */}
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
         <Button
           onClick={() => onViewChange('pos')}
-          className="h-16 flex items-center justify-center gap-3 bg-primary hover:bg-primary/90"
+          className="h-14 sm:h-16 flex items-center justify-center gap-2 sm:gap-3 bg-primary hover:bg-primary/90 text-sm sm:text-base"
         >
-          <ShoppingCart className="h-5 w-5" />
+          <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
           <span className="font-medium">New Sale</span>
         </Button>
 
         <Button
           onClick={() => onViewChange('inventory')}
           variant="outline"
-          className="h-16 flex items-center justify-center gap-3"
+          className="h-14 sm:h-16 flex items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base"
         >
-          <Package className="h-5 w-5" />
+          <Package className="h-4 w-4 sm:h-5 sm:w-5" />
           <span className="font-medium">Inventory</span>
         </Button>
 
         <Button
           onClick={() => onViewChange('customers')}
           variant="outline"
-          className="h-16 flex items-center justify-center gap-3"
+          className="h-14 sm:h-16 flex items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base"
         >
-          <Users className="h-5 w-5" />
+          <Users className="h-4 w-4 sm:h-5 sm:w-5" />
           <span className="font-medium">Customers</span>
         </Button>
 
         <Button
           onClick={() => onViewChange('transactions')}
           variant="outline"
-          className="h-16 flex items-center justify-center gap-3"
+          className="h-14 sm:h-16 flex items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base"
         >
-          <Eye className="h-5 w-5" />
+          <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
           <span className="font-medium">Transactions</span>
         </Button>
       </div>

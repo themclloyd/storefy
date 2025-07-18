@@ -32,7 +32,7 @@ export type Permission =
   | 'export_all_data';
 
 // Define pages that require permission checks
-export type ProtectedPage = 
+export type ProtectedPage =
   | 'dashboard'
   | 'pos'
   | 'inventory'
@@ -44,7 +44,9 @@ export type ProtectedPage =
   | 'layby'
   | 'reports'
   | 'expenses'
-  | 'settings';
+  | 'settings'
+  | 'showcase'
+  | 'analytics';
 
 interface UserRole {
   role: 'owner' | 'manager' | 'cashier';
@@ -172,8 +174,8 @@ export function PermissionProvider({ children }: { children: React.ReactNode }) 
 
       // All pages
       const allPages: ProtectedPage[] = [
-        'dashboard', 'pos', 'inventory', 'products', 'categories', 'suppliers',
-        'customers', 'transactions', 'layby', 'reports', 'expenses', 'settings'
+        'analytics', 'dashboard', 'pos', 'inventory', 'products', 'categories', 'suppliers',
+        'customers', 'transactions', 'layby', 'reports', 'expenses', 'showcase', 'settings'
       ];
       allPages.forEach(p => newPageAccess.add(p));
     }
@@ -189,8 +191,8 @@ export function PermissionProvider({ children }: { children: React.ReactNode }) 
       managerPermissions.forEach(p => newPermissions.add(p));
 
       const managerPages: ProtectedPage[] = [
-        'dashboard', 'pos', 'inventory', 'products', 'categories', 'suppliers',
-        'customers', 'transactions', 'layby', 'reports', 'expenses'
+        'analytics', 'dashboard', 'pos', 'inventory', 'products', 'categories', 'suppliers',
+        'customers', 'transactions', 'layby', 'reports', 'expenses', 'showcase'
       ];
       managerPages.forEach(p => newPageAccess.add(p));
     }
@@ -206,7 +208,7 @@ export function PermissionProvider({ children }: { children: React.ReactNode }) 
       cashierPermissions.forEach(p => newPermissions.add(p));
 
       const cashierPages: ProtectedPage[] = [
-        'dashboard', 'pos', 'inventory', 'customers', 'transactions', 'layby', 'expenses'
+        'analytics', 'dashboard', 'pos', 'inventory', 'customers', 'transactions', 'layby', 'expenses', 'showcase'
       ];
       cashierPages.forEach(p => newPageAccess.add(p));
     }

@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ShoppingCart, Plus, Minus, Trash2, Percent, DollarSign, CreditCard, Search, Loader2, User, UserPlus, History, Grid3X3, List, LayoutGrid } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { ShoppingCart, Plus, Minus, Trash2, Percent, DollarSign, CreditCard, Search, Loader2, User, UserPlus, History, Grid3X3, List, LayoutGrid, X } from "lucide-react";
 import { useStore } from "@/contexts/StoreContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -93,6 +94,9 @@ export function POSView() {
 
   // Add customer state
   const [showAddCustomer, setShowAddCustomer] = useState(false);
+
+  // Mobile cart state
+  const [showMobileCart, setShowMobileCart] = useState(false);
 
   // Tax calculation state
   const [taxCalculation, setTaxCalculation] = useState<any>(null);
@@ -602,59 +606,84 @@ export function POSView() {
 
   return (
     <>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+      <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 md:gap-6 h-full">
       {/* Products Section */}
-      <div className="lg:col-span-2 space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="lg:col-span-2 space-y-4 md:space-y-6 flex-1">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">POS System</h1>
-            <p className="text-muted-foreground mt-2">Select products to add to cart</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">POS System</h1>
+            <p className="text-sm md:text-base text-muted-foreground mt-1 md:mt-2">Select products to add to cart</p>
           </div>
-          <Button
-            variant="outline"
-            onClick={() => setShowOrderHistory(true)}
-            className="flex items-center gap-2"
-          >
-            <History className="w-4 h-4" />
-            Order History
-          </Button>
+          <div className="flex items-center gap-2">
+            {/* Mobile Cart Button */}
+            <Sheet open={showMobileCart} onOpenChange={setShowMobileCart}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="lg:hidden relative"
+                  size="sm"
+                >
+                  <ShoppingCart className="w-4 h-4" />
+                  {cart.length > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+                    >
+                      {cart.length}
+                    </Badge>
+                  )}
+                </Button>
+              </SheetTrigger>
+            </Sheet>
+
+            <Button
+              variant="outline"
+              onClick={() => setShowOrderHistory(true)}
+              className="flex items-center gap-2 w-full sm:w-auto"
+              size="sm"
+            >
+              <History className="w-4 h-4" />
+              <span className="hidden sm:inline">Order History</span>
+              <span className="sm:hidden">History</span>
+            </Button>
+          </div>
         </div>
 
 
 
         <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-foreground">Products</CardTitle>
-              <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+          <CardHeader className="pb-3 sm:pb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <CardTitle className="text-foreground text-lg sm:text-xl">Products</CardTitle>
+              <div className="flex items-center gap-1 bg-muted rounded-lg p-1 self-start sm:self-auto">
                 <Button
                   variant={viewMode === "compact" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setViewMode("compact")}
-                  className="h-8 w-8 p-0"
+                  className="h-7 w-7 sm:h-8 sm:w-8 p-0"
                 >
-                  <Grid3X3 className="w-4 h-4" />
+                  <Grid3X3 className="w-3 h-3 sm:w-4 sm:h-4" />
                 </Button>
                 <Button
                   variant={viewMode === "grid" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setViewMode("grid")}
-                  className="h-8 w-8 p-0"
+                  className="h-7 w-7 sm:h-8 sm:w-8 p-0"
                 >
-                  <LayoutGrid className="w-4 h-4" />
+                  <LayoutGrid className="w-3 h-3 sm:w-4 sm:h-4" />
                 </Button>
                 <Button
                   variant={viewMode === "list" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setViewMode("list")}
-                  className="h-8 w-8 p-0"
+                  className="h-7 w-7 sm:h-8 sm:w-8 p-0"
                 >
-                  <List className="w-4 h-4" />
+                  <List className="w-3 h-3 sm:w-4 sm:h-4" />
                 </Button>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 px-3 sm:px-6">
             {/* Search and Filter Controls */}
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1">
@@ -663,13 +692,13 @@ export function POSView() {
                   placeholder="Search products..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 h-10 sm:h-9"
                 />
               </div>
               <select
                 value={selectedCategory || ""}
                 onChange={(e) => setSelectedCategory(e.target.value || null)}
-                className="px-3 py-2 border border-border rounded-md bg-background text-foreground"
+                className="px-3 py-2 h-10 sm:h-9 border border-border rounded-md bg-background text-foreground text-sm min-w-[140px]"
               >
                 <option value="">All Categories</option>
                 {categories.map((category) => (
@@ -692,9 +721,9 @@ export function POSView() {
               </div>
             ) : (
               <>
-                {/* Compact View */}
+                {/* Compact View - Enhanced Responsive Grid */}
                 {viewMode === "compact" && (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3 md:gap-4">
                     {filteredProducts.map((product) => (
                       <Card
                         key={product.id}
@@ -722,10 +751,10 @@ export function POSView() {
                           </div>
                         </div>
 
-                        <CardContent className="p-4">
-                          <h3 className="font-semibold text-sm mb-2 line-clamp-2 leading-tight">{product.name}</h3>
-                          <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
-                            {product.categories?.name || 'No category'} • {product.sku}
+                        <CardContent className="p-3 sm:p-4">
+                          <h3 className="font-semibold text-xs sm:text-sm mb-1 sm:mb-2 line-clamp-2 leading-tight">{product.name}</h3>
+                          <p className="text-xs text-muted-foreground mb-2 sm:mb-3 line-clamp-1 sm:line-clamp-2">
+                            {product.categories?.name || 'No category'}
                           </p>
 
                           {/* Stock indicator */}
@@ -738,31 +767,31 @@ export function POSView() {
 
                           {/* Price and Add Button */}
                           <div className="flex items-center justify-between">
-                            <span className="text-lg font-bold">{formatCurrency(product.price)}</span>
-                            <div className="flex items-center gap-2">
+                            <span className="text-sm sm:text-lg font-bold">{formatCurrency(product.price)}</span>
+                            <div className="flex items-center gap-1 sm:gap-2">
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="h-8 w-8 p-0 rounded-full"
+                                className="h-7 w-7 sm:h-8 sm:w-8 p-0 rounded-full touch-manipulation"
                                 disabled={getCartQuantity(product.id) === 0}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   updateQuantity(product.id, getCartQuantity(product.id) - 1);
                                 }}
                               >
-                                <Minus className="w-4 h-4" />
+                                <Minus className="w-3 h-3 sm:w-4 sm:h-4" />
                               </Button>
-                              <span className="w-8 text-center font-medium">{getCartQuantity(product.id)}</span>
+                              <span className="w-6 sm:w-8 text-center font-medium text-sm">{getCartQuantity(product.id)}</span>
                               <Button
                                 size="sm"
-                                className="h-8 w-8 p-0 rounded-full"
+                                className="h-7 w-7 sm:h-8 sm:w-8 p-0 rounded-full touch-manipulation"
                                 disabled={product.stock_quantity === 0}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   addToCart(product);
                                 }}
                               >
-                                <Plus className="w-4 h-4" />
+                                <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
                               </Button>
                             </div>
                           </div>
@@ -772,9 +801,9 @@ export function POSView() {
                   </div>
                 )}
 
-                {/* Grid View */}
+                {/* Grid View - Enhanced Responsive */}
                 {viewMode === "grid" && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                     {filteredProducts.map((product) => (
                       <Card
                         key={product.id}
@@ -942,8 +971,8 @@ export function POSView() {
         </Card>
       </div>
 
-      {/* Cart Section */}
-      <div className="lg:col-span-1 space-y-6">
+      {/* Desktop Cart Section */}
+      <div className="hidden lg:block lg:col-span-1 space-y-6">
         <Card className="sticky top-4 h-[85vh] flex flex-col">
           <CardHeader className="pb-4 flex-shrink-0">
             <div className="flex items-center justify-between mb-4">
@@ -1320,6 +1349,233 @@ export function POSView() {
         toast.success(`Customer ${customer.name} added and selected`);
       }}
     />
+
+    {/* Mobile Cart Sheet */}
+    <Sheet open={showMobileCart} onOpenChange={setShowMobileCart}>
+      <SheetContent side="right" className="w-full sm:w-[400px] p-0 flex flex-col">
+        <SheetHeader className="px-6 py-4 border-b">
+          <div className="flex items-center justify-between">
+            <SheetTitle className="flex items-center gap-2">
+              <ShoppingCart className="w-5 h-5 text-primary" />
+              Cart Summary
+            </SheetTitle>
+            <Badge variant="secondary" className="text-xs">
+              {cart.length} items
+            </Badge>
+          </div>
+        </SheetHeader>
+
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Customer Selection - Mobile */}
+          <div className="px-6 py-4 border-b space-y-3">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <User className="w-4 h-4" />
+              <span className="font-medium">Customer</span>
+            </div>
+
+            {selectedCustomer ? (
+              <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                <div className="min-w-0 flex-1">
+                  <div className="font-medium text-sm truncate">{selectedCustomer.name}</div>
+                  <div className="text-xs text-muted-foreground truncate">
+                    {selectedCustomer.email || selectedCustomer.phone || 'No contact info'}
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSelectedCustomer(null)}
+                  className="h-8 px-2 text-xs flex-shrink-0 ml-2"
+                >
+                  <X className="w-3 h-3" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowCustomerSearch(!showCustomerSearch)}
+                  className="flex-1 h-10 justify-start"
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  Walk-in Customer
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowAddCustomer(true)}
+                  className="h-10 px-3"
+                >
+                  <UserPlus className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Cart Items - Mobile */}
+          <div className="flex-1 overflow-hidden flex flex-col px-6">
+            {cart.length === 0 ? (
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-center py-8">
+                  <ShoppingCart className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground font-medium">Your cart is empty</p>
+                  <p className="text-sm text-muted-foreground mt-1">Add products to get started</p>
+                </div>
+              </div>
+            ) : (
+              <>
+                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide py-4 flex-shrink-0">Items</h4>
+                <div className="flex-1 overflow-y-auto space-y-3 pb-4">
+                  {cart.map((item) => (
+                    <div key={item.id} className="flex items-center gap-3 p-3 border border-border rounded-lg">
+                      {/* Product Image */}
+                      <div className="w-12 h-12 bg-muted rounded-md overflow-hidden flex-shrink-0">
+                        {item.image_url ? (
+                          <img
+                            src={item.image_url}
+                            alt={item.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <span className="text-sm font-medium text-muted-foreground">
+                              {item.name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between">
+                          <h5 className="font-medium text-foreground text-sm truncate pr-2">{item.name}</h5>
+                          <span className="text-sm font-medium text-foreground">
+                            {formatCurrency(item.price * item.quantity)}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">{formatCurrency(item.price)} each</p>
+
+                        <div className="flex items-center justify-between mt-2">
+                          <div className="flex items-center gap-1">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              className="h-7 w-7 p-0"
+                            >
+                              <Minus className="w-3 h-3" />
+                            </Button>
+                            <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              className="h-7 w-7 p-0"
+                            >
+                              <Plus className="w-3 h-3" />
+                            </Button>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => removeFromCart(item.id)}
+                            className="h-7 w-7 p-0 text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Cart Summary and Checkout - Mobile */}
+          {cart.length > 0 && (
+            <div className="border-t bg-background p-6 space-y-4">
+              {/* Totals */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Subtotal</span>
+                  <span>{formatCurrency(subtotal)}</span>
+                </div>
+                {discountAmount > 0 && (
+                  <div className="flex justify-between text-sm text-green-600">
+                    <span>Discount {discountCode && `(${discountCode})`}</span>
+                    <span>-{formatCurrency(discountAmount)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-sm">
+                  <span>Tax</span>
+                  <span>{formatCurrency(taxAmount)}</span>
+                </div>
+                <div className="flex justify-between text-lg font-bold border-t pt-2">
+                  <span>Total</span>
+                  <span>{formatCurrency(total)}</span>
+                </div>
+              </div>
+
+              {/* Payment Method */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Payment Method</label>
+                <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {getPaymentOptions().map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {formatPaymentMethodDisplay(option.value)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Checkout Button */}
+              <Button
+                onClick={processOrder}
+                disabled={isProcessingOrder || cart.length === 0}
+                className="w-full h-12 text-base font-medium"
+              >
+                {isProcessingOrder ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Complete Sale - {formatCurrency(total)}
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
+        </div>
+      </SheetContent>
+    </Sheet>
+
+    {/* Floating Cart Button for Mobile */}
+    {cart.length > 0 && (
+      <div className="lg:hidden fixed bottom-20 right-4 z-40">
+        <Button
+          onClick={() => setShowMobileCart(true)}
+          className="h-14 w-14 rounded-full shadow-lg bg-primary hover:bg-primary/90 relative"
+          size="sm"
+        >
+          <ShoppingCart className="w-6 h-6" />
+          <Badge
+            variant="destructive"
+            className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0 flex items-center justify-center text-xs font-bold"
+          >
+            {cart.length}
+          </Badge>
+        </Button>
+      </div>
+    )}
     </>
   );
 }

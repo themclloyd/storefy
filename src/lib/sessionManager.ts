@@ -27,6 +27,7 @@ class SessionManager {
   private lastActivity: number = Date.now();
   private sessionWarningCallback?: (minutesLeft: number) => void;
   private sessionExpiredCallback?: () => void;
+  private throttledActivityHandler: (() => void) | null = null;
 
   private constructor() {
     // Get timeout from environment or use defaults
@@ -55,8 +56,11 @@ class SessionManager {
    * Initialize activity tracking for session extension
    */
   private initializeActivityTracking(): void {
+    // Clean up existing listeners first
+    this.cleanupActivityTracking();
+
     const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
-    
+
     const updateActivity = () => {
       this.lastActivity = Date.now();
       this.extendCurrentSession();
@@ -72,18 +76,56 @@ class SessionManager {
       }, 30000); // Update at most every 30 seconds
     };
 
+    // Store the throttled function for cleanup
+    this.throttledActivityHandler = throttledUpdate;
+
     events.forEach(event => {
-      document.addEventListener(event, throttledUpdate, true);
+      document.addEventListener(event, throttledUpdate, { passive: true, capture: true });
     });
+  }
+
+  /**
+   * Clean up activity tracking listeners
+   */
+  private cleanupActivityTracking(): void {
+    if (this.throttledActivityHandler) {
+      const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+      events.forEach(event => {
+        document.removeEventListener(event, this.throttledActivityHandler, { capture: true });
+      });
+      this.throttledActivityHandler = null;
+    }
   }
 
   /**
    * Start monitoring sessions for expiry
    */
   private startSessionMonitoring(): void {
+    // Clear existing timer first
+    if (this.activityTimer) {
+      clearInterval(this.activityTimer);
+    }
+
     this.activityTimer = setInterval(() => {
       this.checkSessionExpiry();
     }, this.config.activityCheckInterval);
+  }
+
+  /**
+   * Clean up all timers and event listeners
+   */
+  public cleanup(): void {
+    this.cleanupActivityTracking();
+
+    if (this.activityTimer) {
+      clearInterval(this.activityTimer);
+      this.activityTimer = null;
+    }
+
+    if (this.warningTimer) {
+      clearTimeout(this.warningTimer);
+      this.warningTimer = null;
+    }
   }
 
   /**

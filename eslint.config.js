@@ -6,20 +6,35 @@ import tseslint from "@typescript-eslint/eslint-plugin";
 import tsparser from "@typescript-eslint/parser";
 
 export default [
-  { ignores: ["dist"] },
+  {
+    ignores: [
+      "dist/**",
+      "build/**",
+      "node_modules/**",
+      ".next/**",
+      "coverage/**",
+      "*.config.js",
+      "*.config.ts",
+      "public/**"
+    ]
+  },
   {
     ...js.configs.recommended,
-    files: ["**/*.{ts,tsx}"],
+    files: ["**/*.{js,jsx,ts,tsx}"],
     languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
+      ecmaVersion: 2024,
+      sourceType: "module",
+      globals: {
+        ...globals.browser,
+        ...globals.es2024,
+        ...globals.node,
+      },
       parser: tsparser,
       parserOptions: {
-        ecmaVersion: 2020,
-        sourceType: "module",
         ecmaFeatures: {
           jsx: true,
         },
+        project: "./tsconfig.json",
       },
     },
     plugins: {
@@ -33,14 +48,32 @@ export default [
         "warn",
         { allowConstantExport: true },
       ],
+
+      // TypeScript rules for 2025
       "@typescript-eslint/no-unused-vars": [
-        "warn",
+        "error",
         {
           "argsIgnorePattern": "^_",
           "varsIgnorePattern": "^_",
+          "caughtErrorsIgnorePattern": "^_",
           "ignoreRestSiblings": true
         }
       ],
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/prefer-const": "error",
+      "@typescript-eslint/prefer-nullish-coalescing": "error",
+      "@typescript-eslint/prefer-optional-chain": "error",
+      "@typescript-eslint/no-unnecessary-type-assertion": "error",
+      "@typescript-eslint/no-non-null-assertion": "warn",
+
+      // Modern JavaScript features
+      "prefer-const": "error",
+      "prefer-arrow-callback": "error",
+      "prefer-template": "error",
+      "object-shorthand": "error",
+      "no-var": "error",
+      "no-duplicate-imports": "error",
+
       "no-console": ["warn", { "allow": ["warn", "error"] }],
       // Security-focused rules
       "no-eval": "error",

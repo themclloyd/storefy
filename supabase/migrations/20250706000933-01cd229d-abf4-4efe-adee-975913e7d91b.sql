@@ -18,6 +18,7 @@ CREATE TABLE public.stores (
   email TEXT,
   currency TEXT DEFAULT 'USD',
   tax_rate DECIMAL(5,4) DEFAULT 0.0825,
+  store_code TEXT UNIQUE,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );

@@ -16,6 +16,7 @@ class PageStateManager {
   private static instance: PageStateManager;
   private readonly STORAGE_KEY = 'storefy_last_page';
   private readonly MAX_AGE_HOURS = 24; // Clear old page states after 24 hours
+  private cleanupInterval: NodeJS.Timeout | null = null;
 
   private constructor() {
     this.initializeCleanup();
@@ -154,9 +155,14 @@ class PageStateManager {
   private initializeCleanup(): void {
     // Clean up on initialization
     this.cleanupOldStates();
-    
+
+    // Clear any existing interval
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+    }
+
     // Set up periodic cleanup (every hour)
-    setInterval(() => {
+    this.cleanupInterval = setInterval(() => {
       this.cleanupOldStates();
     }, 60 * 60 * 1000);
   }
@@ -189,11 +195,22 @@ class PageStateManager {
     // Check if we still have a valid session
     const pinSession = sessionManager.getPinSession();
     const hasValidSession = pinSession !== null;
-    
+
     if (!hasValidSession) {
       // No valid session, clear page state
       this.clearPageState();
       console.log('🔄 Session ended, page state cleared');
+    }
+  }
+
+  /**
+   * Cleanup method to prevent memory leaks
+   */
+  public cleanup(): void {
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+      this.cleanupInterval = null;
+      console.log('🧹 PageStateManager cleanup completed');
     }
   }
 }

@@ -3,8 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { SubscriptionPlans } from '@/components/subscription/SubscriptionPlans';
 import { SubscriptionStatus } from '@/components/subscription/SubscriptionStatus';
+import { SubscriptionHistory } from '@/components/subscription/SubscriptionHistory';
 import { useSubscription } from '@/hooks/useSubscription';
-import { CreditCard, Clock, CheckCircle, AlertTriangle, ArrowLeft, Bug } from 'lucide-react';
+import { CreditCard, Clock, CheckCircle, AlertTriangle, ArrowLeft, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { PageLoading } from '@/components/ui/modern-loading';
@@ -12,7 +13,7 @@ import { Sidebar } from '@/components/layout/Sidebar';
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 import { ThemeToggleButton } from '@/components/ui/theme-toggle';
-import { paychanguService } from '@/services/paychangu';
+
 import { toast } from 'sonner';
 
 export default function SubscriptionPage() {
@@ -25,21 +26,7 @@ export default function SubscriptionPage() {
   } = useSubscription();
   const [view, setView] = useState<'overview' | 'plans' | 'manage'>('overview');
 
-  // Debug function to test PayChangu API
-  const testPayChanguAPI = async () => {
-    try {
-      console.log('Testing PayChangu API...');
-      toast.info('Testing PayChangu API...');
 
-      // Test with a dummy tx_ref to see the API response
-      const result = await paychanguService.verifyPayment('test_tx_ref_123');
-      console.log('PayChangu API test result:', result);
-      toast.success('PayChangu API test completed - check console');
-    } catch (error: any) {
-      console.error('PayChangu API test error:', error);
-      toast.error(`PayChangu API test failed: ${error.message}`);
-    }
-  };
 
   // Simple status determination
   const getStatus = () => {
@@ -123,16 +110,6 @@ export default function SubscriptionPage() {
             <Breadcrumbs activeView="subscription" />
           </div>
           <div className="ml-auto px-4 flex items-center gap-2">
-            {/* Debug button - remove in production */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={testPayChanguAPI}
-              className="text-xs"
-            >
-              <Bug className="w-3 h-3 mr-1" />
-              Test API
-            </Button>
             <ThemeToggleButton />
           </div>
         </header>
@@ -157,10 +134,10 @@ export default function SubscriptionPage() {
               <div className="space-y-6">
                 <div className="text-center mb-8">
                   <h1 className="text-3xl font-bold text-foreground mb-2">
-                    Subscription
+                    Subscription Dashboard
                   </h1>
-                  <p className="text-muted-foreground">
-                    Manage your Storefy subscription
+                  <p className="text-muted-foreground text-lg">
+                    Manage your Storefy subscription and track your usage
                   </p>
                 </div>
 
@@ -214,12 +191,12 @@ export default function SubscriptionPage() {
                 </Card>
 
                 {/* Quick Stats for Active Users */}
-                {status.type === 'active' && subscription && (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {subscription && (
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <Card className="p-4">
                       <div className="text-center">
                         <div className="text-2xl font-bold text-foreground">
-                          {subscription.plan_name}
+                          {subscription.subscription_plans?.display_name || 'Unknown'}
                         </div>
                         <div className="text-sm text-muted-foreground">Current Plan</div>
                       </div>
@@ -232,15 +209,25 @@ export default function SubscriptionPage() {
                             'N/A'
                           }
                         </div>
-                        <div className="text-sm text-muted-foreground">Next Billing</div>
+                        <div className="text-sm text-muted-foreground">
+                          {isTrialing ? 'Trial Ends' : 'Next Billing'}
+                        </div>
                       </div>
                     </Card>
                     <Card className="p-4">
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-primary">
-                          Active
+                        <div className="text-2xl font-bold text-primary capitalize">
+                          {subscription.status}
                         </div>
                         <div className="text-sm text-muted-foreground">Status</div>
+                      </div>
+                    </Card>
+                    <Card className="p-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-foreground">
+                          ${subscription.subscription_plans?.price_monthly || '0'}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Monthly Cost</div>
                       </div>
                     </Card>
                   </div>
@@ -267,6 +254,40 @@ export default function SubscriptionPage() {
                     </div>
                   </Card>
                 )}
+
+                {/* Subscription History */}
+                {subscription && (
+                  <SubscriptionHistory subscriptionId={subscription.id} />
+                )}
+
+                {/* Help Section */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Need Help?</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <h4 className="font-medium mb-2">Subscription Questions</h4>
+                        <ul className="text-sm text-muted-foreground space-y-1">
+                          <li>• All plans include core POS features</li>
+                          <li>• Upgrade or downgrade anytime</li>
+                          <li>• Trial days are credited on upgrade</li>
+                          <li>• Cancel anytime with no penalties</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <h4 className="font-medium mb-2">Support</h4>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          Need assistance with your subscription?
+                        </p>
+                        <Button variant="outline" size="sm">
+                          Contact Support
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             )}
 
@@ -295,16 +316,112 @@ export default function SubscriptionPage() {
 
             {/* Manage View */}
             {view === 'manage' && (
-              <div className="space-y-6">
+              <div className="space-y-8">
                 <div className="text-center mb-8">
                   <h2 className="text-2xl font-bold text-foreground mb-2">
                     Manage Subscription
                   </h2>
                   <p className="text-muted-foreground">
-                    View and manage your subscription details
+                    View and manage your subscription details, usage, and billing
                   </p>
                 </div>
+
+                {/* Subscription Status */}
                 <SubscriptionStatus />
+
+                {/* Quick Actions */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Settings className="w-5 h-5" />
+                      Quick Actions
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <Button
+                        variant="outline"
+                        onClick={() => setView('plans')}
+                        className="h-20 flex-col gap-2"
+                      >
+                        <CreditCard className="w-6 h-6" />
+                        <span>Change Plan</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          // Scroll to history section
+                          const historyElement = document.querySelector('[data-subscription-history]');
+                          if (historyElement) {
+                            historyElement.scrollIntoView({ behavior: 'smooth' });
+                          }
+                        }}
+                        className="h-20 flex-col gap-2"
+                      >
+                        <Clock className="w-6 h-6" />
+                        <span>View History</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          // TODO: Implement usage analytics
+                          toast.info('Usage analytics feature coming soon');
+                        }}
+                        className="h-20 flex-col gap-2"
+                      >
+                        <CheckCircle className="w-6 h-6" />
+                        <span>Usage Analytics</span>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Billing Information */}
+                {subscription && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Billing Information</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <h4 className="font-medium mb-2">Current Plan</h4>
+                          <p className="text-muted-foreground">
+                            {subscription.subscription_plans?.display_name || 'Unknown Plan'}
+                          </p>
+                        </div>
+                        <div>
+                          <h4 className="font-medium mb-2">Billing Cycle</h4>
+                          <p className="text-muted-foreground capitalize">
+                            {subscription.billing_cycle || 'Monthly'}
+                          </p>
+                        </div>
+                        <div>
+                          <h4 className="font-medium mb-2">Next Billing Date</h4>
+                          <p className="text-muted-foreground">
+                            {subscription.next_billing_date
+                              ? new Date(subscription.next_billing_date).toLocaleDateString()
+                              : 'N/A'
+                            }
+                          </p>
+                        </div>
+                        <div>
+                          <h4 className="font-medium mb-2">Status</h4>
+                          <Badge variant={subscription.status === 'active' ? 'default' : 'secondary'}>
+                            {subscription.status}
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Detailed Subscription History */}
+                {subscription && (
+                  <div data-subscription-history>
+                    <SubscriptionHistory subscriptionId={subscription.id} />
+                  </div>
+                )}
               </div>
             )}
           </div>

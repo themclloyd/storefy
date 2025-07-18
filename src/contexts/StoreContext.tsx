@@ -1,10 +1,11 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthContext';
 import { securityAudit } from '@/utils/securityAudit';
 import { sessionManager } from '@/lib/sessionManager';
 import { pageStateManager } from '@/lib/pageStateManager';
 import { useAppInitialization } from './AppInitializationContext';
+import { debounceAsync } from '@/utils/debounce';
 
 interface Store {
   id: string;
@@ -132,7 +133,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const isOwner = pinData ? pinData.role === 'owner' : currentStore?.owner_id === user?.id;
   const canManage = isOwner || userRole === 'manager';
 
-  const fetchStores = async () => {
+  const fetchStoresInternal = async () => {
     // Check for PIN session
     const pinSession = localStorage.getItem('pin_session');
     const pinData = pinSession ? JSON.parse(pinSession) : null;
@@ -253,6 +254,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Create debounced version to prevent excessive calls
+  const fetchStores = useCallback(
+    debounceAsync(fetchStoresInternal, 300), // 300ms debounce
+    [user?.id] // Only recreate if user ID changes
+  );
+
   const selectStore = (storeId: string) => {
     console.log('🏪 selectStore called with:', storeId);
     const store = stores.find(s => s.id === storeId);
@@ -327,33 +334,49 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     await fetchStores();
   };
 
+  // Use refs to prevent excessive re-fetching
+  const lastUserIdRef = useRef<string | null>(null);
+  const hasInitializedRef = useRef(false);
+
   useEffect(() => {
+    const currentUserId = user?.id || null;
+    const hasUserChanged = lastUserIdRef.current !== currentUserId;
+
     console.log('🔄 Main store fetch useEffect triggered:', {
       hasUser: !!user,
-      userId: user?.id,
-      authLoading
+      userId: currentUserId,
+      authLoading,
+      hasUserChanged,
+      hasInitialized: hasInitializedRef.current
     });
 
-    if (user) {
+    // Skip if auth is still loading and we haven't initialized yet
+    if (authLoading && !hasInitializedRef.current) {
+      console.log('⏳ Auth still loading, waiting...');
+      return;
+    }
+
+    // Only fetch if user actually changed or first initialization
+    if (user && (hasUserChanged || !hasInitializedRef.current)) {
       console.log('👤 User found, calling fetchStores');
+      lastUserIdRef.current = currentUserId;
+      hasInitializedRef.current = true;
       fetchStores();
-    } else {
-      console.log('❌ No user, clearing stores');
+    } else if (!user && hasUserChanged) {
+      console.log('❌ User logged out, clearing stores');
+      lastUserIdRef.current = null;
       // User logged out, clear everything
       setStores([]);
       setCurrentStore(null);
       setUserRole(null);
       setLoading(false);
       // Only clear store selection if we're sure the user actually logged out
-      // Don't clear during initial load when authentication is still loading
-      if (!authLoading && user === null) {
+      if (!authLoading) {
         console.log('🗑️ User explicitly logged out (auth complete), clearing store selection');
         clearStoreSelection();
-      } else {
-        console.log('⏳ Auth still loading or user undefined, keeping store selection');
       }
     }
-  }, [user, authLoading]);
+  }, [user?.id, authLoading]); // Only depend on user ID, not full user object
 
   // Auto-restore store selection for main users
   useEffect(() => {
@@ -385,17 +408,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }
   }, [stores, user, pinData, currentStore]);
 
-  // Listen for PIN session changes
+  // Listen for PIN session changes (consolidated single listener)
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'pin_session') {
-        // PIN session changed, refetch stores
+        // PIN session changed, refetch stores (debounced)
         fetchStores();
       }
     };
 
     const handlePinSessionChange = () => {
-      // Custom event for same-tab PIN session changes
+      // Custom event for same-tab PIN session changes (debounced)
       fetchStores();
     };
 
@@ -406,17 +429,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('pin-session-changed', handlePinSessionChange);
     };
-  }, []);
-
-  // Also listen for PIN session changes
-  useEffect(() => {
-    const handleStorageChange = () => {
-      fetchStores();
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+  }, [fetchStores]); // Depend on fetchStores to get the debounced version
 
   // Check if user has a valid store selection
   const hasValidStoreSelection = Boolean(currentStore && (pinData || (!pinData && user)));

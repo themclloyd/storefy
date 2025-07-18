@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { teamMemberLogs, logActivity } from "@/lib/activityLogger";
 import { clearTaxCache, percentageToDecimal, isValidTaxRate, WORLD_CURRENCIES } from "@/lib/taxUtils";
 import { PaymentMethodsSettings } from "./PaymentMethodsSettings";
+import { ShowcaseSettings } from "./ShowcaseSettings";
 import { PrivacySettings } from "@/components/analytics/ConsentBanner";
 
 interface TeamMember {
@@ -81,6 +82,9 @@ export function SettingsView() {
   const [storeTaxRate, setStoreTaxRate] = useState('8.25');
   const [updatingStore, setUpdatingStore] = useState(false);
 
+  // Showcase status
+  const [showcaseEnabled, setShowcaseEnabled] = useState(false);
+
   useEffect(() => {
     if (currentStore) {
       fetchTeamMembers();
@@ -101,6 +105,7 @@ export function SettingsView() {
       setStoreEmail(currentStore.email || '');
       setStoreCurrency(currentStore.currency || 'MWK');
       setStoreTaxRate(currentStore.tax_rate?.toString() || '8.25');
+      setShowcaseEnabled(currentStore.enable_public_showcase || false);
     }
   }, [currentStore]);
 
@@ -563,16 +568,45 @@ export function SettingsView() {
   return (
     <TooltipProvider>
       <div className="p-6 max-w-7xl mx-auto space-y-6">
-        <div className="flex items-center gap-3 mb-6">
-          <Settings className="w-8 h-8 text-primary" />
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Settings</h1>
-            <p className="text-muted-foreground">Manage your store settings and preferences</p>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <Settings className="w-8 h-8 text-primary" />
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Settings</h1>
+              <p className="text-muted-foreground">Manage your store settings and preferences</p>
+            </div>
           </div>
+
+          {/* Quick Access to Store Catalog */}
+          {currentStore && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const showcaseUrl = `${window.location.origin}/showcase/${currentStore.id}`;
+                    window.open(showcaseUrl, '_blank');
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <Globe className="w-4 h-4" />
+                  View Store Catalog
+                  {showcaseEnabled && (
+                    <Badge variant="default" className="ml-1 text-xs">
+                      Live
+                    </Badge>
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{showcaseEnabled ? 'View your public store catalog' : 'Enable showcase in settings to make your catalog public'}</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
 
         <Tabs defaultValue="team" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="team" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
               Team
@@ -580,6 +614,15 @@ export function SettingsView() {
             <TabsTrigger value="store" className="flex items-center gap-2">
               <Store className="w-4 h-4" />
               Store
+            </TabsTrigger>
+            <TabsTrigger value="showcase" className="flex items-center gap-2">
+              <Globe className="w-4 h-4" />
+              Showcase
+              {showcaseEnabled && (
+                <Badge variant="default" className="ml-1 text-xs">
+                  Live
+                </Badge>
+              )}
             </TabsTrigger>
             <TabsTrigger value="payments" className="flex items-center gap-2">
               <CreditCard className="w-4 h-4" />
@@ -1191,6 +1234,11 @@ export function SettingsView() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Public Showcase Tab */}
+          <TabsContent value="showcase" className="space-y-6">
+            <ShowcaseSettings onShowcaseStatusChange={setShowcaseEnabled} />
           </TabsContent>
 
           {/* Payment Methods Tab */}

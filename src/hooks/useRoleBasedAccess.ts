@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   BarChart3, ShoppingCart, Package, FolderOpen, Truck, Users,
-  Receipt, Clock, CreditCard, Settings
+  Receipt, Clock, CreditCard, Settings, Globe, TrendingUp
 } from 'lucide-react';
 
 /**
@@ -156,10 +156,9 @@ export function useRoleBasedNavigation() {
   
   const getAvailablePages = (): ProtectedPage[] => {
     const allPages: ProtectedPage[] = [
-      'dashboard', 'pos', 'inventory', 'products', 'categories', 'suppliers',
-      'customers', 'transactions', 'layby', 'reports', 'expenses', 'settings'
+      'analytics', 'dashboard', 'pos', 'inventory', 'customers', 'transactions', 'layby', 'expenses', 'showcase'
     ];
-    
+
     return allPages.filter(page => canAccessPage(page));
   };
   
@@ -167,22 +166,24 @@ export function useRoleBasedNavigation() {
     const availablePages = getAvailablePages();
     
     const navigationMap = {
+      analytics: { label: 'Analytics', icon: TrendingUp },
       dashboard: { label: 'Overview', icon: BarChart3 },
       pos: { label: 'POS', icon: ShoppingCart },
       inventory: { label: 'Inventory', icon: Package },
-      products: { label: 'Products', icon: Package },
       customers: { label: 'Customers', icon: Users },
       layby: { label: 'Layby', icon: Clock },
       transactions: { label: 'Transactions', icon: Receipt },
-      reports: { label: 'Reports', icon: BarChart3 },
       expenses: { label: 'Expenses', icon: CreditCard },
-      settings: { label: 'Settings', icon: Settings }
+      showcase: { label: 'Store Showcase', icon: Globe }
     };
     
     return availablePages.map(page => ({
       id: page,
-      ...navigationMap[page]
-    }));
+      ...navigationMap[page],
+      // Fallback for unmapped pages
+      label: navigationMap[page]?.label || page.charAt(0).toUpperCase() + page.slice(1),
+      icon: navigationMap[page]?.icon || Settings
+    })).filter(item => item.icon); // Filter out items without icons
   };
   
   return {

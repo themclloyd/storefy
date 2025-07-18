@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Plus, Package, AlertTriangle, Edit, Trash2, Loader2, Settings, TrendingUp, Download, CheckSquare, FolderOpen, History } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Search, Plus, Package, AlertTriangle, Edit, Trash2, Loader2, Settings, TrendingUp, Download, CheckSquare, FolderOpen, History, MoreVertical, Filter, Grid3X3, List, Globe } from "lucide-react";
 import { useStore } from "@/contexts/StoreContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { SecureAction, SecureButton } from "@/components/auth/SecureAction";
@@ -19,9 +20,10 @@ import { CategoriesView } from "./CategoriesView";
 import { FilteredInventoryView } from "./FilteredInventoryView";
 import { BulkOperationsBar } from "./BulkOperationsBar";
 import { BulkStockAdjustmentDialog } from "./BulkStockAdjustmentDialog";
-import { AdvancedFilters, FilterOptions } from "./AdvancedFilters";
+import { FilterOptions } from "./AdvancedFilters";
 import { ExportDialog } from "./ExportDialog";
 import { ProductHistoryModal } from "./ProductHistoryModal";
+import { ProductPublicVisibilityDialog } from "./ProductPublicVisibilityDialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useTax } from "@/hooks/useTax";
 
@@ -63,6 +65,7 @@ export function InventoryView() {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showStockDialog, setShowStockDialog] = useState(false);
+  const [showPublicVisibilityDialog, setShowPublicVisibilityDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showSuppliersView, setShowSuppliersView] = useState(false);
   const [showCategoriesView, setShowCategoriesView] = useState(false);
@@ -88,6 +91,14 @@ export function InventoryView() {
     sortBy: "name",
     sortOrder: "asc",
   });
+
+  // Mobile-specific states
+  const [viewMode, setViewMode] = useState<'table' | 'cards'>(() => {
+    // Default to cards on mobile, table on desktop
+    return window.innerWidth < 768 ? 'cards' : 'table';
+  });
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [showMobileActions, setShowMobileActions] = useState(false);
 
   useEffect(() => {
     if ((currentStore && user) || (currentStoreId && isPinSession)) {
@@ -242,6 +253,11 @@ export function InventoryView() {
     setShowDeleteDialog(true);
   };
 
+  const handlePublicVisibility = (product: Product) => {
+    setSelectedProduct(product);
+    setShowPublicVisibilityDialog(true);
+  };
+
   const handleStockAdjustment = (product: Product) => {
     setSelectedProduct(product);
     setShowStockDialog(true);
@@ -257,6 +273,7 @@ export function InventoryView() {
     setShowEditDialog(false);
     setShowDeleteDialog(false);
     setShowStockDialog(false);
+    setShowPublicVisibilityDialog(false);
     setShowHistoryModal(false);
   };
 
@@ -349,94 +366,209 @@ export function InventoryView() {
   }
 
   return (
-    <div className="space-y-4 md:space-y-6 p-4 md:p-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">Inventory Management</h1>
-          <p className="text-muted-foreground mt-1 md:mt-2">
-            Track and manage your product inventory
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setShowExportDialog(true)}
-            disabled={filteredInventory.length === 0}
-          >
-            <Download className="w-4 h-4 mr-2" />
-            Export
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setShowCategoriesView(true)}
-          >
-            <FolderOpen className="w-4 h-4 mr-2" />
-            Manage Categories
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setShowSuppliersView(true)}
-          >
-            <Settings className="w-4 h-4 mr-2" />
-            Manage Suppliers
-          </Button>
-          <SecureButton
-            permission="manage_inventory"
-            onClick={() => setShowAddDialog(true)}
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add Product
-          </SecureButton>
+    <div className="space-y-4 md:space-y-6 p-3 sm:p-4 md:p-6">
+      {/* Mobile Header */}
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">Inventory</h1>
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">
+              {filteredInventory.length} products
+            </p>
+          </div>
+
+          {/* Mobile Action Buttons */}
+          <div className="flex items-center gap-2">
+            {/* View Mode Toggle */}
+            <div className="hidden sm:flex items-center gap-1 bg-muted rounded-lg p-1">
+              <Button
+                variant={viewMode === "cards" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("cards")}
+                className="h-8 w-8 p-0"
+              >
+                <Grid3X3 className="w-4 h-4" />
+              </Button>
+              <Button
+                variant={viewMode === "table" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("table")}
+                className="h-8 w-8 p-0"
+              >
+                <List className="w-4 h-4" />
+              </Button>
+            </div>
+
+            {/* Mobile Filters */}
+            <Sheet open={showMobileFilters} onOpenChange={setShowMobileFilters}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="sm" className="sm:hidden">
+                  <Filter className="w-4 h-4" />
+                </Button>
+              </SheetTrigger>
+            </Sheet>
+
+            {/* Mobile Actions Menu */}
+            <Sheet open={showMobileActions} onOpenChange={setShowMobileActions}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="sm" className="sm:hidden">
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
+              </SheetTrigger>
+            </Sheet>
+
+            {/* Desktop Actions */}
+            <div className="hidden sm:flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowExportDialog(true)}
+                disabled={filteredInventory.length === 0}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                <span className="hidden md:inline">Export</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowCategoriesView(true)}
+              >
+                <FolderOpen className="w-4 h-4 mr-2" />
+                <span className="hidden lg:inline">Categories</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowSuppliersView(true)}
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                <span className="hidden lg:inline">Suppliers</span>
+              </Button>
+            </div>
+
+            {/* Add Product Button */}
+            <SecureButton
+              permission="manage_inventory"
+              onClick={() => setShowAddDialog(true)}
+              size="sm"
+              className="hidden sm:flex"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              <span className="hidden md:inline">Add Product</span>
+            </SecureButton>
+          </div>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+      {/* Stats Cards - Mobile Optimized */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
         <Card className="card-professional">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Products
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
+              Products
             </CardTitle>
-            <Package className="h-4 w-4 text-primary" />
+            <Package className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{products.length}</div>
+          <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+            <div className="text-lg sm:text-2xl font-bold text-foreground">{products.length}</div>
+            <p className="text-xs text-muted-foreground hidden sm:block">
+              {products.filter(p => p.is_active).length} active
+            </p>
           </CardContent>
         </Card>
 
         <Card className="card-professional">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Low Stock Alerts
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
+              Low Stock
             </CardTitle>
-            <AlertTriangle className="h-4 w-4 text-warning" />
+            <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 text-warning" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-warning">{lowStockItems.length}</div>
+          <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+            <div className="text-lg sm:text-2xl font-bold text-warning">{lowStockItems.length}</div>
+            <p className="text-xs text-muted-foreground hidden sm:block">
+              Need attention
+            </p>
           </CardContent>
         </Card>
 
-        <Card className="card-professional">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+        <Card className="card-professional col-span-2 sm:col-span-1">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
               Total Value
             </CardTitle>
-            <Package className="h-4 w-4 text-success" />
+            <Package className="h-3 w-3 sm:h-4 sm:w-4 text-success" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-success">
+          <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+            <div className="text-lg sm:text-2xl font-bold text-success">
               {formatCurrency(products.reduce((sum, item) => sum + (item.stock_quantity * item.cost), 0))}
+            </div>
+            <p className="text-xs text-muted-foreground hidden sm:block">
+              Inventory value
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Desktop Search Bar */}
+      <div className="hidden sm:block">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-4">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Search products by name or SKU..."
+                  value={filters.search}
+                  onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                  className="pl-10"
+                />
+              </div>
+              <select
+                value={filters.category}
+                onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
+                className="px-3 py-2 border border-border rounded-md bg-background text-foreground min-w-[150px]"
+              >
+                <option value="all">All Categories</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={filters.stockLevel}
+                onChange={(e) => setFilters(prev => ({ ...prev, stockLevel: e.target.value }))}
+                className="px-3 py-2 border border-border rounded-md bg-background text-foreground min-w-[140px]"
+              >
+                <option value="all">All Stock</option>
+                <option value="low">Low Stock</option>
+                <option value="out">Out of Stock</option>
+                <option value="in">In Stock</option>
+              </select>
+              {(filters.search || filters.category !== 'all' || filters.stockLevel !== 'all') && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setFilters({
+                    search: "",
+                    category: "all",
+                    supplier: "all",
+                    stockLevel: "all",
+                    priceRange: { min: null, max: null },
+                    sortBy: "name",
+                    sortOrder: "asc",
+                  })}
+                >
+                  Clear
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Advanced Filters */}
-      <AdvancedFilters
-        filters={filters}
-        onFiltersChange={setFilters}
-        onReset={resetFilters}
-      />
+
 
       {/* Inventory Table */}
       <Card className="card-professional">
@@ -452,8 +584,130 @@ export function InventoryView() {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <Table>
+          {/* Mobile Card View */}
+          {viewMode === 'cards' && (
+            <div className="p-3 sm:p-6 space-y-3">
+              {filteredInventory.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  {products.length === 0 ? "No products found. Add your first product to get started." : "No products match your search criteria."}
+                </div>
+              ) : (
+                filteredInventory.map((item) => (
+                  <Card key={item.id} className="border border-border hover:shadow-md transition-shadow">
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-3">
+                        {/* Product Image */}
+                        <div className="w-16 h-16 bg-muted rounded-lg overflow-hidden flex-shrink-0">
+                          {item.image_url ? (
+                            <img
+                              src={item.image_url}
+                              alt={item.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Package className="w-6 h-6 text-muted-foreground" />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Product Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="min-w-0 flex-1">
+                              <h3 className="font-semibold text-foreground truncate">{item.name}</h3>
+                              <p className="text-sm text-muted-foreground">SKU: {item.sku}</p>
+                            </div>
+                            <div className="flex items-center gap-2 ml-2">
+                              <Checkbox
+                                checked={selectedProducts.some(p => p.id === item.id)}
+                                onCheckedChange={(checked) => handleSelectProduct(item, checked as boolean)}
+                                aria-label={`Select ${item.name}`}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Product Details */}
+                          <div className="grid grid-cols-2 gap-2 text-sm mb-3">
+                            <div>
+                              <span className="text-muted-foreground">Category:</span>
+                              <p className="font-medium">{item.categories?.name || 'Uncategorized'}</p>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Stock:</span>
+                              <div className="flex items-center gap-1">
+                                <span className={`font-medium ${item.stock_quantity <= item.low_stock_threshold ? 'text-destructive' : 'text-foreground'}`}>
+                                  {item.stock_quantity}
+                                </span>
+                                {item.stock_quantity <= item.low_stock_threshold && (
+                                  <AlertTriangle className="w-3 h-3 text-destructive" />
+                                )}
+                              </div>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Price:</span>
+                              <p className="font-medium">{formatCurrency(item.price)}</p>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Supplier:</span>
+                              <p className="font-medium truncate">{item.suppliers?.name || 'No supplier'}</p>
+                            </div>
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex items-center gap-2">
+                            <SecureButton
+                              permission="manage_inventory"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedProduct(item);
+                                setShowStockDialog(true);
+                              }}
+                              className="flex-1"
+                            >
+                              <Package className="w-3 h-3 mr-1" />
+                              Stock
+                            </SecureButton>
+                            <SecureButton
+                              permission="manage_inventory"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedProduct(item);
+                                setShowEditDialog(true);
+                              }}
+                              className="flex-1"
+                            >
+                              <Edit className="w-3 h-3 mr-1" />
+                              Edit
+                            </SecureButton>
+                            <SecureButton
+                              permission="manage_inventory"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedProduct(item);
+                                setShowDeleteDialog(true);
+                              }}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </SecureButton>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          )}
+
+          {/* Desktop Table View */}
+          {viewMode === 'table' && (
+            <div className="overflow-x-auto">
+              <Table className="min-w-[800px]">
             <TableHeader>
               <TableRow>
                 <TableHead className="w-12">
@@ -556,6 +810,15 @@ export function InventoryView() {
                           permission="manage_inventory"
                           size="sm"
                           variant="outline"
+                          onClick={() => handlePublicVisibility(item)}
+                          title="Public Showcase Settings"
+                        >
+                          <Globe className="w-3 h-3" />
+                        </SecureButton>
+                        <SecureButton
+                          permission="manage_inventory"
+                          size="sm"
+                          variant="outline"
                           onClick={() => handleEditProduct(item)}
                           title="Edit Product"
                         >
@@ -578,7 +841,8 @@ export function InventoryView() {
               )}
             </TableBody>
           </Table>
-          </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -608,6 +872,13 @@ export function InventoryView() {
         onOpenChange={(open) => !open && handleDialogClose()}
         product={selectedProduct}
         onStockAdjusted={handleProductUpdated}
+      />
+
+      <ProductPublicVisibilityDialog
+        open={showPublicVisibilityDialog}
+        onOpenChange={(open) => !open && handleDialogClose()}
+        product={selectedProduct}
+        onUpdate={handleProductUpdated}
       />
 
       <BulkStockAdjustmentDialog
@@ -648,6 +919,173 @@ export function InventoryView() {
         }}
         onBulkStockAdjustment={handleBulkStockAdjustment}
       />
+
+      {/* Mobile Filters Sheet */}
+      <Sheet open={showMobileFilters} onOpenChange={setShowMobileFilters}>
+        <SheetContent side="right" className="w-full sm:w-[400px]">
+          <SheetHeader>
+            <SheetTitle>Filters & Search</SheetTitle>
+          </SheetHeader>
+          <div className="mt-6 space-y-4">
+            {/* Search */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Search Products</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Search by name or SKU..."
+                  value={filters.search}
+                  onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+
+            {/* Category Filter */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Category</label>
+              <select
+                value={filters.category}
+                onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
+                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
+              >
+                <option value="all">All Categories</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Stock Level Filter */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Stock Level</label>
+              <select
+                value={filters.stockLevel}
+                onChange={(e) => setFilters(prev => ({ ...prev, stockLevel: e.target.value }))}
+                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
+              >
+                <option value="all">All Stock Levels</option>
+                <option value="low">Low Stock</option>
+                <option value="out">Out of Stock</option>
+                <option value="in">In Stock</option>
+              </select>
+            </div>
+
+            <Button
+              onClick={() => {
+                setFilters({
+                  search: "",
+                  category: "all",
+                  supplier: "all",
+                  stockLevel: "all",
+                  priceRange: { min: null, max: null },
+                  sortBy: "name",
+                  sortOrder: "asc",
+                });
+                setShowMobileFilters(false);
+              }}
+              variant="outline"
+              className="w-full"
+            >
+              Reset Filters
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Mobile Actions Sheet */}
+      <Sheet open={showMobileActions} onOpenChange={setShowMobileActions}>
+        <SheetContent side="right" className="w-full sm:w-[400px]">
+          <SheetHeader>
+            <SheetTitle>Actions</SheetTitle>
+          </SheetHeader>
+          <div className="mt-6 space-y-3">
+            <SecureButton
+              permission="manage_inventory"
+              onClick={() => {
+                setShowAddDialog(true);
+                setShowMobileActions(false);
+              }}
+              className="w-full justify-start"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Product
+            </SecureButton>
+
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowCategoriesView(true);
+                setShowMobileActions(false);
+              }}
+              className="w-full justify-start"
+            >
+              <FolderOpen className="w-4 h-4 mr-2" />
+              Manage Categories
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowSuppliersView(true);
+                setShowMobileActions(false);
+              }}
+              className="w-full justify-start"
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              Manage Suppliers
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowExportDialog(true);
+                setShowMobileActions(false);
+              }}
+              disabled={filteredInventory.length === 0}
+              className="w-full justify-start"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export Data
+            </Button>
+
+            {selectedProducts.length > 0 && (
+              <>
+                <div className="border-t pt-3 mt-3">
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {selectedProducts.length} products selected
+                  </p>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowBulkStockDialog(true);
+                      setShowMobileActions(false);
+                    }}
+                    className="w-full justify-start"
+                  >
+                    <Package className="w-4 h-4 mr-2" />
+                    Bulk Stock Update
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Floating Add Button for Mobile */}
+      <div className="sm:hidden fixed bottom-20 right-4 z-40">
+        <SecureButton
+          permission="manage_inventory"
+          onClick={() => setShowAddDialog(true)}
+          className="h-14 w-14 rounded-full shadow-lg"
+          size="sm"
+        >
+          <Plus className="w-6 h-6" />
+        </SecureButton>
+      </div>
     </div>
   );
 }

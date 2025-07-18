@@ -1,8 +1,8 @@
-
 import { useEffect, useState, Suspense, lazy } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useStore } from "@/contexts/StoreContext";
 import { usePermissions } from "@/contexts/PermissionContext";
+import { useRoleBasedNavigation } from "@/hooks/useRoleBasedAccess";
 import { useNavigate, useSearchParams, useLocation, Navigate } from "react-router-dom";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
@@ -11,6 +11,7 @@ import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { ThemeToggleButton } from "@/components/ui/theme-toggle";
 import { PageLoading, InlineLoading } from "@/components/ui/modern-loading";
+import { usePageLoading } from "@/contexts/LoadingContext";
 import { pageStateManager } from "@/lib/pageStateManager";
 
 // Lazy load view components for code splitting
@@ -25,24 +26,30 @@ const CustomersView = lazy(() => import("@/components/customers/CustomersView").
 const ReportsView = lazy(() => import("@/components/reports/ReportsView").then(module => ({ default: module.ReportsView })));
 const SettingsView = lazy(() => import("@/components/settings/SettingsView").then(module => ({ default: module.SettingsView })));
 const StoreManagementView = lazy(() => import("@/components/stores/StoreManagementView").then(module => ({ default: module.StoreManagementView })));
+const AnalyticsView = lazy(() => import("@/components/analytics/AnalyticsView").then(module => ({ default: module.AnalyticsView })));
+const ShowcaseManagementView = lazy(() => import("@/components/showcase/ShowcaseManagementView").then(module => ({ default: module.ShowcaseManagementView })));
 
-// Loading component for Suspense fallback
+// Minimal loading component for Suspense fallback (component-level loading)
 const LoadingSpinner = ({ view = 'dashboard' }: { view?: string }) => (
-  <InlineLoading text={`Loading ${view}...`} size="lg" />
+  <div className="flex items-center justify-center p-8">
+    <InlineLoading text={`Loading ${view}...`} size="sm" />
+  </div>
 );
 
-const Index = () => {
+interface IndexProps {
+  activeView?: string;
+}
+
+const Index = ({ activeView: propActiveView = 'dashboard' }: IndexProps) => {
   const { user, loading: authLoading } = useAuth();
   const { currentStore, stores, loading: storeLoading, isOwner } = useStore();
+  const setPageLoading = usePageLoading();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
-  // Initialize activeView with last saved page or dashboard as fallback
-  const [activeView, setActiveView] = useState(() => {
-    // Try to restore last page if we have a valid session
-    const lastPage = pageStateManager.getLastPage(user?.id, currentStore?.id);
-    return lastPage && pageStateManager.isValidPage(lastPage) ? lastPage : "dashboard";
-  });
+
+  // Use prop activeView instead of internal routing logic
+  const [activeView, setActiveView] = useState(propActiveView);
 
   // Modern loading for initial app state
   const isInitialLoading = authLoading || storeLoading || (!user && !localStorage.getItem('pin_session'));
@@ -51,107 +58,32 @@ const Index = () => {
   const pinSession = localStorage.getItem('pin_session');
   const hasPinSession = pinSession !== null;
 
-  // Show modern loading during initial loading
-  if (isInitialLoading) {
-    return <PageLoading text="Loading application..." />;
-  }
-
   useEffect(() => {
     if (!authLoading && !user && !hasPinSession) {
       navigate("/");
     }
   }, [user, authLoading, navigate, hasPinSession]);
 
-  // Handle URL path for view selection with page state restoration
+  // Update activeView when prop changes (for React Router navigation)
   useEffect(() => {
-    const path = location.pathname;
-    const pathToView = {
-      '/app': 'dashboard',
-      '/dashboard': 'dashboard',
-      '/pos': 'pos',
-      '/inventory': 'inventory',
-      '/categories': 'categories',
-      '/suppliers': 'suppliers',
-      '/expenses': 'expenses',
-      '/layby': 'layby',
-      '/transactions': 'transactions',
-      '/customers': 'customers',
-      '/reports': 'reports',
-      '/settings': 'settings',
-      '/stores': 'stores'
-    };
+    setActiveView(propActiveView);
+  }, [propActiveView]);
 
-    // Check if this is a direct URL access or refresh
-    const isDirectAccess = !document.referrer || document.referrer.indexOf(window.location.origin) !== 0;
-
-    if (isDirectAccess && (path === '/app' || path === '/')) {
-      // For generic paths on direct access, try to restore last page
-      const lastPage = pageStateManager.getLastPage(user?.id, currentStore?.id);
-      if (lastPage && pageStateManager.isValidPage(lastPage)) {
-        console.log('🔄 Restoring last page on direct access:', lastPage);
-        setActiveView(lastPage);
-        // Update URL to match the restored page
-        const viewToPath = {
-          'dashboard': '/dashboard',
-          'pos': '/pos',
-          'inventory': '/inventory',
-          'categories': '/categories',
-          'suppliers': '/suppliers',
-          'expenses': '/expenses',
-          'layby': '/layby',
-          'transactions': '/transactions',
-          'customers': '/customers',
-          'reports': '/reports',
-          'settings': '/settings',
-          'stores': '/stores'
-        };
-        const restoredPath = viewToPath[lastPage as keyof typeof viewToPath] || '/dashboard';
-        navigate(restoredPath, { replace: true });
-        return;
-      }
-    }
-
-    // Normal path-based view selection
-    const view = pathToView[path as keyof typeof pathToView] || 'dashboard';
-    setActiveView(view);
-  }, [location.pathname, user?.id, currentStore?.id, navigate]);
-
-  // Update document title based on active view and save page state
+  // Save current page state when activeView changes
   useEffect(() => {
-    const viewTitles = {
-      dashboard: "Dashboard",
-      pos: "POS System",
-      inventory: "Inventory",
-      categories: "Categories",
-      suppliers: "Suppliers",
-      expenses: "Expenses",
-      layby: "Layby",
-      transactions: "Transactions",
-      customers: "Customers",
-      reports: "Reports",
-      settings: "Settings",
-      stores: "Store Management"
-    };
-
-    const viewTitle = viewTitles[activeView as keyof typeof viewTitles] || "Dashboard";
-    document.title = `${viewTitle} - Storefy`;
-
-    // Save current page state whenever activeView changes (including direct URL navigation)
-    if (user || localStorage.getItem('pin_session')) {
+    if (user?.id && currentStore?.id && activeView) {
       pageStateManager.saveCurrentPage(activeView, user?.id, currentStore?.id);
     }
   }, [activeView, user?.id, currentStore?.id]);
 
-  // Handle view changes with URL updates and page state persistence
+  // Handle view changes with React Router navigation
   const handleViewChange = (view: string) => {
-    setActiveView(view);
+    console.log('🔄 View change requested:', view);
 
-    // Save the current page state for restoration on refresh
-    pageStateManager.saveCurrentPage(view, user?.id, currentStore?.id);
-
-    // Navigate to clean URLs
+    // Navigate using React Router
     const viewToPath = {
       'dashboard': '/dashboard',
+      'analytics': '/analytics',
       'pos': '/pos',
       'inventory': '/inventory',
       'categories': '/categories',
@@ -161,61 +93,91 @@ const Index = () => {
       'transactions': '/transactions',
       'customers': '/customers',
       'reports': '/reports',
+      'showcase': '/showcase',
       'settings': '/settings',
       'stores': '/stores'
     };
 
-    const path = viewToPath[view as keyof typeof viewToPath] || '/dashboard';
-    navigate(path, { replace: false });
-  };
-
-  const renderView = () => {
-    // Show store management view for owners with multiple stores
-    if (isOwner && stores.length > 1 && activeView === "stores") {
-      return (
-        <Suspense fallback={<LoadingSpinner view="settings" />}>
-          <StoreManagementView />
-        </Suspense>
-      );
+    const newPath = viewToPath[view as keyof typeof viewToPath];
+    if (newPath) {
+      navigate(newPath);
     }
 
-    const viewComponent = (() => {
-      switch (activeView) {
-        case "dashboard":
-          return <SimpleDashboard onViewChange={handleViewChange} />;
-        case "pos":
-          return <POSView />;
-        case "inventory":
-          return <InventoryView />;
-        case "expenses":
-          return <ExpenseView />;
-        case "layby":
-          return <LaybyView />;
-        case "transactions":
-          return <TransactionView />;
-        case "customers":
-          return <CustomersView />;
-        case "reports":
-          return <ReportsView />;
-        case "settings":
-          return <SettingsView />;
-        case "stores":
-          return <StoreManagementView />;
-        default:
-          return <SimpleDashboard onViewChange={handleViewChange} />;
-      }
-    })();
-
-    return (
-      <Suspense fallback={<LoadingSpinner view={activeView} />}>
-        {viewComponent}
-      </Suspense>
-    );
+    // Save the page state
+    if (user?.id && currentStore?.id) {
+      pageStateManager.saveCurrentPage(view, user?.id, currentStore?.id);
+    }
   };
 
+  // Get available pages based on user permissions
+  const { getAvailablePages } = useRoleBasedNavigation();
+  const availablePages = getAvailablePages();
 
+  // Use unified loading system for initial loading
+  useEffect(() => {
+    if (isInitialLoading) {
+      setPageLoading(true, 'Loading application...');
+    } else {
+      setPageLoading(false);
+    }
 
-  // This is now handled by the skeleton loading above
+    return () => {
+      setPageLoading(false);
+    };
+  }, [isInitialLoading, setPageLoading]);
+
+  // Don't render anything while loading - the LoadingProvider will handle the UI
+  if (isInitialLoading) {
+    return null;
+  }
+
+  // Render the appropriate view component
+  const renderView = () => {
+    // Check if user has access to the current view
+    if (!availablePages.includes(activeView)) {
+      // Redirect to dashboard if no access
+      if (activeView !== 'dashboard') {
+        setActiveView('dashboard');
+        navigate('/dashboard', { replace: true });
+      }
+      return <SimpleDashboard />;
+    }
+
+    switch (activeView) {
+      case 'dashboard':
+        return <SimpleDashboard />;
+      case 'analytics':
+        return <AnalyticsView />;
+      case 'pos':
+        return <POSView />;
+      case 'inventory':
+        return <InventoryView />;
+      case 'expenses':
+        return <ExpenseView />;
+      case 'layby':
+        return <LaybyView />;
+      case 'transactions':
+        return <TransactionView />;
+      case 'customers':
+        return <CustomersView />;
+      case 'reports':
+        return <ReportsView />;
+      case 'showcase':
+        return <ShowcaseManagementView />;
+      case 'settings':
+        return <SettingsView />;
+      case 'stores':
+        return <StoreManagementView />;
+      default:
+        return <SimpleDashboard />;
+    }
+  };
+
+  const viewComponent = (
+    <Suspense fallback={<LoadingSpinner view={activeView} />}>
+      {renderView()}
+    </Suspense>
+  );
 
   // Redirect to auth if not logged in and no PIN session
   if (!user && !hasPinSession) {
@@ -227,14 +189,9 @@ const Index = () => {
     const pinData = JSON.parse(pinSession);
     
     if (storeLoading) {
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-background">
-          <div className="text-center">
-            <div className="w-8 h-8 bg-primary rounded-full animate-pulse mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading store...</p>
-          </div>
-        </div>
-      );
+      // Use unified loading system
+      setPageLoading(true, 'Loading store...');
+      return null;
     }
 
     return (
@@ -247,7 +204,7 @@ const Index = () => {
         <SidebarInset>
           <div className="flex-1 overflow-auto">
             <div className="p-6">
-              {renderView()}
+              {viewComponent}
             </div>
           </div>
         </SidebarInset>
@@ -278,16 +235,9 @@ const Index = () => {
     return <Navigate to="/pin-login" replace />;
   }
 
-  // If PIN user but no current store, there's an issue - redirect to PIN login
-  if (!currentStore && hasPinSession) {
-    localStorage.removeItem('pin_session');
-    window.location.href = '/pin-login';
-    return null;
-  }
-
+  // Main application layout with sidebar
   return (
     <SidebarProvider defaultOpen={true}>
-      {/* Sidebar */}
       <Sidebar
         collapsible="icon"
         activeView={activeView}
@@ -295,32 +245,26 @@ const Index = () => {
       />
 
       <SidebarInset>
-        {/* Header with Breadcrumbs */}
         <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="flex items-center gap-4 px-4">
             <SidebarTrigger className="h-8 w-8" />
             <div className="h-4 w-px bg-border" />
             <Breadcrumbs activeView={activeView} />
           </div>
-
-          {/* Theme Toggle in Top Right */}
-          <div className="flex items-center gap-2 px-4 ml-auto">
+          <div className="ml-auto px-4">
             <ThemeToggleButton />
           </div>
         </header>
 
-        {/* Main Content */}
         <div className="flex-1 overflow-auto">
-          <div className="p-4 md:p-6 pb-20 md:pb-6">
-            {renderView()}
+          <div className="p-6">
+            {viewComponent}
           </div>
         </div>
-
-        {/* Mobile Bottom Navigation */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50">
-          <MobileBottomNav activeView={activeView} onViewChange={handleViewChange} />
-        </div>
       </SidebarInset>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav activeView={activeView} onViewChange={handleViewChange} />
     </SidebarProvider>
   );
 };

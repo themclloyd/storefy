@@ -1113,9 +1113,13 @@ export type Database = {
           id: string
           image_url: string | null
           is_active: boolean | null
+          is_public: boolean | null
           low_stock_threshold: number | null
           name: string
           price: number
+          public_description: string | null
+          show_price_publicly: boolean | null
+          show_stock_publicly: boolean | null
           sku: string | null
           stock_quantity: number | null
           store_id: string
@@ -1130,9 +1134,13 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean | null
+          is_public?: boolean | null
           low_stock_threshold?: number | null
           name: string
           price: number
+          public_description?: string | null
+          show_price_publicly?: boolean | null
+          show_stock_publicly?: boolean | null
           sku?: string | null
           stock_quantity?: number | null
           store_id: string
@@ -1147,9 +1155,13 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean | null
+          is_public?: boolean | null
           low_stock_threshold?: number | null
           name?: string
           price?: number
+          public_description?: string | null
+          show_price_publicly?: boolean | null
+          show_stock_publicly?: boolean | null
           sku?: string | null
           stock_quantity?: number | null
           store_id?: string
@@ -1206,6 +1218,54 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      showcase_analytics: {
+        Row: {
+          created_at: string | null
+          event_type: string
+          id: string
+          ip_address: unknown | null
+          product_id: string | null
+          referrer: string | null
+          store_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_type: string
+          id?: string
+          ip_address?: unknown | null
+          product_id?: string | null
+          referrer?: string | null
+          store_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_type?: string
+          id?: string
+          ip_address?: unknown | null
+          product_id?: string | null
+          referrer?: string | null
+          store_id?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "showcase_analytics_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "showcase_analytics_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       security_events: {
         Row: {
@@ -1483,10 +1543,19 @@ export type Database = {
           created_at: string
           currency: string | null
           email: string | null
+          enable_public_showcase: boolean | null
           id: string
           name: string
           owner_id: string
           phone: string | null
+          showcase_banner_url: string | null
+          showcase_contact_info: Json | null
+          showcase_description: string | null
+          showcase_logo_url: string | null
+          showcase_seo_description: string | null
+          showcase_seo_title: string | null
+          showcase_slug: string | null
+          showcase_theme: Json | null
           store_code: string
           tax_rate: number | null
           updated_at: string
@@ -1496,10 +1565,19 @@ export type Database = {
           created_at?: string
           currency?: string | null
           email?: string | null
+          enable_public_showcase?: boolean | null
           id?: string
           name: string
           owner_id: string
           phone?: string | null
+          showcase_banner_url?: string | null
+          showcase_contact_info?: Json | null
+          showcase_description?: string | null
+          showcase_logo_url?: string | null
+          showcase_seo_description?: string | null
+          showcase_seo_title?: string | null
+          showcase_slug?: string | null
+          showcase_theme?: Json | null
           store_code: string
           tax_rate?: number | null
           updated_at?: string
@@ -1509,10 +1587,19 @@ export type Database = {
           created_at?: string
           currency?: string | null
           email?: string | null
+          enable_public_showcase?: boolean | null
           id?: string
           name?: string
           owner_id?: string
           phone?: string | null
+          showcase_banner_url?: string | null
+          showcase_contact_info?: Json | null
+          showcase_description?: string | null
+          showcase_logo_url?: string | null
+          showcase_seo_description?: string | null
+          showcase_seo_title?: string | null
+          showcase_slug?: string | null
+          showcase_theme?: Json | null
           store_code?: string
           tax_rate?: number | null
           updated_at?: string
