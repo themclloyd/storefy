@@ -113,8 +113,9 @@ export function StoreShortLinkPage() {
         return;
       }
 
-      // Store member session info in localStorage for PIN-based access
-      localStorage.setItem('pin_session', JSON.stringify({
+      // Store member session info using session manager for proper timeout handling
+      const { sessionManager } = await import('@/lib/sessionManager');
+      sessionManager.createPinSession({
         member_id: memberData.id,
         user_id: memberData.user_id,
         store_id: memberData.store_id,
@@ -122,7 +123,7 @@ export function StoreShortLinkPage() {
         name: displayName,
         store_name: memberData.stores.name,
         login_time: new Date().toISOString()
-      }));
+      });
 
       // Refresh PIN session client to load new session
       pinSessionClient.refreshPinSession();

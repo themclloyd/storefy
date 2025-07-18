@@ -70,72 +70,70 @@ export function TransactionReceiptDialog({
 
   const handlePrint = () => {
     if (receiptRef.current) {
-      const printWindow = window.open('', '_blank');
-      if (printWindow) {
-        printWindow.document.write(`
-          <html>
-            <head>
-              <title>Receipt - ${transactionNumber}</title>
-              <style>
-                body {
-                  font-family: 'Courier New', monospace;
-                  margin: 0;
-                  padding: 10px;
-                  font-size: 12px;
-                  line-height: 1.3;
-                  width: 80mm;
-                  max-width: 80mm;
-                }
-                .receipt-content {
-                  width: 100%;
-                }
-                .text-center { text-align: center; }
-                .font-bold { font-weight: bold; }
-                .space-y-1 > * + * { margin-top: 4px; }
-                .space-y-2 > * + * { margin-top: 8px; }
-                .space-y-3 > * + * { margin-top: 12px; }
-                .space-y-4 > * + * { margin-top: 16px; }
-                .flex { display: flex; }
-                .justify-between { justify-content: space-between; }
-                .items-start { align-items: flex-start; }
-                .flex-1 { flex: 1; }
-                hr { border: none; border-top: 1px dashed #000; margin: 8px 0; }
-                .text-sm { font-size: 11px; }
-                .text-xs { font-size: 10px; }
-                .text-lg { font-size: 14px; }
-                .text-red-600 { color: #dc2626; }
-                .text-green-600 { color: #16a34a; }
-                .no-print { display: block; }
-                @media print {
-                  body {
-                    margin: 0;
-                    padding: 5px;
-                    -webkit-print-color-adjust: exact;
-                    color-adjust: exact;
-                  }
-                  .no-print { display: none !important; }
-                  @page {
-                    size: 80mm auto;
-                    margin: 0;
-                  }
-                }
-              </style>
-            </head>
-            <body>
-              ${receiptRef.current.innerHTML}
-            </body>
-          </html>
-        `);
-        printWindow.document.close();
+      // Create a secure print stylesheet
+      const printStyles = `
+        @media print {
+          body {
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 10px;
+            font-size: 12px;
+            line-height: 1.3;
+            width: 80mm;
+            max-width: 80mm;
+            -webkit-print-color-adjust: exact;
+            color-adjust: exact;
+          }
+          .receipt-content {
+            width: 100%;
+          }
+          .text-center { text-align: center; }
+          .font-bold { font-weight: bold; }
+          .space-y-1 > * + * { margin-top: 4px; }
+          .space-y-2 > * + * { margin-top: 8px; }
+          .space-y-3 > * + * { margin-top: 12px; }
+          .space-y-4 > * + * { margin-top: 16px; }
+          .flex { display: flex; }
+          .justify-between { justify-content: space-between; }
+          .items-start { align-items: flex-start; }
+          .flex-1 { flex: 1; }
+          hr { border: none; border-top: 1px dashed #000; margin: 8px 0; }
+          .text-sm { font-size: 11px; }
+          .text-xs { font-size: 10px; }
+          .text-lg { font-size: 14px; }
+          .text-red-600 { color: #dc2626; }
+          .text-green-600 { color: #16a34a; }
+          .no-print { display: none !important; }
+          @page {
+            size: 80mm auto;
+            margin: 0;
+          }
+        }
+      `;
 
-        // Wait for content to load before printing
-        setTimeout(() => {
-          printWindow.print();
-          printWindow.close();
-        }, 250);
+      // Create a temporary print stylesheet
+      const printStyleSheet = document.createElement('style');
+      printStyleSheet.type = 'text/css';
+      printStyleSheet.textContent = printStyles;
+      document.head.appendChild(printStyleSheet);
 
-        toast.success('Receipt sent to printer');
-      }
+      // Use window.print() instead of opening a new window
+      const originalContent = document.body.innerHTML;
+      const printContent = receiptRef.current.innerHTML;
+      
+      // Replace body content temporarily
+      document.body.innerHTML = printContent;
+      
+      // Print
+      window.print();
+      
+      // Restore original content
+      document.body.innerHTML = originalContent;
+      
+      // Remove temporary stylesheet
+      document.head.removeChild(printStyleSheet);
+
+      toast.success('Receipt sent to printer');
     }
   };
 

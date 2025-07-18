@@ -1,6 +1,8 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useRoleBasedNavigation } from '@/hooks/useRoleBasedAccess';
+import { sessionManager } from '@/lib/sessionManager';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +20,8 @@ import {
   Crown,
   UserCheck,
   Users,
-  ChevronDown
+  ChevronDown,
+  CreditCard
 } from 'lucide-react';
 
 interface UserMenuProps {
@@ -28,16 +31,16 @@ interface UserMenuProps {
 export function UserMenu({ onViewChange }: UserMenuProps) {
   const { user, signOut } = useAuth();
   const { userRole } = useRoleBasedNavigation();
+  const navigate = useNavigate();
 
-  // Check for PIN session
-  const pinSession = localStorage.getItem('pin_session');
-  const pinData = pinSession ? JSON.parse(pinSession) : null;
+  // Check for PIN session using session manager
+  const pinData = sessionManager.getPinSession();
 
   const handleSignOut = async () => {
     // Clear PIN session if exists
-    if (pinSession) {
-      localStorage.removeItem('pin_session');
-      window.location.href = '/pin-login';
+    if (pinData) {
+      sessionManager.clearPinSession();
+      navigate('/pin-login');
       return;
     }
 
@@ -49,6 +52,12 @@ export function UserMenu({ onViewChange }: UserMenuProps) {
       onViewChange('settings');
     }
   };
+
+  const handleSubscription = () => {
+    navigate('/subscription');
+  };
+
+
 
   const getRoleIcon = (role: string) => {
     switch (role) {
@@ -77,14 +86,14 @@ export function UserMenu({ onViewChange }: UserMenuProps) {
   };
 
   // Get display name and email
-  const displayName = pinData?.member_name || user?.email?.split('@')[0] || 'User';
+  const displayName = pinData?.name || user?.email?.split('@')[0] || 'User';
   const displayEmail = pinData ? null : user?.email;
   const displayRole = userRole?.role || 'member';
 
   // Get initials for avatar
   const initials = displayName
     .split(' ')
-    .map(name => name[0])
+    .map((name: string) => name[0])
     .join('')
     .toUpperCase()
     .slice(0, 2);
@@ -142,13 +151,22 @@ export function UserMenu({ onViewChange }: UserMenuProps) {
           <Settings className="w-4 h-4 mr-2" />
           Settings
         </DropdownMenuItem>
+        {/* Only show subscription for main users (not PIN sessions) */}
+        {!pinData && (
+          <DropdownMenuItem onClick={handleSubscription} className="cursor-pointer">
+            <CreditCard className="w-4 h-4 mr-2" />
+            Subscription
+          </DropdownMenuItem>
+        )}
+
+
         <DropdownMenuSeparator />
-        <DropdownMenuItem 
-          onClick={handleSignOut} 
+        <DropdownMenuItem
+          onClick={handleSignOut}
           className="cursor-pointer text-destructive focus:text-destructive"
         >
           <LogOut className="w-4 h-4 mr-2" />
-          {pinSession ? "End Session" : "Sign Out"}
+          {pinData ? "End Session" : "Sign Out"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

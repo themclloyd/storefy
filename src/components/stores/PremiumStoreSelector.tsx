@@ -4,10 +4,16 @@ import { Badge } from '@/components/ui/badge';
 import { Building2, Users, Crown, UserCheck, Store, ArrowRight, LogOut, Plus, MapPin } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { CreateStoreDialog } from './CreateStoreDialog';
+import { StoreSelectorSkeleton, CompactStoreSelectorSkeleton } from '@/components/ui/store-selector-skeleton';
 
 export function PremiumStoreSelector() {
-  const { stores, currentStore, selectStore } = useStore();
+  const { stores, currentStore, selectStore, loading } = useStore();
   const { user, signOut } = useAuth();
+
+  // Show skeleton while loading stores
+  if (loading) {
+    return stores.length === 0 ? <CompactStoreSelectorSkeleton /> : <StoreSelectorSkeleton />;
+  }
 
   const getRoleIcon = (role: string) => {
     switch (role) {
@@ -126,7 +132,10 @@ export function PremiumStoreSelector() {
 
             <div
               className="border border-border rounded-lg p-6 cursor-pointer hover:bg-muted/50 transition-colors space-y-4"
-              onClick={() => selectStore(singleStore.id)}
+              onClick={() => {
+                console.log('🖱️ Single store clicked:', singleStore.id, singleStore.name);
+                selectStore(singleStore.id);
+              }}
             >
               <div className="text-center space-y-2">
                 <div className="w-6 h-6 bg-primary rounded mx-auto flex items-center justify-center">
@@ -209,7 +218,10 @@ export function PremiumStoreSelector() {
                     ? 'bg-primary/5 border-primary'
                     : 'hover:bg-muted/50'
                 }`}
-                onClick={() => selectStore(store.id)}
+                onClick={() => {
+                console.log('🖱️ Store clicked:', store.id, store.name);
+                selectStore(store.id);
+              }}
               >
                 <div className="flex items-center space-x-4">
                   <div className={`w-8 h-8 rounded flex items-center justify-center flex-shrink-0 ${

@@ -1,0 +1,1400 @@
+script.js:1 Ignoring Event: localhost
+y @ script.js:1
+b @ script.js:1
+n @ script.js:1
+(anonymous) @ script.js:1
+n @ script.js:1
+(anonymous) @ script.js:1
+(anonymous) @ script.js:1
+paychangu.ts:65 PayChangu service initialized with key: Present
+HiddenAdminAccess.tsx:148 🔧 Admin access helper available: window.adminAccess.showHelp()
+AppInitializationContext.tsx:72 🚀 Starting app initialization...
+AppInitializationContext.tsx:77 📋 Phase 1: Checking authentication... {authLoading: true, hasUser: false, hasPinSession: false}
+AppInitializationContext.tsx:85 ⏳ Waiting for auth to complete...
+sessionTest.ts:234 🔧 Session testing utilities available at window.sessionTest
+sessionTest.ts:235    - runAll(): Run all tests
+sessionTest.ts:236    - info(): Show current session info
+sessionTest.ts:237    - expiry(): Test session expiry (1 minute)
+sessionTest.ts:238    - cleanup(): Clean up test sessions
+sessionTest.ts:239    - debugStore(): Debug store selection issues
+App.tsx:100 🔧 Session testing utilities loaded. Use window.sessionTest in console.
+AppInitializationContext.tsx:72 🚀 Starting app initialization...
+AppInitializationContext.tsx:77 📋 Phase 1: Checking authentication... {authLoading: false, hasUser: false, hasPinSession: false}
+AppInitializationContext.tsx:103 ❌ No authentication found
+AppInitializationContext.tsx:139 🎉 App initialization complete!
+StoreContext.tsx:331 🔄 Main store fetch useEffect triggered: {hasUser: false, userId: undefined, authLoading: false}
+StoreContext.tsx:341 ❌ No user, clearing stores
+StoreContext.tsx:350 🗑️ User explicitly logged out (auth complete), clearing store selection
+pageStateManager.ts:133 🗑️ Page state cleared
+StoreContext.tsx:361 Skipping store restoration: {hasPinData: false, hasUser: false, storesCount: 0, hasCurrentStore: false}
+StoreContext.tsx:361 Skipping store restoration: {hasPinData: false, hasUser: false, storesCount: 0, hasCurrentStore: false}
+script.debug.js:1 [Vercel Web Analytics] Debug mode is enabled by default in development. No requests will be sent to the server.
+script.debug.js:1 [Vercel Web Analytics] Running queued event event {name: 'page_view', data: {…}, options: undefined}
+script.debug.js:1 [Vercel Web Analytics] [event] page_view {o: 'http://localhost:8080/', sv: '0.1.3', sdkn: '@vercel/analytics/react', sdkv: '1.5.0', ts: 1752798078330, …}
+script.debug.js:1 [Vercel Web Analytics] [pageview] http://localhost:8080/ {o: 'http://localhost:8080/', sv: '0.1.3', sdkn: '@vercel/analytics/react', sdkv: '1.5.0', ts: 1752798078330, …}
+script.debug.js:1 [Vercel Web Analytics] [event] page_view {o: 'http://localhost:8080/', sv: '0.1.3', sdkn: '@vercel/analytics/react', sdkv: '1.5.0', ts: 1752798079030, …}
+script.js:1 Ignoring Event: localhost
+overrideMethod @ hook.js:608
+y @ script.js:1
+b @ script.js:1
+n @ script.js:1
+i @ script.js:1
+r.pushState @ script.js:1
+history.pushState @ extend-native-history-api.js:1
+history.pushState @ script.debug.js:1
+push @ react-router-dom.js?v=d11540c6:625
+(anonymous) @ react-router-dom.js?v=d11540c6:5300
+(anonymous) @ HiddenAdminAccess.tsx:104
+setTimeout
+checkSpecialUrls @ HiddenAdminAccess.tsx:103
+(anonymous) @ HiddenAdminAccess.tsx:109
+react-stack-bottom-frame @ react-dom_client.js?v=d11540c6:17478
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+commitHookEffectListMount @ react-dom_client.js?v=d11540c6:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=d11540c6:8518
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9887
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9899
+flushPassiveEffects @ react-dom_client.js?v=d11540c6:11302
+(anonymous) @ react-dom_client.js?v=d11540c6:11060
+performWorkUntilDeadline @ react-dom_client.js?v=d11540c6:36
+<HiddenAdminAccess>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=d11540c6:250
+AppContent @ App.tsx:56
+react-stack-bottom-frame @ react-dom_client.js?v=d11540c6:17424
+renderWithHooks @ react-dom_client.js?v=d11540c6:4206
+updateFunctionComponent @ react-dom_client.js?v=d11540c6:6619
+beginWork @ react-dom_client.js?v=d11540c6:7654
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+performUnitOfWork @ react-dom_client.js?v=d11540c6:10868
+workLoopSync @ react-dom_client.js?v=d11540c6:10728
+renderRootSync @ react-dom_client.js?v=d11540c6:10711
+performWorkOnRoot @ react-dom_client.js?v=d11540c6:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=d11540c6:11623
+performWorkUntilDeadline @ react-dom_client.js?v=d11540c6:36
+<AppContent>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=d11540c6:250
+App @ App.tsx:114
+react-stack-bottom-frame @ react-dom_client.js?v=d11540c6:17424
+renderWithHooks @ react-dom_client.js?v=d11540c6:4206
+updateFunctionComponent @ react-dom_client.js?v=d11540c6:6619
+beginWork @ react-dom_client.js?v=d11540c6:7654
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+performUnitOfWork @ react-dom_client.js?v=d11540c6:10868
+workLoopSync @ react-dom_client.js?v=d11540c6:10728
+renderRootSync @ react-dom_client.js?v=d11540c6:10711
+performWorkOnRoot @ react-dom_client.js?v=d11540c6:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=d11540c6:11623
+performWorkUntilDeadline @ react-dom_client.js?v=d11540c6:36
+<App>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=d11540c6:250
+(anonymous) @ main.tsx:8
+script.debug.js:1 [Vercel Web Analytics] [pageview] http://localhost:8080/system {o: 'http://localhost:8080/system', sv: '0.1.3', sdkn: '@vercel/analytics/react', sdkv: '1.5.0', ts: 1752798079041, …}
+script.debug.js:1 [Vercel Web Analytics] [event] page_view {o: 'http://localhost:8080/system', sv: '0.1.3', sdkn: '@vercel/analytics/react', sdkv: '1.5.0', ts: 1752798079659, …}
+SystemManagementView.tsx?t=1752797756608:151 Uncaught ReferenceError: LogOut is not defined
+    at SystemManagementView (SystemManagementView.tsx?t=1752797756608:151:67)
+    at react-stack-bottom-frame (react-dom_client.js?v=d11540c6:17424:20)
+    at renderWithHooks (react-dom_client.js?v=d11540c6:4206:24)
+    at updateFunctionComponent (react-dom_client.js?v=d11540c6:6619:21)
+    at beginWork (react-dom_client.js?v=d11540c6:7654:20)
+    at runWithFiberInDEV (react-dom_client.js?v=d11540c6:1485:72)
+    at performUnitOfWork (react-dom_client.js?v=d11540c6:10868:98)
+    at workLoopSync (react-dom_client.js?v=d11540c6:10728:43)
+    at renderRootSync (react-dom_client.js?v=d11540c6:10711:13)
+    at performWorkOnRoot (react-dom_client.js?v=d11540c6:10359:46)
+SystemManagementView @ SystemManagementView.tsx?t=1752797756608:151
+react-stack-bottom-frame @ react-dom_client.js?v=d11540c6:17424
+renderWithHooks @ react-dom_client.js?v=d11540c6:4206
+updateFunctionComponent @ react-dom_client.js?v=d11540c6:6619
+beginWork @ react-dom_client.js?v=d11540c6:7654
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+performUnitOfWork @ react-dom_client.js?v=d11540c6:10868
+workLoopSync @ react-dom_client.js?v=d11540c6:10728
+renderRootSync @ react-dom_client.js?v=d11540c6:10711
+performWorkOnRoot @ react-dom_client.js?v=d11540c6:10359
+performSyncWorkOnRoot @ react-dom_client.js?v=d11540c6:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=d11540c6:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=d11540c6:11558
+(anonymous) @ react-dom_client.js?v=d11540c6:11649
+<...>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=d11540c6:250
+AppContent @ App.tsx:76
+react-stack-bottom-frame @ react-dom_client.js?v=d11540c6:17424
+renderWithHooks @ react-dom_client.js?v=d11540c6:4206
+updateFunctionComponent @ react-dom_client.js?v=d11540c6:6619
+beginWork @ react-dom_client.js?v=d11540c6:7654
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+performUnitOfWork @ react-dom_client.js?v=d11540c6:10868
+workLoopSync @ react-dom_client.js?v=d11540c6:10728
+renderRootSync @ react-dom_client.js?v=d11540c6:10711
+performWorkOnRoot @ react-dom_client.js?v=d11540c6:10330
+performSyncWorkOnRoot @ react-dom_client.js?v=d11540c6:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=d11540c6:11536
+flushSyncWork$1 @ react-dom_client.js?v=d11540c6:10567
+f @ react-dom_client.js?v=d11540c6:17681
+exports.flushSync @ chunk-Y5BGZF4O.js?v=d11540c6:92
+(anonymous) @ sonner.js?v=d11540c6:923
+<AppContent>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=d11540c6:250
+App @ App.tsx:114
+react-stack-bottom-frame @ react-dom_client.js?v=d11540c6:17424
+renderWithHooks @ react-dom_client.js?v=d11540c6:4206
+updateFunctionComponent @ react-dom_client.js?v=d11540c6:6619
+beginWork @ react-dom_client.js?v=d11540c6:7654
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+performUnitOfWork @ react-dom_client.js?v=d11540c6:10868
+workLoopSync @ react-dom_client.js?v=d11540c6:10728
+renderRootSync @ react-dom_client.js?v=d11540c6:10711
+performWorkOnRoot @ react-dom_client.js?v=d11540c6:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=d11540c6:11623
+performWorkUntilDeadline @ react-dom_client.js?v=d11540c6:36
+<App>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=d11540c6:250
+(anonymous) @ main.tsx:8
+App.tsx:76 An error occurred in the <SystemManagementView> component.
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
+
+overrideMethod @ hook.js:608
+defaultOnUncaughtError @ react-dom_client.js?v=d11540c6:6229
+logUncaughtError @ react-dom_client.js?v=d11540c6:6283
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+lane.callback @ react-dom_client.js?v=d11540c6:6311
+callCallback @ react-dom_client.js?v=d11540c6:4097
+commitCallbacks @ react-dom_client.js?v=d11540c6:4109
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1487
+commitLayoutEffectOnFiber @ react-dom_client.js?v=d11540c6:9029
+flushLayoutEffects @ react-dom_client.js?v=d11540c6:11174
+commitRoot @ react-dom_client.js?v=d11540c6:11080
+commitRootWhenReady @ react-dom_client.js?v=d11540c6:10512
+performWorkOnRoot @ react-dom_client.js?v=d11540c6:10457
+performSyncWorkOnRoot @ react-dom_client.js?v=d11540c6:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=d11540c6:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=d11540c6:11558
+(anonymous) @ react-dom_client.js?v=d11540c6:11649
+<...>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=d11540c6:250
+AppContent @ App.tsx:76
+react-stack-bottom-frame @ react-dom_client.js?v=d11540c6:17424
+renderWithHooks @ react-dom_client.js?v=d11540c6:4206
+updateFunctionComponent @ react-dom_client.js?v=d11540c6:6619
+beginWork @ react-dom_client.js?v=d11540c6:7654
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+performUnitOfWork @ react-dom_client.js?v=d11540c6:10868
+workLoopSync @ react-dom_client.js?v=d11540c6:10728
+renderRootSync @ react-dom_client.js?v=d11540c6:10711
+performWorkOnRoot @ react-dom_client.js?v=d11540c6:10330
+performSyncWorkOnRoot @ react-dom_client.js?v=d11540c6:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=d11540c6:11536
+flushSyncWork$1 @ react-dom_client.js?v=d11540c6:10567
+f @ react-dom_client.js?v=d11540c6:17681
+exports.flushSync @ chunk-Y5BGZF4O.js?v=d11540c6:92
+(anonymous) @ sonner.js?v=d11540c6:923
+<AppContent>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=d11540c6:250
+App @ App.tsx:114
+react-stack-bottom-frame @ react-dom_client.js?v=d11540c6:17424
+renderWithHooks @ react-dom_client.js?v=d11540c6:4206
+updateFunctionComponent @ react-dom_client.js?v=d11540c6:6619
+beginWork @ react-dom_client.js?v=d11540c6:7654
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+performUnitOfWork @ react-dom_client.js?v=d11540c6:10868
+workLoopSync @ react-dom_client.js?v=d11540c6:10728
+renderRootSync @ react-dom_client.js?v=d11540c6:10711
+performWorkOnRoot @ react-dom_client.js?v=d11540c6:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=d11540c6:11623
+performWorkUntilDeadline @ react-dom_client.js?v=d11540c6:36
+<App>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=d11540c6:250
+(anonymous) @ main.tsx:8
+script.debug.js:1 [Vercel Web Analytics] [event] error_occurred {o: 'http://localhost:8080/system', sv: '0.1.3', sdkn: '@vercel/analytics/react', sdkv: '1.5.0', ts: 1752798097353, …}
+AppInitializationContext.tsx:72 🚀 Starting app initialization...
+AppInitializationContext.tsx:77 📋 Phase 1: Checking authentication... {authLoading: true, hasUser: false, hasPinSession: false}
+AppInitializationContext.tsx:85 ⏳ Waiting for auth to complete...
+AppInitializationContext.tsx:72 🚀 Starting app initialization...
+AppInitializationContext.tsx:77 📋 Phase 1: Checking authentication... {authLoading: false, hasUser: false, hasPinSession: false}
+AppInitializationContext.tsx:103 ❌ No authentication found
+AppInitializationContext.tsx:139 🎉 App initialization complete!
+App.tsx:100 🔧 Session testing utilities loaded. Use window.sessionTest in console.
+StoreContext.tsx:331 🔄 Main store fetch useEffect triggered: {hasUser: false, userId: undefined, authLoading: false}
+StoreContext.tsx:341 ❌ No user, clearing stores
+StoreContext.tsx:350 🗑️ User explicitly logged out (auth complete), clearing store selection
+pageStateManager.ts:133 🗑️ Page state cleared
+StoreContext.tsx:361 Skipping store restoration: {hasPinData: false, hasUser: false, storesCount: 0, hasCurrentStore: false}
+script.debug.js:1 [Vercel Web Analytics] [event] page_view {o: 'http://localhost:8080/system', sv: '0.1.3', sdkn: '@vercel/analytics/react', sdkv: '1.5.0', ts: 1752798177009, …}
+script.debug.js:1 [Vercel Web Analytics] [event] performance_metric {o: 'http://localhost:8080/system', sv: '0.1.3', sdkn: '@vercel/analytics/react', sdkv: '1.5.0', ts: 1752798177010, …}
+StoreContext.tsx:361 Skipping store restoration: {hasPinData: false, hasUser: false, storesCount: 0, hasCurrentStore: false}
+requests.js:1  GET https://irmuaqhwmtgbkftqlohx.supabase.co/rest/v1/activity_logs?select=id%2Caction%2Ccreated_at%2Cuser_id%2Cstore_id%2Cmetadata%2Cprofiles%21inner%28display_name%29%2Cstores%28name%29&order=created_at.desc&limit=50 400 (Bad Request)
+s.fetch @ requests.js:1
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3929
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3950
+fulfilled @ @supabase_supabase-js.js?v=d11540c6:3902
+Promise.then
+step @ @supabase_supabase-js.js?v=d11540c6:3915
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3917
+__awaiter6 @ @supabase_supabase-js.js?v=d11540c6:3899
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3940
+then @ @supabase_supabase-js.js?v=d11540c6:89
+requests.js:1  GET https://irmuaqhwmtgbkftqlohx.supabase.co/rest/v1/transactions?select=total_amount 400 (Bad Request)
+s.fetch @ requests.js:1
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3929
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3950
+fulfilled @ @supabase_supabase-js.js?v=d11540c6:3902
+Promise.then
+step @ @supabase_supabase-js.js?v=d11540c6:3915
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3917
+__awaiter6 @ @supabase_supabase-js.js?v=d11540c6:3899
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3940
+then @ @supabase_supabase-js.js?v=d11540c6:89
+requests.js:1  HEAD https://irmuaqhwmtgbkftqlohx.supabase.co/rest/v1/activity_logs?select=user_id&created_at=gte.2025-07-17T00%3A23%3A00.673Z 400 (Bad Request)
+s.fetch @ requests.js:1
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3929
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3950
+fulfilled @ @supabase_supabase-js.js?v=d11540c6:3902
+Promise.then
+step @ @supabase_supabase-js.js?v=d11540c6:3915
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3917
+__awaiter6 @ @supabase_supabase-js.js?v=d11540c6:3899
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3940
+then @ @supabase_supabase-js.js?v=d11540c6:89
+script.debug.js:1 [Vercel Web Analytics] [event] page_view {o: 'http://localhost:8080/system', sv: '0.1.3', sdkn: '@vercel/analytics/react', sdkv: '1.5.0', ts: 1752798280617, …}
+script.debug.js:1 [Vercel Web Analytics] [event] page_view {o: 'http://localhost:8080/system', sv: '0.1.3', sdkn: '@vercel/analytics/react', sdkv: '1.5.0', ts: 1752798281621, …}
+script.debug.js:1 [Vercel Web Analytics] [event] page_view {o: 'http://localhost:8080/system', sv: '0.1.3', sdkn: '@vercel/analytics/react', sdkv: '1.5.0', ts: 1752798284171, …}
+script.debug.js:1 [Vercel Web Analytics] [event] page_view {o: 'http://localhost:8080/system', sv: '0.1.3', sdkn: '@vercel/analytics/react', sdkv: '1.5.0', ts: 1752799453419, …}
+SystemDashboard.tsx:94 🔄 Fetching system statistics...
+SystemDashboard.tsx:172 🔄 Fetching user activity...
+requests.js:1  GET https://irmuaqhwmtgbkftqlohx.supabase.co/auth/v1/admin/users?page=&per_page= 403 (Forbidden)
+s.fetch @ requests.js:1
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:4368
+_handleRequest2 @ @supabase_supabase-js.js?v=d11540c6:4646
+_request @ @supabase_supabase-js.js?v=d11540c6:4636
+listUsers @ @supabase_supabase-js.js?v=d11540c6:4846
+fetchSystemStats @ SystemDashboard.tsx:97
+fetchSystemData @ SystemDashboard.tsx:80
+(anonymous) @ SystemDashboard.tsx:73
+react-stack-bottom-frame @ react-dom_client.js?v=d11540c6:17478
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+commitHookEffectListMount @ react-dom_client.js?v=d11540c6:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=d11540c6:8518
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9887
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9960
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9940
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9899
+flushPassiveEffects @ react-dom_client.js?v=d11540c6:11302
+flushPendingEffects @ react-dom_client.js?v=d11540c6:11276
+flushSpawnedWork @ react-dom_client.js?v=d11540c6:11250
+commitRoot @ react-dom_client.js?v=d11540c6:11081
+commitRootWhenReady @ react-dom_client.js?v=d11540c6:10512
+performWorkOnRoot @ react-dom_client.js?v=d11540c6:10457
+performSyncWorkOnRoot @ react-dom_client.js?v=d11540c6:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=d11540c6:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=d11540c6:11558
+(anonymous) @ react-dom_client.js?v=d11540c6:11649
+<SystemDashboard>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=d11540c6:250
+SystemManagementView @ SystemManagementView.tsx?t=1752798642739:374
+react-stack-bottom-frame @ react-dom_client.js?v=d11540c6:17424
+renderWithHooks @ react-dom_client.js?v=d11540c6:4206
+updateFunctionComponent @ react-dom_client.js?v=d11540c6:6619
+beginWork @ react-dom_client.js?v=d11540c6:7654
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+performUnitOfWork @ react-dom_client.js?v=d11540c6:10868
+workLoopSync @ react-dom_client.js?v=d11540c6:10728
+renderRootSync @ react-dom_client.js?v=d11540c6:10711
+performWorkOnRoot @ react-dom_client.js?v=d11540c6:10330
+performSyncWorkOnRoot @ react-dom_client.js?v=d11540c6:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=d11540c6:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=d11540c6:11558
+(anonymous) @ react-dom_client.js?v=d11540c6:11649
+SystemDashboard.tsx:101 Could not fetch users from auth.users, trying profiles table: AuthApiError: User not allowed
+    at handleError2 (@supabase_supabase-js.js?v=d11540c6:4611:9)
+    at async _handleRequest2 (@supabase_supabase-js.js?v=d11540c6:4652:5)
+    at async _request (@supabase_supabase-js.js?v=d11540c6:4636:16)
+    at async GoTrueAdminApi.listUsers (@supabase_supabase-js.js?v=d11540c6:4846:24)
+    at async fetchSystemStats (SystemDashboard.tsx:97:54)
+    at async Promise.all (index 0)
+    at async fetchSystemData (SystemDashboard.tsx:79:7)
+overrideMethod @ hook.js:608
+fetchSystemStats @ SystemDashboard.tsx:101
+await in fetchSystemStats
+fetchSystemData @ SystemDashboard.tsx:80
+(anonymous) @ SystemDashboard.tsx:73
+react-stack-bottom-frame @ react-dom_client.js?v=d11540c6:17478
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+commitHookEffectListMount @ react-dom_client.js?v=d11540c6:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=d11540c6:8518
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9887
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9960
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9940
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9899
+flushPassiveEffects @ react-dom_client.js?v=d11540c6:11302
+flushPendingEffects @ react-dom_client.js?v=d11540c6:11276
+flushSpawnedWork @ react-dom_client.js?v=d11540c6:11250
+commitRoot @ react-dom_client.js?v=d11540c6:11081
+commitRootWhenReady @ react-dom_client.js?v=d11540c6:10512
+performWorkOnRoot @ react-dom_client.js?v=d11540c6:10457
+performSyncWorkOnRoot @ react-dom_client.js?v=d11540c6:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=d11540c6:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=d11540c6:11558
+(anonymous) @ react-dom_client.js?v=d11540c6:11649
+<SystemDashboard>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=d11540c6:250
+SystemManagementView @ SystemManagementView.tsx?t=1752798642739:374
+react-stack-bottom-frame @ react-dom_client.js?v=d11540c6:17424
+renderWithHooks @ react-dom_client.js?v=d11540c6:4206
+updateFunctionComponent @ react-dom_client.js?v=d11540c6:6619
+beginWork @ react-dom_client.js?v=d11540c6:7654
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+performUnitOfWork @ react-dom_client.js?v=d11540c6:10868
+workLoopSync @ react-dom_client.js?v=d11540c6:10728
+renderRootSync @ react-dom_client.js?v=d11540c6:10711
+performWorkOnRoot @ react-dom_client.js?v=d11540c6:10330
+performSyncWorkOnRoot @ react-dom_client.js?v=d11540c6:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=d11540c6:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=d11540c6:11558
+(anonymous) @ react-dom_client.js?v=d11540c6:11649
+requests.js:1  GET https://irmuaqhwmtgbkftqlohx.supabase.co/rest/v1/activity_logs?select=id%2Caction%2Ccreated_at%2Cuser_id%2Cstore_id%2Cmetadata&order=created_at.desc&limit=20 400 (Bad Request)
+s.fetch @ requests.js:1
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3929
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3950
+fulfilled @ @supabase_supabase-js.js?v=d11540c6:3902
+Promise.then
+step @ @supabase_supabase-js.js?v=d11540c6:3915
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3917
+__awaiter6 @ @supabase_supabase-js.js?v=d11540c6:3899
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3940
+then @ @supabase_supabase-js.js?v=d11540c6:89
+SystemDashboard.tsx:189 Activity logs table not available: {code: '42703', details: null, hint: null, message: 'column activity_logs.action does not exist'}
+overrideMethod @ hook.js:608
+fetchUserActivity @ SystemDashboard.tsx:189
+await in fetchUserActivity
+fetchSystemData @ SystemDashboard.tsx:81
+(anonymous) @ SystemDashboard.tsx:73
+react-stack-bottom-frame @ react-dom_client.js?v=d11540c6:17478
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+commitHookEffectListMount @ react-dom_client.js?v=d11540c6:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=d11540c6:8518
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9887
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9960
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9940
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9899
+flushPassiveEffects @ react-dom_client.js?v=d11540c6:11302
+flushPendingEffects @ react-dom_client.js?v=d11540c6:11276
+flushSpawnedWork @ react-dom_client.js?v=d11540c6:11250
+commitRoot @ react-dom_client.js?v=d11540c6:11081
+commitRootWhenReady @ react-dom_client.js?v=d11540c6:10512
+performWorkOnRoot @ react-dom_client.js?v=d11540c6:10457
+performSyncWorkOnRoot @ react-dom_client.js?v=d11540c6:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=d11540c6:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=d11540c6:11558
+(anonymous) @ react-dom_client.js?v=d11540c6:11649
+<SystemDashboard>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=d11540c6:250
+SystemManagementView @ SystemManagementView.tsx?t=1752798642739:374
+react-stack-bottom-frame @ react-dom_client.js?v=d11540c6:17424
+renderWithHooks @ react-dom_client.js?v=d11540c6:4206
+updateFunctionComponent @ react-dom_client.js?v=d11540c6:6619
+beginWork @ react-dom_client.js?v=d11540c6:7654
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+performUnitOfWork @ react-dom_client.js?v=d11540c6:10868
+workLoopSync @ react-dom_client.js?v=d11540c6:10728
+renderRootSync @ react-dom_client.js?v=d11540c6:10711
+performWorkOnRoot @ react-dom_client.js?v=d11540c6:10330
+performSyncWorkOnRoot @ react-dom_client.js?v=d11540c6:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=d11540c6:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=d11540c6:11558
+(anonymous) @ react-dom_client.js?v=d11540c6:11649
+requests.js:1  GET https://irmuaqhwmtgbkftqlohx.supabase.co/rest/v1/transactions?select=id%2Ccreated_at%2Ctotal_amount%2Cstore_id%2Cstores%28name%29&order=created_at.desc&limit=10 400 (Bad Request)
+s.fetch @ requests.js:1
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3929
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3950
+fulfilled @ @supabase_supabase-js.js?v=d11540c6:3902
+Promise.then
+step @ @supabase_supabase-js.js?v=d11540c6:3915
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3917
+__awaiter6 @ @supabase_supabase-js.js?v=d11540c6:3899
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3940
+then @ @supabase_supabase-js.js?v=d11540c6:89
+SystemDashboard.tsx:205 Error fetching transactions: {code: '42703', details: null, hint: null, message: 'column transactions.total_amount does not exist'}
+overrideMethod @ hook.js:608
+fetchUserActivity @ SystemDashboard.tsx:205
+await in fetchUserActivity
+fetchSystemData @ SystemDashboard.tsx:81
+(anonymous) @ SystemDashboard.tsx:73
+react-stack-bottom-frame @ react-dom_client.js?v=d11540c6:17478
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+commitHookEffectListMount @ react-dom_client.js?v=d11540c6:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=d11540c6:8518
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9887
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9960
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9940
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9899
+flushPassiveEffects @ react-dom_client.js?v=d11540c6:11302
+flushPendingEffects @ react-dom_client.js?v=d11540c6:11276
+flushSpawnedWork @ react-dom_client.js?v=d11540c6:11250
+commitRoot @ react-dom_client.js?v=d11540c6:11081
+commitRootWhenReady @ react-dom_client.js?v=d11540c6:10512
+performWorkOnRoot @ react-dom_client.js?v=d11540c6:10457
+performSyncWorkOnRoot @ react-dom_client.js?v=d11540c6:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=d11540c6:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=d11540c6:11558
+(anonymous) @ react-dom_client.js?v=d11540c6:11649
+<SystemDashboard>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=d11540c6:250
+SystemManagementView @ SystemManagementView.tsx?t=1752798642739:374
+react-stack-bottom-frame @ react-dom_client.js?v=d11540c6:17424
+renderWithHooks @ react-dom_client.js?v=d11540c6:4206
+updateFunctionComponent @ react-dom_client.js?v=d11540c6:6619
+beginWork @ react-dom_client.js?v=d11540c6:7654
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+performUnitOfWork @ react-dom_client.js?v=d11540c6:10868
+workLoopSync @ react-dom_client.js?v=d11540c6:10728
+renderRootSync @ react-dom_client.js?v=d11540c6:10711
+performWorkOnRoot @ react-dom_client.js?v=d11540c6:10330
+performSyncWorkOnRoot @ react-dom_client.js?v=d11540c6:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=d11540c6:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=d11540c6:11558
+(anonymous) @ react-dom_client.js?v=d11540c6:11649
+requests.js:1  GET https://irmuaqhwmtgbkftqlohx.supabase.co/rest/v1/transactions?select=total_amount 400 (Bad Request)
+s.fetch @ requests.js:1
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3929
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3950
+fulfilled @ @supabase_supabase-js.js?v=d11540c6:3902
+Promise.then
+step @ @supabase_supabase-js.js?v=d11540c6:3915
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3917
+__awaiter6 @ @supabase_supabase-js.js?v=d11540c6:3899
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3940
+then @ @supabase_supabase-js.js?v=d11540c6:89
+SystemDashboard.tsx:128 Error fetching revenue: {code: '42703', details: null, hint: null, message: 'column transactions.total_amount does not exist'}
+overrideMethod @ hook.js:608
+fetchSystemStats @ SystemDashboard.tsx:128
+await in fetchSystemStats
+fetchSystemData @ SystemDashboard.tsx:80
+(anonymous) @ SystemDashboard.tsx:73
+react-stack-bottom-frame @ react-dom_client.js?v=d11540c6:17478
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+commitHookEffectListMount @ react-dom_client.js?v=d11540c6:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=d11540c6:8518
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9887
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9960
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9940
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9899
+flushPassiveEffects @ react-dom_client.js?v=d11540c6:11302
+flushPendingEffects @ react-dom_client.js?v=d11540c6:11276
+flushSpawnedWork @ react-dom_client.js?v=d11540c6:11250
+commitRoot @ react-dom_client.js?v=d11540c6:11081
+commitRootWhenReady @ react-dom_client.js?v=d11540c6:10512
+performWorkOnRoot @ react-dom_client.js?v=d11540c6:10457
+performSyncWorkOnRoot @ react-dom_client.js?v=d11540c6:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=d11540c6:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=d11540c6:11558
+(anonymous) @ react-dom_client.js?v=d11540c6:11649
+<SystemDashboard>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=d11540c6:250
+SystemManagementView @ SystemManagementView.tsx?t=1752798642739:374
+react-stack-bottom-frame @ react-dom_client.js?v=d11540c6:17424
+renderWithHooks @ react-dom_client.js?v=d11540c6:4206
+updateFunctionComponent @ react-dom_client.js?v=d11540c6:6619
+beginWork @ react-dom_client.js?v=d11540c6:7654
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+performUnitOfWork @ react-dom_client.js?v=d11540c6:10868
+workLoopSync @ react-dom_client.js?v=d11540c6:10728
+renderRootSync @ react-dom_client.js?v=d11540c6:10711
+performWorkOnRoot @ react-dom_client.js?v=d11540c6:10330
+performSyncWorkOnRoot @ react-dom_client.js?v=d11540c6:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=d11540c6:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=d11540c6:11558
+(anonymous) @ react-dom_client.js?v=d11540c6:11649
+SystemDashboard.tsx:162 📊 System stats fetched: {totalUsers: 0, totalStores: 1, totalTransactions: 0, totalRevenue: 0, activeUsers: 1, …}
+script.debug.js:1 [Vercel Web Analytics] [event] page_view {o: 'http://localhost:8080/system', sv: '0.1.3', sdkn: '@vercel/analytics/react', sdkv: '1.5.0', ts: 1752799539122, …}
+script.debug.js:1 [Vercel Web Analytics] [event] page_view {o: 'http://localhost:8080/system', sv: '0.1.3', sdkn: '@vercel/analytics/react', sdkv: '1.5.0', ts: 1752800811414, …}
+script.debug.js:1 [Vercel Web Analytics] [event] page_view {o: 'http://localhost:8080/system', sv: '0.1.3', sdkn: '@vercel/analytics/react', sdkv: '1.5.0', ts: 1752800815479, …}
+script.debug.js:1 [Vercel Web Analytics] [event] page_view {o: 'http://localhost:8080/system', sv: '0.1.3', sdkn: '@vercel/analytics/react', sdkv: '1.5.0', ts: 1752800815486, …}
+UserManagement.tsx:49 🔄 Fetching system users...
+requests.js:1  GET https://irmuaqhwmtgbkftqlohx.supabase.co/auth/v1/admin/users?page=&per_page= 403 (Forbidden)
+s.fetch @ requests.js:1
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:4368
+_handleRequest2 @ @supabase_supabase-js.js?v=d11540c6:4646
+_request @ @supabase_supabase-js.js?v=d11540c6:4636
+listUsers @ @supabase_supabase-js.js?v=d11540c6:4846
+fetchUsers @ UserManagement.tsx:52
+(anonymous) @ UserManagement.tsx:43
+react-stack-bottom-frame @ react-dom_client.js?v=d11540c6:17478
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+commitHookEffectListMount @ react-dom_client.js?v=d11540c6:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=d11540c6:8518
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9887
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9960
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9940
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9899
+flushPassiveEffects @ react-dom_client.js?v=d11540c6:11302
+flushPendingEffects @ react-dom_client.js?v=d11540c6:11276
+flushSpawnedWork @ react-dom_client.js?v=d11540c6:11250
+commitRoot @ react-dom_client.js?v=d11540c6:11081
+commitRootWhenReady @ react-dom_client.js?v=d11540c6:10512
+performWorkOnRoot @ react-dom_client.js?v=d11540c6:10457
+performSyncWorkOnRoot @ react-dom_client.js?v=d11540c6:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=d11540c6:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=d11540c6:11558
+(anonymous) @ react-dom_client.js?v=d11540c6:11649
+<UserManagement>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=d11540c6:250
+SystemManagementView @ SystemManagementView.tsx:173
+react-stack-bottom-frame @ react-dom_client.js?v=d11540c6:17424
+renderWithHooks @ react-dom_client.js?v=d11540c6:4206
+updateFunctionComponent @ react-dom_client.js?v=d11540c6:6619
+beginWork @ react-dom_client.js?v=d11540c6:7654
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+performUnitOfWork @ react-dom_client.js?v=d11540c6:10868
+workLoopSync @ react-dom_client.js?v=d11540c6:10728
+renderRootSync @ react-dom_client.js?v=d11540c6:10711
+performWorkOnRoot @ react-dom_client.js?v=d11540c6:10330
+performSyncWorkOnRoot @ react-dom_client.js?v=d11540c6:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=d11540c6:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=d11540c6:11558
+(anonymous) @ react-dom_client.js?v=d11540c6:11649
+UserManagement.tsx:55 Could not fetch from auth.users: AuthApiError: User not allowed
+    at handleError2 (@supabase_supabase-js.js?v=d11540c6:4611:9)
+    at async _handleRequest2 (@supabase_supabase-js.js?v=d11540c6:4652:5)
+    at async _request (@supabase_supabase-js.js?v=d11540c6:4636:16)
+    at async GoTrueAdminApi.listUsers (@supabase_supabase-js.js?v=d11540c6:4846:24)
+    at async fetchUsers (UserManagement.tsx:52:53)
+overrideMethod @ hook.js:608
+fetchUsers @ UserManagement.tsx:55
+await in fetchUsers
+(anonymous) @ UserManagement.tsx:43
+react-stack-bottom-frame @ react-dom_client.js?v=d11540c6:17478
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+commitHookEffectListMount @ react-dom_client.js?v=d11540c6:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=d11540c6:8518
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9887
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9960
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9940
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9899
+flushPassiveEffects @ react-dom_client.js?v=d11540c6:11302
+flushPendingEffects @ react-dom_client.js?v=d11540c6:11276
+flushSpawnedWork @ react-dom_client.js?v=d11540c6:11250
+commitRoot @ react-dom_client.js?v=d11540c6:11081
+commitRootWhenReady @ react-dom_client.js?v=d11540c6:10512
+performWorkOnRoot @ react-dom_client.js?v=d11540c6:10457
+performSyncWorkOnRoot @ react-dom_client.js?v=d11540c6:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=d11540c6:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=d11540c6:11558
+(anonymous) @ react-dom_client.js?v=d11540c6:11649
+<UserManagement>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=d11540c6:250
+SystemManagementView @ SystemManagementView.tsx:173
+react-stack-bottom-frame @ react-dom_client.js?v=d11540c6:17424
+renderWithHooks @ react-dom_client.js?v=d11540c6:4206
+updateFunctionComponent @ react-dom_client.js?v=d11540c6:6619
+beginWork @ react-dom_client.js?v=d11540c6:7654
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+performUnitOfWork @ react-dom_client.js?v=d11540c6:10868
+workLoopSync @ react-dom_client.js?v=d11540c6:10728
+renderRootSync @ react-dom_client.js?v=d11540c6:10711
+performWorkOnRoot @ react-dom_client.js?v=d11540c6:10330
+performSyncWorkOnRoot @ react-dom_client.js?v=d11540c6:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=d11540c6:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=d11540c6:11558
+(anonymous) @ react-dom_client.js?v=d11540c6:11649
+StoreManagement.tsx:54 🔄 Fetching system stores...
+requests.js:1  GET https://irmuaqhwmtgbkftqlohx.supabase.co/rest/v1/stores?select=*%2Cprofiles%21stores_owner_id_fkey%28display_name%29 400 (Bad Request)
+s.fetch @ requests.js:1
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3929
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3950
+fulfilled @ @supabase_supabase-js.js?v=d11540c6:3902
+Promise.then
+step @ @supabase_supabase-js.js?v=d11540c6:3915
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3917
+__awaiter6 @ @supabase_supabase-js.js?v=d11540c6:3899
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3940
+then @ @supabase_supabase-js.js?v=d11540c6:89
+StoreManagement.tsx:65 Error fetching stores: {code: 'PGRST200', details: "Searched for a foreign key relationship between 's…n the schema 'public', but no matches were found.", hint: "Perhaps you meant 'products' instead of 'profiles'.", message: "Could not find a relationship between 'stores' and 'profiles' in the schema cache"}
+overrideMethod @ hook.js:608
+fetchStores @ StoreManagement.tsx:65
+await in fetchStores
+(anonymous) @ StoreManagement.tsx:48
+react-stack-bottom-frame @ react-dom_client.js?v=d11540c6:17478
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+commitHookEffectListMount @ react-dom_client.js?v=d11540c6:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=d11540c6:8518
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9887
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9960
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9940
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=d11540c6:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=d11540c6:9899
+flushPassiveEffects @ react-dom_client.js?v=d11540c6:11302
+flushPendingEffects @ react-dom_client.js?v=d11540c6:11276
+flushSpawnedWork @ react-dom_client.js?v=d11540c6:11250
+commitRoot @ react-dom_client.js?v=d11540c6:11081
+commitRootWhenReady @ react-dom_client.js?v=d11540c6:10512
+performWorkOnRoot @ react-dom_client.js?v=d11540c6:10457
+performSyncWorkOnRoot @ react-dom_client.js?v=d11540c6:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=d11540c6:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=d11540c6:11558
+(anonymous) @ react-dom_client.js?v=d11540c6:11649
+<StoreManagement>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=d11540c6:250
+SystemManagementView @ SystemManagementView.tsx:177
+react-stack-bottom-frame @ react-dom_client.js?v=d11540c6:17424
+renderWithHooks @ react-dom_client.js?v=d11540c6:4206
+updateFunctionComponent @ react-dom_client.js?v=d11540c6:6619
+beginWork @ react-dom_client.js?v=d11540c6:7654
+runWithFiberInDEV @ react-dom_client.js?v=d11540c6:1485
+performUnitOfWork @ react-dom_client.js?v=d11540c6:10868
+workLoopSync @ react-dom_client.js?v=d11540c6:10728
+renderRootSync @ react-dom_client.js?v=d11540c6:10711
+performWorkOnRoot @ react-dom_client.js?v=d11540c6:10330
+performSyncWorkOnRoot @ react-dom_client.js?v=d11540c6:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=d11540c6:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=d11540c6:11558
+(anonymous) @ react-dom_client.js?v=d11540c6:11649
+DatabaseManagement.tsx:61 🔄 Fetching database statistics...
+requests.js:1  HEAD https://irmuaqhwmtgbkftqlohx.supabase.co/rest/v1/transaction_items?select=* 404 (Not Found)
+s.fetch @ requests.js:1
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3929
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3950
+fulfilled @ @supabase_supabase-js.js?v=d11540c6:3902
+Promise.then
+step @ @supabase_supabase-js.js?v=d11540c6:3915
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3917
+__awaiter6 @ @supabase_supabase-js.js?v=d11540c6:3899
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3940
+then @ @supabase_supabase-js.js?v=d11540c6:89
+requests.js:1  HEAD https://irmuaqhwmtgbkftqlohx.supabase.co/rest/v1/layby_sales?select=* 404 (Not Found)
+s.fetch @ requests.js:1
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3929
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3950
+fulfilled @ @supabase_supabase-js.js?v=d11540c6:3902
+Promise.then
+step @ @supabase_supabase-js.js?v=d11540c6:3915
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3917
+__awaiter6 @ @supabase_supabase-js.js?v=d11540c6:3899
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3940
+then @ @supabase_supabase-js.js?v=d11540c6:89
+DatabaseManagement.tsx:101 📊 Database stats fetched: {totalRows: 2, healthyTables: 9, connectionStatus: 'warning'}
+AnonymousAnalytics.tsx:66 🔄 Fetching anonymous analytics...
+requests.js:1  GET https://irmuaqhwmtgbkftqlohx.supabase.co/rest/v1/transactions?select=total_amount 400 (Bad Request)
+s.fetch @ requests.js:1
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3929
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3950
+fulfilled @ @supabase_supabase-js.js?v=d11540c6:3902
+Promise.then
+step @ @supabase_supabase-js.js?v=d11540c6:3915
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3917
+__awaiter6 @ @supabase_supabase-js.js?v=d11540c6:3899
+(anonymous) @ @supabase_supabase-js.js?v=d11540c6:3940
+then @ @supabase_supabase-js.js?v=d11540c6:89
+AnonymousAnalytics.tsx:120 📊 Anonymous metrics fetched
+create gitignore to ignire ,env file i can see it has been pushed to 

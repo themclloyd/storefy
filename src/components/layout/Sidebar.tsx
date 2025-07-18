@@ -1,8 +1,12 @@
 
-import { Store } from "lucide-react";
+import { Store, CreditCard } from "lucide-react";
 import { useRoleBasedNavigation } from "@/hooks/useRoleBasedAccess";
 import { CompactStoreSelector } from "@/components/stores/CompactStoreSelector";
 import { UserMenu } from "@/components/layout/UserMenu";
+import { SidebarSubscriptionStatus } from "@/components/subscription/SidebarSubscriptionStatus";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { usePermissions } from "@/contexts/PermissionContext";
 import {
   Sidebar as SidebarPrimitive,
   SidebarContent,
@@ -27,6 +31,9 @@ interface SidebarProps {
 export function Sidebar({ activeView, onViewChange }: SidebarProps) {
   const { state } = useSidebar();
   const { getNavigationItems } = useRoleBasedNavigation();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { userRole } = usePermissions();
 
   // Get role-based navigation items
   const navigationItems = getNavigationItems();
@@ -34,7 +41,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
   // Get filtered navigation items based on role permissions
   const filteredMainNav = [
     ...navigationItems.filter(item =>
-      ['dashboard', 'pos', 'inventory', 'expenses', 'customers', 'transactions', 'settings'].includes(item.id)
+      ['dashboard', 'pos', 'inventory', 'layby', 'expenses', 'customers', 'transactions', 'settings'].includes(item.id)
     )
   ];
 
@@ -74,8 +81,6 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
               {filteredMainNav.map((item) => {
                 const Icon = item.icon;
 
-
-
                 return (
                   <SidebarMenuItem key={item.id}>
                     <SidebarMenuButton
@@ -94,11 +99,33 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
           </SidebarGroupContent>
         </SidebarGroup>
 
+        {/* Account Section */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Account</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu className="space-y-1">
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  onClick={() => navigate('/subscription')}
+                  tooltip={state === "collapsed" ? "Subscription" : undefined}
+                  className="h-10 px-3 justify-start gap-3"
+                >
+                  <CreditCard className="size-4 shrink-0" />
+                  <span className="truncate">Subscription</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
 
       </SidebarContent>
 
       <SidebarFooter className="border-t border-border/40 bg-sidebar">
         <div className="p-4 space-y-3">
+          {/* Subscription Status */}
+          <SidebarSubscriptionStatus />
+
           {/* User Menu - Big and Prominent */}
           <UserMenu onViewChange={onViewChange} />
 

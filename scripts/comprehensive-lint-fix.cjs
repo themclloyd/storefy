@@ -38,7 +38,7 @@ const fixConfig = {
     { file: 'src/components/reports/ReportsView.tsx', imports: ['Filter', 'Eye', 'Legend'] },
     { file: 'src/components/settings/PaymentMethodsSettings.tsx', imports: ['Building', 'Hash'] },
     { file: 'src/components/settings/SettingsView.tsx', imports: ['AlertDialogTrigger', 'Globe'] },
-    { file: 'src/components/storefy-sidebar.tsx', imports: ['Clock', 'Layers', 'HelpCircle', 'Search', 'LogOut'] },
+
     { file: 'src/components/stores/CompactStoreSelector.tsx', imports: ['useState'] },
     { file: 'src/components/stores/CreateStoreDialog.tsx', imports: ['MapPin'] },
     { file: 'src/components/stores/StoreManagementView.tsx', imports: ['Trash2'] },

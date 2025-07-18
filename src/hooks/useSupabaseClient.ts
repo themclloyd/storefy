@@ -1,5 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { sessionManager } from '@/lib/sessionManager';
 
 /**
  * Hook for data operations that automatically handles PIN sessions
@@ -7,9 +8,8 @@ import { supabase } from '@/integrations/supabase/client';
 export function useStoreData() {
   const { user } = useAuth();
 
-  // Check for PIN session
-  const pinSession = localStorage.getItem('pin_session');
-  const pinData = pinSession ? JSON.parse(pinSession) : null;
+  // Check for PIN session using session manager
+  const pinData = sessionManager.getPinSession();
   const isPinSession = pinData !== null;
 
   return {

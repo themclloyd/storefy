@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils';
 import { useStore } from '@/contexts/StoreContext';
 import { useStoreData } from '@/hooks/useSupabaseClient';
 import { useTax } from '@/hooks/useTax';
+import { InlineLoading } from '@/components/ui/modern-loading';
 import {
   ResponsiveContainer,
   PieChart as RechartsPieChart,
@@ -195,12 +196,7 @@ export function SimpleDashboard({ onViewChange }: DashboardProps) {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        <span className="ml-2 text-muted-foreground">Loading dashboard...</span>
-      </div>
-    );
+    return <InlineLoading text="Loading dashboard..." size="lg" />;
   }
 
   return (

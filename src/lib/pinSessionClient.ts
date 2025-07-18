@@ -1,14 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-
-interface PinSessionData {
-  member_id: string;
-  user_id: string | null;
-  store_id: string;
-  role: string;
-  name: string;
-  store_name: string;
-  login_time: string;
-}
+import { sessionManager, type PinSessionData } from './sessionManager';
 
 /**
  * Custom Supabase client for PIN sessions that sets context variables
@@ -23,15 +14,8 @@ class PinSessionClient {
   }
 
   private loadPinSession() {
-    const pinSession = localStorage.getItem('pin_session');
-    if (pinSession) {
-      try {
-        this.pinData = JSON.parse(pinSession);
-      } catch (error) {
-        console.error('Invalid PIN session data:', error);
-        localStorage.removeItem('pin_session');
-      }
-    }
+    // Use the session manager to get valid PIN session
+    this.pinData = sessionManager.getPinSession();
   }
 
   /**
@@ -86,21 +70,21 @@ class PinSessionClient {
    * Check if user has PIN session
    */
   hasPinSession(): boolean {
-    return this.pinData !== null;
+    return sessionManager.getPinSession() !== null;
   }
 
   /**
    * Get PIN session data
    */
   getPinSession(): PinSessionData | null {
-    return this.pinData;
+    return sessionManager.getPinSession();
   }
 
   /**
    * Clear PIN session
    */
   clearPinSession(): void {
-    localStorage.removeItem('pin_session');
+    sessionManager.clearPinSession();
     this.pinData = null;
     this.contextSet = false;
   }

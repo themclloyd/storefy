@@ -10,6 +10,8 @@ import { StoreSelector } from "@/components/stores/StoreSelector";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { ThemeToggleButton } from "@/components/ui/theme-toggle";
+import { PageLoading, InlineLoading } from "@/components/ui/modern-loading";
+import { pageStateManager } from "@/lib/pageStateManager";
 
 // Lazy load view components for code splitting
 const SimpleDashboard = lazy(() => import("@/components/dashboard/SimpleDashboard").then(module => ({ default: module.SimpleDashboard })));
@@ -17,6 +19,7 @@ const POSView = lazy(() => import("@/components/pos/POSView").then(module => ({ 
 const InventoryView = lazy(() => import("@/components/inventory/InventoryView").then(module => ({ default: module.InventoryView })));
 
 const ExpenseView = lazy(() => import("@/components/expenses/ExpenseView").then(module => ({ default: module.ExpenseView })));
+const LaybyView = lazy(() => import("@/components/layby/LaybyView").then(module => ({ default: module.LaybyView })));
 const TransactionView = lazy(() => import("@/components/transactions/TransactionView").then(module => ({ default: module.TransactionView })));
 const CustomersView = lazy(() => import("@/components/customers/CustomersView").then(module => ({ default: module.CustomersView })));
 const ReportsView = lazy(() => import("@/components/reports/ReportsView").then(module => ({ default: module.ReportsView })));
@@ -24,13 +27,8 @@ const SettingsView = lazy(() => import("@/components/settings/SettingsView").the
 const StoreManagementView = lazy(() => import("@/components/stores/StoreManagementView").then(module => ({ default: module.StoreManagementView })));
 
 // Loading component for Suspense fallback
-const LoadingSpinner = () => (
-  <div className="flex items-center justify-center p-8">
-    <div className="text-center">
-      <div className="w-8 h-8 bg-primary rounded-full animate-pulse mx-auto mb-4"></div>
-      <p className="text-muted-foreground">Loading...</p>
-    </div>
-  </div>
+const LoadingSpinner = ({ view = 'dashboard' }: { view?: string }) => (
+  <InlineLoading text={`Loading ${view}...`} size="lg" />
 );
 
 const Index = () => {
@@ -39,11 +37,24 @@ const Index = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
-  const [activeView, setActiveView] = useState("dashboard");
+  // Initialize activeView with last saved page or dashboard as fallback
+  const [activeView, setActiveView] = useState(() => {
+    // Try to restore last page if we have a valid session
+    const lastPage = pageStateManager.getLastPage(user?.id, currentStore?.id);
+    return lastPage && pageStateManager.isValidPage(lastPage) ? lastPage : "dashboard";
+  });
+
+  // Modern loading for initial app state
+  const isInitialLoading = authLoading || storeLoading || (!user && !localStorage.getItem('pin_session'));
 
   // Check for PIN session
   const pinSession = localStorage.getItem('pin_session');
   const hasPinSession = pinSession !== null;
+
+  // Show modern loading during initial loading
+  if (isInitialLoading) {
+    return <PageLoading text="Loading application..." />;
+  }
 
   useEffect(() => {
     if (!authLoading && !user && !hasPinSession) {
@@ -51,7 +62,7 @@ const Index = () => {
     }
   }, [user, authLoading, navigate, hasPinSession]);
 
-  // Handle URL path for view selection
+  // Handle URL path for view selection with page state restoration
   useEffect(() => {
     const path = location.pathname;
     const pathToView = {
@@ -70,11 +81,42 @@ const Index = () => {
       '/stores': 'stores'
     };
 
+    // Check if this is a direct URL access or refresh
+    const isDirectAccess = !document.referrer || document.referrer.indexOf(window.location.origin) !== 0;
+
+    if (isDirectAccess && (path === '/app' || path === '/')) {
+      // For generic paths on direct access, try to restore last page
+      const lastPage = pageStateManager.getLastPage(user?.id, currentStore?.id);
+      if (lastPage && pageStateManager.isValidPage(lastPage)) {
+        console.log('🔄 Restoring last page on direct access:', lastPage);
+        setActiveView(lastPage);
+        // Update URL to match the restored page
+        const viewToPath = {
+          'dashboard': '/dashboard',
+          'pos': '/pos',
+          'inventory': '/inventory',
+          'categories': '/categories',
+          'suppliers': '/suppliers',
+          'expenses': '/expenses',
+          'layby': '/layby',
+          'transactions': '/transactions',
+          'customers': '/customers',
+          'reports': '/reports',
+          'settings': '/settings',
+          'stores': '/stores'
+        };
+        const restoredPath = viewToPath[lastPage as keyof typeof viewToPath] || '/dashboard';
+        navigate(restoredPath, { replace: true });
+        return;
+      }
+    }
+
+    // Normal path-based view selection
     const view = pathToView[path as keyof typeof pathToView] || 'dashboard';
     setActiveView(view);
-  }, [location.pathname]);
+  }, [location.pathname, user?.id, currentStore?.id, navigate]);
 
-  // Update document title based on active view
+  // Update document title based on active view and save page state
   useEffect(() => {
     const viewTitles = {
       dashboard: "Dashboard",
@@ -93,11 +135,19 @@ const Index = () => {
 
     const viewTitle = viewTitles[activeView as keyof typeof viewTitles] || "Dashboard";
     document.title = `${viewTitle} - Storefy`;
-  }, [activeView]);
 
-  // Handle view changes with URL updates
+    // Save current page state whenever activeView changes (including direct URL navigation)
+    if (user || localStorage.getItem('pin_session')) {
+      pageStateManager.saveCurrentPage(activeView, user?.id, currentStore?.id);
+    }
+  }, [activeView, user?.id, currentStore?.id]);
+
+  // Handle view changes with URL updates and page state persistence
   const handleViewChange = (view: string) => {
     setActiveView(view);
+
+    // Save the current page state for restoration on refresh
+    pageStateManager.saveCurrentPage(view, user?.id, currentStore?.id);
 
     // Navigate to clean URLs
     const viewToPath = {
@@ -123,7 +173,7 @@ const Index = () => {
     // Show store management view for owners with multiple stores
     if (isOwner && stores.length > 1 && activeView === "stores") {
       return (
-        <Suspense fallback={<LoadingSpinner />}>
+        <Suspense fallback={<LoadingSpinner view="settings" />}>
           <StoreManagementView />
         </Suspense>
       );
@@ -140,6 +190,7 @@ const Index = () => {
         case "expenses":
           return <ExpenseView />;
         case "layby":
+          return <LaybyView />;
         case "transactions":
           return <TransactionView />;
         case "customers":
@@ -156,23 +207,15 @@ const Index = () => {
     })();
 
     return (
-      <Suspense fallback={<LoadingSpinner />}>
+      <Suspense fallback={<LoadingSpinner view={activeView} />}>
         {viewComponent}
       </Suspense>
     );
   };
 
-  // Show loading spinner while checking auth
-  if (authLoading && !hasPinSession) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="w-8 h-8 bg-primary rounded-full animate-pulse mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+
+
+  // This is now handled by the skeleton loading above
 
   // Redirect to auth if not logged in and no PIN session
   if (!user && !hasPinSession) {

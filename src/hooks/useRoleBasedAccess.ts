@@ -172,6 +172,7 @@ export function useRoleBasedNavigation() {
       inventory: { label: 'Inventory', icon: Package },
       products: { label: 'Products', icon: Package },
       customers: { label: 'Customers', icon: Users },
+      layby: { label: 'Layby', icon: Clock },
       transactions: { label: 'Transactions', icon: Receipt },
       reports: { label: 'Reports', icon: BarChart3 },
       expenses: { label: 'Expenses', icon: CreditCard },

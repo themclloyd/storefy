@@ -1,12 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useStore } from '@/contexts/StoreContext';
 import { usePermissions, ProtectedPage } from '@/contexts/PermissionContext';
-import { Loader2 } from 'lucide-react';
+import { useAccessControl, AccessControlWrapper } from '@/middleware/accessControlNew';
+import { sessionManager } from '@/lib/sessionManager';
+import { Loader2, Mail } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Shield, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -25,13 +30,32 @@ export function ProtectedRoute({
   const { currentStore, loading: storeLoading, hasValidStoreSelection } = useStore();
   const { canAccessPage, loading: permissionLoading } = usePermissions();
   const location = useLocation();
+  const [sessionChecked, setSessionChecked] = useState(false);
 
-  // Check for PIN session
-  const pinSession = localStorage.getItem('pin_session');
+  // Check for valid PIN session using session manager
+  const pinSession = sessionManager.getPinSession();
   const hasPinSession = pinSession !== null;
 
+  // Set up session expiry handling
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      // Only redirect if we're not already on a login page
+      if (!location.pathname.includes('/auth') && !location.pathname.includes('/pin-login') && !location.pathname.includes('/store/')) {
+        window.location.href = '/';
+      }
+    };
+
+    sessionManager.onSessionExpired(handleSessionExpired);
+    setSessionChecked(true);
+
+    return () => {
+      // Cleanup is handled by sessionManager singleton
+    };
+  }, [location.pathname]);
+
   // Fast loading check - only show loading for essential checks
-  const isLoading = authLoading || storeLoading;
+  // For main users, wait for store loading to complete before making decisions
+  const isLoading = authLoading || (user && !hasPinSession && storeLoading) || !sessionChecked;
 
   // Show minimal loading only for critical auth/store checks
   if (isLoading) {
@@ -45,9 +69,119 @@ export function ProtectedRoute({
     );
   }
 
-  // Redirect to landing page if not authenticated and no PIN session
+  // More graceful authentication check - only redirect if we're sure there's no valid session
   if (!user && !hasPinSession) {
+    // Don't redirect if we're already on a login page to prevent loops
+    if (location.pathname.includes('/auth') || location.pathname.includes('/pin-login') || location.pathname.includes('/store/') || location.pathname === '/') {
+      return <>{children}</>;
+    }
     return <Navigate to="/" state={{ from: location }} replace />;
+  }
+
+  // Check if user's email is verified (only for main users, not PIN sessions)
+  if (user && !hasPinSession && !user.email_confirmed_at) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-8">
+        <div className="max-w-md w-full px-4">
+          <Card>
+            <CardHeader className="text-center">
+              <div className="flex justify-center mb-4">
+                <Mail className="h-12 w-12 text-blue-500" />
+              </div>
+              <CardTitle className="text-xl text-blue-600">
+                Verify Your Email
+              </CardTitle>
+              <CardDescription>
+                We've sent a verification link to <strong>{user.email}</strong>.
+                Please check your email and click the link to verify your account.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="text-center text-sm text-gray-600">
+                <p>Didn't receive the email? Check your spam folder or</p>
+                <Button
+                  variant="link"
+                  className="p-0 h-auto text-blue-600"
+                  onClick={async () => {
+                    try {
+                      await supabase.auth.resend({
+                        type: 'signup',
+                        email: user.email!
+                      });
+                      toast.success('Verification email sent!');
+                    } catch (error) {
+                      toast.error('Failed to resend email');
+                    }
+                  }}
+                >
+                  resend verification email
+                </Button>
+              </div>
+              <Button
+                variant="ghost"
+                onClick={() => supabase.auth.signOut()}
+                className="w-full"
+              >
+                Sign Out
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if user's email is verified (only for main users, not PIN sessions)
+  if (user && !hasPinSession && !user.email_confirmed_at) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-8">
+        <div className="max-w-md w-full px-4">
+          <Card>
+            <CardHeader className="text-center">
+              <div className="flex justify-center mb-4">
+                <Mail className="h-12 w-12 text-blue-500" />
+              </div>
+              <CardTitle className="text-xl text-blue-600">
+                Verify Your Email
+              </CardTitle>
+              <CardDescription>
+                We've sent a verification link to <strong>{user.email}</strong>.
+                Please check your email and click the link to verify your account.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="text-center text-sm text-gray-600">
+                <p>Didn't receive the email? Check your spam folder or</p>
+                <Button
+                  variant="link"
+                  className="p-0 h-auto text-blue-600"
+                  onClick={async () => {
+                    try {
+                      await supabase.auth.resend({
+                        type: 'signup',
+                        email: user.email!
+                      });
+                      toast.success('Verification email sent!');
+                    } catch (error) {
+                      toast.error('Failed to resend email');
+                    }
+                  }}
+                >
+                  resend verification email
+                </Button>
+              </div>
+              <Button
+                variant="ghost"
+                onClick={() => supabase.auth.signOut()}
+                className="w-full"
+              >
+                Sign Out
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
   }
 
   // Strict store selection enforcement for main users
@@ -58,10 +192,13 @@ export function ProtectedRoute({
     }
   }
 
-  // If PIN user but no current store, redirect to PIN login
+  // If PIN user but no current store, clear session and redirect more gracefully
   if (!currentStore && hasPinSession) {
-    localStorage.removeItem('pin_session');
-    return <Navigate to="/pin-login" replace />;
+    sessionManager.clearPinSession();
+    // Only redirect if not already on a login page
+    if (!location.pathname.includes('/pin-login') && !location.pathname.includes('/store/')) {
+      return <Navigate to="/pin-login" replace />;
+    }
   }
 
   // For POS system speed, allow access while permissions load
@@ -93,6 +230,15 @@ export function ProtectedRoute({
         return <Navigate to={fallbackPath} replace />;
       }
     }
+  }
+
+  // Wrap with access control for authenticated users (not PIN sessions)
+  if (user && !hasPinSession) {
+    return (
+      <AccessControlWrapper>
+        {children}
+      </AccessControlWrapper>
+    );
   }
 
   return <>{children}</>;
