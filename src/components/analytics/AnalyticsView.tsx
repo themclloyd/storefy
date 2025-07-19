@@ -2,10 +2,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TrendingUp, Users, DollarSign, Package, Eye, Calendar, BarChart3, PieChart, LineChart, ExternalLink } from "lucide-react";
-import { useStore } from "@/contexts/StoreContext";
+import { useCurrentStore } from "@/stores/storeStore";
 
 export function AnalyticsView() {
-  const { currentStore } = useStore();
+  const currentStore = useCurrentStore();
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">

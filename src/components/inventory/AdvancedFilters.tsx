@@ -25,7 +25,7 @@ import {
   ArrowUp,
   ArrowDown
 } from "lucide-react";
-import { useStore } from "@/contexts/StoreContext";
+import { useCurrentStore } from "@/stores/storeStore";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface FilterOptions {
@@ -58,7 +58,7 @@ interface AdvancedFiltersProps {
 }
 
 export function AdvancedFilters({ filters, onFiltersChange, onReset }: AdvancedFiltersProps) {
-  const { currentStore } = useStore();
+  const currentStore = useCurrentStore();
   const [isOpen, setIsOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);

@@ -150,7 +150,7 @@ This document outlines the comprehensive Role-Based Access Control (RBAC) system
 
 ### Conditional Component Rendering
 ```tsx
-<SecureAction permission="manage_team">
+<SecureAction permission="manage_users">
   <TeamManagementPanel />
 </SecureAction>
 ```

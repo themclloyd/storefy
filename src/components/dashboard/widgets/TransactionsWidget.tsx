@@ -11,7 +11,7 @@ import {
   Clock
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useStore } from '@/contexts/StoreContext';
+import { useCurrentStore } from '@/stores/storeStore';
 import { supabase } from '@/integrations/supabase/client';
 
 interface TransactionsWidgetProps {
@@ -35,7 +35,7 @@ interface TransactionData {
 }
 
 export function TransactionsWidget({ onViewMore }: TransactionsWidgetProps) {
-  const { currentStore } = useStore();
+  const currentStore = useCurrentStore();
   const [loading, setLoading] = useState(true);
   const [transactionData, setTransactionData] = useState<TransactionData>({
     totalTransactions: 0,

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useStore } from '@/contexts/StoreContext';
+import { useCurrentStore } from '@/stores/storeStore';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface PaymentMethod {
@@ -21,7 +21,7 @@ export interface PaymentOption {
 }
 
 export function usePaymentMethods() {
-  const { currentStore } = useStore();
+  const currentStore = useCurrentStore();
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

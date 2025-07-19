@@ -6,8 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Clock, Plus, Search, DollarSign, Calendar, User, Package, AlertCircle, CheckCircle, XCircle, CreditCard, History, Settings, Eye } from "lucide-react";
-import { useStore } from "@/contexts/StoreContext";
-import { useAuth } from "@/contexts/AuthContext";
+import { useCurrentStore } from "@/stores/storeStore";
+import { useUser } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useTax } from "@/hooks/useTax";
@@ -63,8 +63,8 @@ interface LaybyStats {
 }
 
 export function LaybyView() {
-  const { currentStore } = useStore();
-  const { user } = useAuth();
+  const currentStore = useCurrentStore();
+  const user = useUser();
   const { formatCurrency } = useTax();
   const [laybyOrders, setLaybyOrders] = useState<LaybyOrder[]>([]);
   const [loading, setLoading] = useState(true);

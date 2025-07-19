@@ -25,7 +25,7 @@ import {
   Calendar,
   History
 } from "lucide-react";
-import { useStore } from "@/contexts/StoreContext";
+import { useCurrentStore } from "@/stores/storeStore";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useTax } from "@/hooks/useTax";

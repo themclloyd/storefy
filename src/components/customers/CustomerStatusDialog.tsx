@@ -26,7 +26,7 @@ import {
   DollarSign,
   ShoppingCart
 } from "lucide-react";
-import { useStore } from "@/contexts/StoreContext";
+import { useCurrentStore } from "@/stores/storeStore";
 import { useStoreData } from "@/hooks/useSupabaseClient";
 import { toast } from "sonner";
 
@@ -58,7 +58,7 @@ export function CustomerStatusDialog({
   customer,
   onStatusUpdated
 }: CustomerStatusDialogProps) {
-  const { currentStore } = useStore();
+  const currentStore = useCurrentStore();
   const { from, currentStoreId, isPinSession: _isPinSession } = useStoreData();
   const [loading, setLoading] = useState(false);
   const [newStatus, setNewStatus] = useState<string>("");

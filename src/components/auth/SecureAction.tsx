@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSecureAction, usePermission } from '@/hooks/useRoleBasedAccess';
-import { Permission } from '@/contexts/PermissionContext';
+import { Permission } from '@/stores/permissionStore';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Shield, AlertTriangle, Loader2 } from 'lucide-react';
@@ -17,14 +17,19 @@ interface SecureActionProps {
 /**
  * Component that renders children only if user has the required permission
  */
-export function SecureAction({ 
-  permission, 
-  children, 
+export function SecureAction({
+  permission,
+  children,
   onUnauthorized,
   showUnauthorizedMessage = false,
-  fallbackComponent 
+  fallbackComponent
 }: SecureActionProps) {
   const { hasPermission, loading } = usePermission(permission);
+
+  // Debug logging for manage_users permission
+  if (permission === 'manage_users') {
+    console.log('🔐 SecureAction check - Permission:', permission, 'Has permission:', hasPermission, 'Loading:', loading);
+  }
 
   if (loading) {
     return <Loader2 className="h-4 w-4 animate-spin" />;

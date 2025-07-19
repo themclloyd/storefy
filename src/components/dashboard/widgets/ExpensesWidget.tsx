@@ -11,7 +11,7 @@ import {
   Eye
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useStore } from '@/contexts/StoreContext';
+import { useCurrentStore } from '@/stores/storeStore';
 import { useStoreData } from '@/hooks/useSupabaseClient';
 
 interface ExpensesWidgetProps {
@@ -37,7 +37,7 @@ interface ExpenseData {
 }
 
 export function ExpensesWidget({ onViewMore }: ExpensesWidgetProps) {
-  const { currentStore } = useStore();
+  const currentStore = useCurrentStore();
   const { from, currentStoreId, isPinSession } = useStoreData();
   const [loading, setLoading] = useState(true);
   const [expenseData, setExpenseData] = useState<ExpenseData>({

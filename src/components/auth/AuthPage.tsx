@@ -25,7 +25,7 @@ export function AuthPage() {
 
   useEffect(() => {
     if (user) {
-      navigate('/dashboard');
+      navigate('/app/dashboard');
     }
   }, [user, navigate]);
 

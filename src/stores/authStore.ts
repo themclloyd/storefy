@@ -47,18 +47,32 @@ export const useAuthStore = create<AuthStore>()(
         signIn: async (email: string, password: string) => {
           try {
             set({ loading: true }, false, 'signIn:start');
-            
-            const { error } = await supabase.auth.signInWithPassword({
+            console.log('🔐 Starting sign in for:', email);
+
+            const { data, error } = await supabase.auth.signInWithPassword({
               email,
               password,
             });
 
-            if (error) throw error;
+            if (error) {
+              console.error('🔐 Sign in error:', error);
+              throw error;
+            }
+
+            console.log('🔐 Sign in successful:', data.user?.email);
+
+            // Directly update the store state with the user and session
+            set({
+              user: data.user,
+              session: data.session,
+              loading: false
+            }, false, 'signIn:success');
+
             return { error: null };
           } catch (error) {
+            console.error('🔐 Sign in failed:', error);
+            set({ loading: false }, false, 'signIn:error');
             return { error: error instanceof Error ? error : new Error('Sign in failed') };
-          } finally {
-            set({ loading: false }, false, 'signIn:end');
           }
         },
 
@@ -126,17 +140,19 @@ export const useAuthStore = create<AuthStore>()(
             }, false, 'initialize:complete');
 
             // Set up auth state listener
+            console.log('🔐 Setting up auth state change listener...');
             const { data: { subscription } } = supabase.auth.onAuthStateChange(
               (event, session) => {
-                console.log('Auth state changed:', event, session?.user?.email);
-                
-                set({ 
-                  session, 
+                console.log('🔐 Auth state changed:', event, session?.user?.email);
+
+                set({
+                  session,
                   user: session?.user ?? null,
-                  loading: false 
+                  loading: false
                 }, false, `authStateChange:${event}`);
               }
             );
+            console.log('🔐 Auth state change listener set up successfully');
 
             // Return cleanup function
             return () => subscription.unsubscribe();

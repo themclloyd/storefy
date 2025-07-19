@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import React, { useState, useCallback } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useUser } from '@/stores/authStore';
 import { toast } from 'sonner';
 
 export interface SubscriptionLimitCheck {
@@ -49,7 +49,7 @@ export async function checkSubscriptionLimits(
  */
 
 export function useSubscriptionLimits() {
-  const { user } = useAuth();
+  const user = useUser();
   const [checking, setChecking] = useState(false);
 
   const checkLimits = useCallback(async (

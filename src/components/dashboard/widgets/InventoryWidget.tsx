@@ -13,7 +13,7 @@ import {
   Eye
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useStore } from '@/contexts/StoreContext';
+import { useCurrentStore } from '@/stores/storeStore';
 import { supabase } from '@/integrations/supabase/client';
 
 interface InventoryWidgetProps {
@@ -43,7 +43,7 @@ interface InventoryData {
 }
 
 export function InventoryWidget({ onViewMore }: InventoryWidgetProps) {
-  const { currentStore } = useStore();
+  const currentStore = useCurrentStore();
   const [loading, setLoading] = useState(true);
   const [inventoryData, setInventoryData] = useState<InventoryData>({
     totalProducts: 0,

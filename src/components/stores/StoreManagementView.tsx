@@ -21,8 +21,10 @@ interface StoreStats {
 }
 
 export function StoreManagementView() {
-  const { stores, currentStore, selectStore, refreshStores } = useStore();
-  const { user } = useAuth();
+  const stores = useStores();
+  const currentStore = useCurrentStore();
+  const user = useUser();
+  const { selectStore, refreshStores } = useStoreActions();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [newStoreName, setNewStoreName] = useState('');
   const [newStoreAddress, setNewStoreAddress] = useState('');

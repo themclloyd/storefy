@@ -6,8 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Search, Plus, Users, Phone, Mail, Edit, Eye, Loader2, Download, BarChart3, MoreVertical, Filter, Grid3X3, List } from "lucide-react";
-import { useStore } from "@/contexts/StoreContext";
-import { useAuth } from "@/contexts/AuthContext";
+import { useCurrentStore } from "@/stores/storeStore";
+import { useUser } from "@/stores/authStore";
 import { useStoreData } from "@/hooks/useSupabaseClient";
 import { toast } from "sonner";
 import { useTax } from "@/hooks/useTax";
@@ -33,8 +33,8 @@ interface Customer {
 }
 
 export function CustomersView() {
-  const { currentStore } = useStore();
-  const { user } = useAuth();
+  const currentStore = useCurrentStore();
+  const user = useUser();
   const { from, currentStoreId, isPinSession } = useStoreData();
   const { formatCurrency } = useTax();
 

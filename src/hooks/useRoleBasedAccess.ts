@@ -1,10 +1,10 @@
-import { usePermissions, Permission, ProtectedPage } from '@/contexts/PermissionContext';
-import { useStore } from '@/contexts/StoreContext';
+import { usePermissions, Permission, ProtectedPage } from '@/stores/permissionStore';
+import { useCurrentStore } from '@/stores/storeStore';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  BarChart3, ShoppingCart, Package, FolderOpen, Truck, Users,
-  Receipt, Clock, CreditCard, Settings, Globe, TrendingUp
+  BarChart3, ShoppingCart, Package, Users,
+  Receipt, Clock, CreditCard, Settings, Globe
 } from 'lucide-react';
 
 /**
@@ -25,10 +25,10 @@ export function usePermission(permission: Permission) {
 export function usePageAccess(page: ProtectedPage) {
   const { canAccessPage, loading, logSecurityEvent } = usePermissions();
   const navigate = useNavigate();
-  const { currentStore } = useStore();
-  
+  const currentStore = useCurrentStore();
+
   const canAccess = canAccessPage(page);
-  
+
   useEffect(() => {
     if (!loading && !canAccess && currentStore) {
       // Log unauthorized access attempt
@@ -37,12 +37,12 @@ export function usePageAccess(page: ProtectedPage) {
         store_id: currentStore.id,
         timestamp: new Date().toISOString()
       });
-      
+
       // Redirect to dashboard or show error
       navigate('/dashboard', { replace: true });
     }
   }, [loading, canAccess, page, currentStore, navigate, logSecurityEvent]);
-  
+
   return {
     canAccess,
     loading
@@ -90,7 +90,7 @@ export function useRoleBasedRendering() {
  */
 export function useSecureAction() {
   const { checkPermission, logSecurityEvent } = usePermissions();
-  const { currentStore } = useStore();
+  const currentStore = useCurrentStore();
   
   const executeWithPermission = async (
     permission: Permission,
@@ -156,7 +156,7 @@ export function useRoleBasedNavigation() {
   
   const getAvailablePages = (): ProtectedPage[] => {
     const allPages: ProtectedPage[] = [
-      'analytics', 'dashboard', 'pos', 'inventory', 'customers', 'transactions', 'layby', 'expenses', 'showcase'
+      'dashboard', 'pos', 'inventory', 'customers', 'transactions', 'layby', 'expenses', 'settings', 'showcase'
     ];
 
     return allPages.filter(page => canAccessPage(page));
@@ -164,9 +164,10 @@ export function useRoleBasedNavigation() {
   
   const getNavigationItems = () => {
     const availablePages = getAvailablePages();
-    
+
+    console.log('🔧 Navigation - User role:', userRole, 'Available pages:', availablePages);
+
     const navigationMap = {
-      analytics: { label: 'Analytics', icon: TrendingUp },
       dashboard: { label: 'Overview', icon: BarChart3 },
       pos: { label: 'POS', icon: ShoppingCart },
       inventory: { label: 'Inventory', icon: Package },
@@ -174,6 +175,7 @@ export function useRoleBasedNavigation() {
       layby: { label: 'Layby', icon: Clock },
       transactions: { label: 'Transactions', icon: Receipt },
       expenses: { label: 'Expenses', icon: CreditCard },
+      settings: { label: 'Settings', icon: Settings },
       showcase: { label: 'Store Showcase', icon: Globe }
     };
     

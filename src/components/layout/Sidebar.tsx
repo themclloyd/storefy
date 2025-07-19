@@ -6,7 +6,7 @@ import { UserMenu } from "@/components/layout/UserMenu";
 
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/stores/authStore";
-import { usePermissions } from "@/contexts/PermissionContext";
+import { usePermissions } from "@/stores/permissionStore";
 import {
   Sidebar as SidebarPrimitive,
   SidebarContent,
@@ -38,6 +38,10 @@ export function Sidebar({ activeView, onViewChange, collapsible = "icon" }: Side
 
   // Get role-based navigation items
   const navigationItems = getNavigationItems();
+
+  // Debug sidebar navigation
+  console.log('🔧 Sidebar - User role:', userRole, 'Navigation items count:', navigationItems.length);
+  console.log('🔧 Sidebar - Navigation items:', navigationItems.map(item => item.label));
 
   // Debug logging (removed for cleaner console)
 

@@ -1,7 +1,7 @@
 import { useEffect, useState, Suspense, lazy } from "react";
 import { useUser, useAuthLoading } from "@/stores/authStore";
 import { useCurrentStore, useStores, useStoreLoading, useIsOwner } from "@/stores/storeStore";
-import { usePermissions } from "@/contexts/PermissionContext";
+import { usePermissions } from "@/stores/permissionStore";
 import { useRoleBasedNavigation } from "@/hooks/useRoleBasedAccess";
 import { useNavigate, useSearchParams, useLocation, Navigate } from "react-router-dom";
 import { Sidebar } from "@/components/layout/Sidebar";
@@ -11,7 +11,7 @@ import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { ThemeToggleButton } from "@/components/ui/theme-toggle";
 import { PageLoading, InlineLoading } from "@/components/ui/modern-loading";
-import { usePageLoading } from "@/contexts/LoadingContext";
+import { usePageLoading } from "@/stores/loadingStore";
 import { pageStateManager } from "@/lib/pageStateManager";
 
 // Lazy load view components for code splitting

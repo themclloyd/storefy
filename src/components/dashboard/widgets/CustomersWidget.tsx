@@ -11,7 +11,7 @@ import {
   Eye
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useStore } from '@/contexts/StoreContext';
+import { useCurrentStore } from '@/stores/storeStore';
 import { useStoreData } from '@/hooks/useSupabaseClient';
 import { useTax } from '@/hooks/useTax';
 
@@ -36,7 +36,7 @@ interface CustomerData {
 }
 
 export function CustomersWidget({ onViewMore }: CustomersWidgetProps) {
-  const { currentStore } = useStore();
+  const currentStore = useCurrentStore();
   const { from, currentStoreId, isPinSession } = useStoreData();
   const { formatCurrency } = useTax();
   const [loading, setLoading] = useState(true);

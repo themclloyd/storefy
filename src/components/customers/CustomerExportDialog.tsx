@@ -17,7 +17,7 @@ import {
   Loader2,
   Users
 } from "lucide-react";
-import { useStore } from "@/contexts/StoreContext";
+import { useCurrentStore } from "@/stores/storeStore";
 import { useStoreData } from "@/hooks/useSupabaseClient";
 import { toast } from "sonner";
 import jsPDF from 'jspdf';
@@ -54,7 +54,7 @@ export function CustomerExportDialog({
   onOpenChange,
   customers
 }: CustomerExportDialogProps) {
-  const { currentStore } = useStore();
+  const currentStore = useCurrentStore();
   const { from: _from, currentStoreId: _currentStoreId, isPinSession: _isPinSession } = useStoreData();
   const [loading, setLoading] = useState(false);
   const [exportOptions, setExportOptions] = useState<ExportOptions>({

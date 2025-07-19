@@ -11,8 +11,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Settings, Users, Shield, Eye, EyeOff, Edit, Trash2, UserCheck, UserX, Crown, UserCog, HelpCircle, UserPlus, Store, Globe, CreditCard, Bell, Activity, Copy } from "lucide-react";
-import { useStore } from "@/contexts/StoreContext";
-import { useAuth } from "@/contexts/AuthContext";
+import { useCurrentStore, useStoreStore } from "@/stores/storeStore";
+import { useUser } from "@/stores/authStore";
 import { SecureAction, SecureButton } from "@/components/auth/SecureAction";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -42,8 +42,14 @@ interface RoleStats {
 }
 
 export function SettingsView() {
-  const { currentStore, isOwner, userRole, updateCurrentStore } = useStore();
-  const { user } = useAuth();
+  const currentStore = useCurrentStore();
+  const user = useUser();
+  const { isOwner, userRole, updateCurrentStore } = useStoreStore();
+
+  // Debug: Log current store to check if store_code is available
+  console.log('🏪 Current store in settings:', currentStore);
+  console.log('🏪 Settings - isOwner:', isOwner, 'userRole:', userRole);
+  console.log('🏪 Settings - user:', user?.id);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [roleStats, setRoleStats] = useState<RoleStats>({ owner: 0, manager: 0, cashier: 0, total: 0 });
   const [loading, setLoading] = useState(true);
@@ -740,7 +746,7 @@ export function SettingsView() {
                     Loading...
                   </div>
                 )}
-                <SecureAction permission="manage_team">
+                <SecureAction permission="manage_users">
                   <Dialog open={showAddMemberDialog} onOpenChange={setShowAddMemberDialog}>
                     <DialogTrigger asChild>
                       <Button size="sm">
@@ -1032,7 +1038,7 @@ export function SettingsView() {
                             <Edit className="w-4 h-4" />
                           </Button>
                           <SecureButton
-                            permission="manage_team"
+                            permission="manage_users"
                             variant="ghost"
                             size="sm"
                             onClick={() => handleDeleteMember(member)}
@@ -1056,63 +1062,75 @@ export function SettingsView() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="w-5 h-5" />
-            Store Access
+            Store Code & PIN Login
           </CardTitle>
           <p className="text-sm text-muted-foreground">
-            Share your store code with team members to give them access
+            Share these with team members for store access
           </p>
         </CardHeader>
-        <CardContent>
-          <div className="bg-muted/50 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <Label className="font-medium">Store Code</Label>
+        <CardContent className="space-y-4">
+          {/* Store Code */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Store Code</Label>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 p-3 bg-muted rounded-md font-mono text-lg font-bold">
+                {currentStore?.store_code}
+              </div>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => {
                   if (currentStore?.store_code) {
                     navigator.clipboard.writeText(currentStore.store_code);
-                    toast.success('Store code copied to clipboard!');
+                    toast.success('Store code copied!');
                   }
                 }}
-                className="h-8"
               >
-                <Copy className="w-3 h-3 mr-1" />
-                Copy
+                <Copy className="w-4 h-4" />
               </Button>
             </div>
-            <div className="font-mono text-xl font-bold text-primary mb-2">
-              {currentStore?.store_code}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Team members use this code to access your store
-            </p>
           </div>
 
-          {/* Short Link for Store Login */}
-          <div className="mt-4 p-4 border border-border rounded-lg">
-            <div className="flex items-center justify-between mb-2">
-              <Label className="font-medium">Quick Access Link</Label>
+          {/* Store Login Link */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Store Login Link</Label>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 p-3 bg-muted rounded-md font-mono text-sm break-all">
+                {window.location.origin}/store/{currentStore?.store_code}
+              </div>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  const shortLink = `${window.location.origin}/store/${currentStore?.store_code}`;
-                  navigator.clipboard.writeText(shortLink);
-                  toast.success('Store link copied to clipboard!');
+                  const storeLink = `${window.location.origin}/store/${currentStore?.store_code}`;
+                  navigator.clipboard.writeText(storeLink);
+                  toast.success('Store link copied!');
                 }}
-                className="h-8"
               >
-                <Copy className="w-3 h-3 mr-1" />
-                Copy Link
+                <Copy className="w-4 h-4" />
               </Button>
             </div>
-            <div className="font-mono text-sm text-muted-foreground mb-2 break-all">
-              {window.location.origin}/store/{currentStore?.store_code}
+          </div>
+
+          {/* PIN Login Link */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">PIN Login Link</Label>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 p-3 bg-muted rounded-md font-mono text-sm break-all">
+                {window.location.origin}/pin-login
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const pinLoginLink = `${window.location.origin}/pin-login`;
+                  navigator.clipboard.writeText(pinLoginLink);
+                  toast.success('PIN login link copied!');
+                }}
+              >
+                <Copy className="w-4 h-4" />
+              </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Share this link with team members for quick store access
-            </p>
           </div>
         </CardContent>
       </Card>

@@ -21,10 +21,12 @@ const ReportsView = lazy(() => import('@/components/reports/ReportsView').then(m
 const ExpenseView = lazy(() => import('@/components/expenses/ExpenseView').then(m => ({ default: m.ExpenseView })));
 const AnalyticsView = lazy(() => import('@/components/analytics/AnalyticsView').then(m => ({ default: m.AnalyticsView })));
 const ShowcaseView = lazy(() => import('@/components/showcase/ShowcaseManagementView').then(m => ({ default: m.ShowcaseManagementView })));
+const PublicStoreShowcase = lazy(() => import('@/components/showcase/PublicStoreShowcase').then(m => ({ default: m.PublicStoreShowcase })));
 const SettingsView = lazy(() => import('@/components/settings/SettingsView').then(m => ({ default: m.SettingsView })));
 const SubscriptionPage = lazy(() => import('@/pages/SubscriptionPage'));
 const PaymentResultPage = lazy(() => import('@/pages/PaymentResultPage'));
 const StoreSelectionPage = lazy(() => import('@/pages/StoreSelectionPage'));
+const StoreShortLinkPage = lazy(() => import('@/pages/StoreShortLinkPage'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
 // Authentication loader
@@ -94,8 +96,39 @@ async function storeLoader() {
 
 // Create the router with data API
 export const router = createBrowserRouter([
+  // Public routes (no authentication providers)
   {
     path: '/',
+    element: <LandingPage />,
+  },
+  {
+    path: '/auth',
+    element: <AuthPage />,
+  },
+  {
+    path: '/pin-login',
+    element: <PinLoginPage />,
+  },
+  // Public store showcase routes (no authentication required)
+  {
+    path: '/showcase/:storeId',
+    element: <PublicStoreShowcase />,
+  },
+  {
+    path: '/store/:storeCode/catalog',
+    element: <PublicStoreShowcase />,
+  },
+  {
+    path: '/shop/:storeSlug',
+    element: <PublicStoreShowcase />,
+  },
+  {
+    path: '/store/:storeCode',
+    element: <StoreShortLinkPage />,
+  },
+  // Protected routes with authentication providers
+  {
+    path: '/app',
     element: <AppProviders />,
     errorElement: <div className="p-8 text-center">
       <h1 className="text-2xl font-bold text-red-600 mb-4">Application Error</h1>
@@ -104,112 +137,186 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <LandingPage />,
-      },
-      {
-        path: 'auth',
-        element: <AuthPage />,
-      },
-      {
-        path: 'pin-login',
-        element: <PinLoginPage />,
+        loader: () => redirect('/app/dashboard'),
       },
       {
         path: 'stores',
         element: <StoreSelectionPage />,
         loader: storeLoader,
       },
+      // Main app routes with layout
       {
-        path: 'app',
+        path: 'dashboard',
         element: <RouterAppLayout />,
         loader: protectedLoader,
         children: [
           {
             index: true,
-            loader: () => redirect('/app/dashboard'),
+            element: <Dashboard onViewChange={() => {}} />,
           },
-          {
-            path: 'dashboard',
-            element: <Dashboard />,
-            loader: protectedLoader,
-          },
+        ],
+      },
       {
         path: 'pos',
-        element: <POSView />,
+        element: <RouterAppLayout />,
         loader: protectedLoader,
+        children: [
+          {
+            index: true,
+            element: <POSView />,
+          },
+        ],
       },
       {
         path: 'inventory',
-        element: <InventoryView />,
+        element: <RouterAppLayout />,
         loader: protectedLoader,
+        children: [
+          {
+            index: true,
+            element: <InventoryView />,
+          },
+        ],
       },
       {
         path: 'categories',
-        element: <CategoriesView />,
+        element: <RouterAppLayout />,
         loader: protectedLoader,
+        children: [
+          {
+            index: true,
+            element: <CategoriesView onClose={() => {}} />,
+          },
+        ],
       },
       {
         path: 'suppliers',
-        element: <SuppliersView />,
+        element: <RouterAppLayout />,
         loader: protectedLoader,
+        children: [
+          {
+            index: true,
+            element: <SuppliersView onClose={() => {}} />,
+          },
+        ],
       },
       {
         path: 'customers',
-        element: <CustomersView />,
+        element: <RouterAppLayout />,
         loader: protectedLoader,
+        children: [
+          {
+            index: true,
+            element: <CustomersView />,
+          },
+        ],
       },
       {
         path: 'layby',
-        element: <LaybyView />,
+        element: <RouterAppLayout />,
         loader: protectedLoader,
+        children: [
+          {
+            index: true,
+            element: <LaybyView />,
+          },
+        ],
       },
       {
         path: 'transactions',
-        element: <TransactionView />,
+        element: <RouterAppLayout />,
         loader: protectedLoader,
+        children: [
+          {
+            index: true,
+            element: <TransactionView />,
+          },
+        ],
       },
       {
         path: 'reports',
-        element: <ReportsView />,
+        element: <RouterAppLayout />,
         loader: protectedLoader,
+        children: [
+          {
+            index: true,
+            element: <ReportsView />,
+          },
+        ],
       },
       {
         path: 'expenses',
-        element: <ExpenseView />,
+        element: <RouterAppLayout />,
         loader: protectedLoader,
+        children: [
+          {
+            index: true,
+            element: <ExpenseView />,
+          },
+        ],
       },
       {
         path: 'analytics',
-        element: <AnalyticsView />,
+        element: <RouterAppLayout />,
         loader: protectedLoader,
+        children: [
+          {
+            index: true,
+            element: <AnalyticsView />,
+          },
+        ],
       },
       {
         path: 'showcase',
-        element: <ShowcaseView />,
+        element: <RouterAppLayout />,
         loader: protectedLoader,
+        children: [
+          {
+            index: true,
+            element: <ShowcaseView />,
+          },
+        ],
       },
       {
         path: 'settings',
-        element: <SettingsView />,
+        element: <RouterAppLayout />,
         loader: protectedLoader,
+        children: [
+          {
+            index: true,
+            element: <SettingsView />,
+          },
+        ],
       },
       {
         path: 'subscription',
-        element: <SubscriptionPage />,
+        element: <RouterAppLayout />,
         loader: protectedLoader,
+        children: [
+          {
+            index: true,
+            element: <SubscriptionPage />,
+          },
+        ],
       },
       {
         path: 'payment-result',
-        element: <PaymentResultPage />,
+        element: <RouterAppLayout />,
         loader: protectedLoader,
-      },
+        children: [
+          {
+            index: true,
+            element: <PaymentResultPage />,
+          },
         ],
       },
-      // Legacy routes for backward compatibility
-      {
-        path: 'dashboard',
-        loader: () => redirect('/app/dashboard'),
-      },
+    ],
+  },
+  // Legacy routes for backward compatibility
+  {
+    path: '/dashboard',
+    loader: () => redirect('/app/dashboard'),
+  },
   {
     path: '/pos',
     loader: () => redirect('/app/pos'),
@@ -258,10 +365,13 @@ export const router = createBrowserRouter([
     path: '/settings',
     loader: () => redirect('/app/settings'),
   },
-      {
-        path: '*',
-        element: <NotFound />,
-      },
-    ],
+  {
+    path: '/stores',
+    loader: () => redirect('/app/stores'),
+  },
+  // 404 catch-all
+  {
+    path: '*',
+    element: <NotFound />,
   },
 ]);

@@ -166,8 +166,14 @@ order_items (0 records)
 │   ├── layout/        # Sidebar, navigation
 │   └── ui/           # shadcn/ui components
 ├── contexts/
-│   ├── AuthContext.tsx    # User authentication
-│   └── StoreContext.tsx   # Store selection & management
+│   ├── AppInitializationContext.tsx  # App startup coordination
+│   ├── LoadingContext.tsx            # Global loading states
+│   ├── NavigationContext.tsx         # Navigation state
+│   └── ThemeContext.tsx              # Theme management
+├── stores/                           # Zustand state management
+│   ├── authStore.ts                  # User authentication
+│   ├── storeStore.ts                 # Store selection & management
+│   └── permissionStore.ts            # Role-based permissions
 ├── hooks/             # Custom React hooks
 ├── integrations/
 │   └── supabase/      # Database client & types

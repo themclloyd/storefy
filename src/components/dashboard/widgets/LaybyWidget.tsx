@@ -11,7 +11,7 @@ import {
   CreditCard
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useStore } from '@/contexts/StoreContext';
+import { useCurrentStore } from '@/stores/storeStore';
 import { supabase } from '@/integrations/supabase/client';
 
 interface LaybyWidgetProps {
@@ -33,7 +33,7 @@ interface LaybyData {
 }
 
 export function LaybyWidget({ onViewMore }: LaybyWidgetProps) {
-  const { currentStore } = useStore();
+  const currentStore = useCurrentStore();
   const [loading, setLoading] = useState(true);
   const [laybyData, setLaybyData] = useState<LaybyData>({
     activeLaybys: 0,

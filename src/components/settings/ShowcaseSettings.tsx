@@ -10,8 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Globe, Store, Palette, Eye, ExternalLink, Copy, Settings, Image, Phone, Mail, MapPin } from "lucide-react";
-import { useStore } from "@/contexts/StoreContext";
-import { useAuth } from "@/contexts/AuthContext";
+import { useCurrentStore, useStoreStore } from "@/stores/storeStore";
+import { useUser } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { generateShowcaseUrl, generateUniqueSlug, updateStoreSlug } from "@/lib/showcase-utils";
@@ -33,8 +33,9 @@ interface ShowcaseSettingsProps {
 }
 
 export function ShowcaseSettings({ onShowcaseStatusChange }: ShowcaseSettingsProps = {}) {
-  const { currentStore, updateCurrentStore } = useStore();
-  const { user } = useAuth();
+  const currentStore = useCurrentStore();
+  const user = useUser();
+  const { updateCurrentStore } = useStoreStore();
   
   // Showcase settings state
   const [enableShowcase, setEnableShowcase] = useState(false);

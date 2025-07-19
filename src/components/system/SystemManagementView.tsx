@@ -36,7 +36,7 @@ import { AnonymousAnalytics } from './AnonymousAnalytics';
 import { PrivacySettings } from './PrivacySettings';
 import { ModernSystemDashboard } from './ModernSystemDashboard';
 import { useUser } from '@/stores/authStore';
-import { usePermissions } from '@/contexts/PermissionContext';
+import { usePermissions } from '@/stores/permissionStore';
 import { useNavigate } from 'react-router-dom';
 
 interface SystemManagementViewProps {

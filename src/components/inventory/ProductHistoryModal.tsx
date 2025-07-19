@@ -20,7 +20,7 @@ import {
   Activity,
   Loader2
 } from "lucide-react";
-import { useStore } from "@/contexts/StoreContext";
+import { useCurrentStore } from "@/stores/storeStore";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -71,7 +71,7 @@ const adjustmentTypeColors = {
 } as const;
 
 export function ProductHistoryModal({ open, onOpenChange, product }: ProductHistoryModalProps) {
-  const { currentStore } = useStore();
+  const currentStore = useCurrentStore();
   const [adjustments, setAdjustments] = useState<StockAdjustment[]>([]);
   const [loading, setLoading] = useState(false);
 

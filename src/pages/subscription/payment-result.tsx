@@ -6,13 +6,13 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle, XCircle, Loader2, ArrowRight } from 'lucide-react';
 import { paychanguService } from '@/services/paychangu';
 import { subscriptionService } from '@/services/subscription';
-import { useAuth } from '@/contexts/AuthContext';
+import { useUser } from '@/stores/authStore';
 
 type PaymentStatus = 'loading' | 'success' | 'failed' | 'cancelled';
 
 export default function PaymentResultPage() {
   const router = useRouter();
-  const { user } = useAuth();
+  const user = useUser();
   const [status, setStatus] = useState<PaymentStatus>('loading');
   const [message, setMessage] = useState('');
   const [transactionRef, setTransactionRef] = useState('');

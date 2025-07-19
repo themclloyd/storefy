@@ -28,8 +28,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, User, Mail, Phone, MapPin, Save, Trash2 } from "lucide-react";
-import { useStore } from "@/contexts/StoreContext";
-import { useAuth } from "@/contexts/AuthContext";
+import { useCurrentStore } from "@/stores/storeStore";
+import { useUser } from "@/stores/authStore";
 import { SecureAction } from "@/components/auth/SecureAction";
 import { useStoreData } from "@/hooks/useSupabaseClient";
 import { toast } from "sonner";
@@ -72,8 +72,8 @@ export function EditCustomerDialog({
   onCustomerUpdated,
   onCustomerDeleted
 }: EditCustomerDialogProps) {
-  const { currentStore } = useStore();
-  const { user } = useAuth();
+  const currentStore = useCurrentStore();
+  const user = useUser();
   const { from, currentStoreId, isPinSession } = useStoreData();
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);

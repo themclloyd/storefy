@@ -20,7 +20,7 @@ import {
   AlertTriangle,
   CheckCircle
 } from "lucide-react";
-import { useStore } from "@/contexts/StoreContext";
+import { useCurrentStore } from "@/stores/storeStore";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -44,7 +44,7 @@ interface OrderHistoryDialogProps {
 }
 
 export function OrderHistoryDialog({ open, onOpenChange }: OrderHistoryDialogProps) {
-  const { currentStore } = useStore();
+  const currentStore = useCurrentStore();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");

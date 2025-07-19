@@ -16,7 +16,7 @@ import {
   PieChart
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useStore } from '@/contexts/StoreContext';
+import { useCurrentStore } from '@/stores/storeStore';
 import { useStoreData } from '@/hooks/useSupabaseClient';
 import { useTax } from '@/hooks/useTax';
 import { InlineLoading } from '@/components/ui/modern-loading';
@@ -66,7 +66,7 @@ interface DashboardStats {
 }
 
 export function SimpleDashboard({ onViewChange }: DashboardProps) {
-  const { currentStore } = useStore();
+  const currentStore = useCurrentStore();
   const { from, currentStoreId, isPinSession } = useStoreData();
   const { formatCurrency } = useTax();
   const [loading, setLoading] = useState(true);

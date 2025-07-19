@@ -11,6 +11,21 @@ interface Store {
   owner_id: string;
   created_at: string;
   updated_at: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  currency?: string;
+  tax_rate?: number;
+  store_code: string;
+  enable_public_showcase?: boolean;
+  showcase_slug?: string;
+  showcase_theme?: any;
+  showcase_description?: string;
+  showcase_logo_url?: string;
+  showcase_banner_url?: string;
+  showcase_contact_info?: any;
+  showcase_seo_title?: string;
+  showcase_seo_description?: string;
   settings?: any;
   subscription_tier?: string;
   subscription_status?: string;
@@ -60,14 +75,22 @@ export const useStoreStore = create<StoreStore>()(
         
         setCurrentStore: (store) => {
           const state = get();
-          const isOwner = store ? store.owner_id === useAuthStore.getState().user?.id : false;
+          const currentUser = useAuthStore.getState().user;
+          console.log('🏪 Setting current store:', store?.name);
+          console.log('🏪 Store owner_id:', store?.owner_id);
+          console.log('🏪 Current user:', currentUser?.id);
+          const isOwner = store ? store.owner_id === currentUser?.id : false;
+          console.log('🏪 Is owner calculated:', isOwner);
           const canManage = isOwner || (state.userRole && ['owner', 'manager'].includes(state.userRole));
-          
-          set({ 
+          const hasValidSelection = Boolean(store && store.id);
+
+          console.log('🏪 Setting hasValidStoreSelection:', hasValidSelection);
+
+          set({
             currentStore: store,
             isOwner,
             canManage,
-            hasValidStoreSelection: Boolean(store)
+            hasValidStoreSelection: hasValidSelection
           }, false, 'setCurrentStore');
         },
         
@@ -81,7 +104,9 @@ export const useStoreStore = create<StoreStore>()(
 
         selectStore: (storeId) => {
           const state = get();
+          console.log('🏪 Selecting store from stores array:', state.stores.length, 'stores');
           const store = state.stores.find(s => s.id === storeId);
+          console.log('🏪 Found store:', store);
           if (store) {
             get().setCurrentStore(store);
 
@@ -132,6 +157,8 @@ export const useStoreStore = create<StoreStore>()(
 
             if (error) throw error;
 
+            console.log('🏪 Fetched stores:', stores);
+            console.log('🏪 First store owner_id:', stores?.[0]?.owner_id);
             set({ stores: stores || [], loading: false }, false, 'refreshStores:success');
           } catch (error) {
             console.error('Error refreshing stores:', error);
@@ -200,6 +227,10 @@ export const useStoreStore = create<StoreStore>()(
 
                   const state = get();
                   const store = state.stores.find(s => s.id === storeId);
+                  console.log('🔄 Restoring store - Available stores:', state.stores.length);
+                  console.log('🔄 Looking for store ID:', storeId);
+                  console.log('🔄 Found store for restoration:', store);
+                  console.log('🔄 Store owner_id during restoration:', store?.owner_id);
                   if (store) {
                     get().setCurrentStore(store);
                     console.log('🔄 Restored store selection:', store.name);
@@ -207,6 +238,27 @@ export const useStoreStore = create<StoreStore>()(
                 } catch (parseError) {
                   console.error('Failed to parse stored selection:', parseError);
                   localStorage.removeItem('storefy_selected_store');
+                }
+              }
+
+              // Check if user needs to select a store
+              const state = get();
+              if (!state.currentStore && state.stores.length > 0) {
+                console.log('🏪 No store selected. User has', state.stores.length, 'store(s) available');
+                // For single store users, auto-select. For multi-store users, they need to choose
+                if (state.stores.length === 1) {
+                  console.log('🏪 Single store user, auto-selecting:', state.stores[0].name);
+                  get().setCurrentStore(state.stores[0]);
+                  // Persist the selection
+                  const selectionData = {
+                    storeId: state.stores[0].id,
+                    userId: user.id,
+                    timestamp: Date.now()
+                  };
+                  localStorage.setItem('storefy_selected_store', JSON.stringify(selectionData));
+                } else {
+                  console.log('🏪 Multi-store user, requires manual selection');
+                  // Don't auto-select for multi-store users - they should choose
                 }
               }
             }

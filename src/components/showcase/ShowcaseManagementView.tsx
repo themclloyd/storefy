@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ExternalLink, Settings, Package, Search, Filter } from "lucide-react";
-import { useStore } from "@/contexts/StoreContext";
+import { useCurrentStore } from "@/stores/storeStore";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/taxUtils";
@@ -39,7 +39,7 @@ interface AnalyticsData {
 }
 
 export function ShowcaseManagementView() {
-  const { currentStore } = useStore();
+  const currentStore = useCurrentStore();
   const [showcaseEnabled, setShowcaseEnabled] = useState(false);
   const [showcaseSlug, setShowcaseSlug] = useState("");
   const [products, setProducts] = useState<Product[]>([]);

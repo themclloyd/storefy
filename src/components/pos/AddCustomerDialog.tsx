@@ -28,7 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
-import { useStore } from "@/contexts/StoreContext";
+import { useCurrentStore } from "@/stores/storeStore";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -63,7 +63,7 @@ export function AddCustomerDialog({
   onOpenChange, 
   onCustomerAdded 
 }: AddCustomerDialogProps) {
-  const { currentStore } = useStore();
+  const currentStore = useCurrentStore();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<CustomerFormData>({

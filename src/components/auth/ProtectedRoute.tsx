@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useUser, useAuthLoading } from '@/stores/authStore';
 import { useCurrentStore, useStoreLoading, useHasValidStoreSelection } from '@/stores/storeStore';
-import { usePermissions, ProtectedPage } from '@/contexts/PermissionContext';
+import { usePermissions, ProtectedPage } from '@/stores/permissionStore';
 import { useAccessControl, AccessControlWrapper } from '@/middleware/accessControlNew';
 import { sessionManager } from '@/lib/sessionManager';
 import { usePageLoading } from '@/stores/loadingStore';

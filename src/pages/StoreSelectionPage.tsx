@@ -6,8 +6,9 @@ import { PremiumStoreSelector } from '@/components/stores/PremiumStoreSelector';
 import { Loader2 } from 'lucide-react';
 
 export default function StoreSelectionPage() {
-  const { user, loading: authLoading } = useAuth();
-  const { currentStore, loading: storeLoading } = useStore();
+  const user = useUser();
+  const authLoading = useAuthLoading();
+  const storeLoading = useStoreLoading();
 
   // Check for PIN session
   const pinSession = localStorage.getItem('pin_session');
