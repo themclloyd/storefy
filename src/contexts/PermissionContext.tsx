@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from './AuthContext';
-import { useStore } from './StoreContext';
+import { useUser } from '@/stores/authStore';
+import { useCurrentStore } from '@/stores/storeStore';
 import { toast } from 'sonner';
 
 // Define all possible permissions
@@ -69,8 +69,8 @@ interface PermissionContextType {
 const PermissionContext = createContext<PermissionContextType | undefined>(undefined);
 
 export function PermissionProvider({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
-  const { currentStore } = useStore();
+  const user = useUser();
+  const currentStore = useCurrentStore();
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(true);
   const [permissions, setPermissions] = useState<Set<Permission>>(new Set());
@@ -81,9 +81,19 @@ export function PermissionProvider({ children }: { children: React.ReactNode }) 
   const pinData = pinSession ? JSON.parse(pinSession) : null;
 
   useEffect(() => {
+    console.log('🔍 Permission useEffect triggered:', {
+      hasCurrentStore: !!currentStore,
+      currentStoreId: currentStore?.id,
+      currentStoreName: currentStore?.name,
+      hasUser: !!user,
+      userId: user?.id,
+      userEmail: user?.email
+    });
+
     if (currentStore) {
       loadUserPermissions();
     } else {
+      console.log('❌ No current store, setting loading to false');
       setLoading(false);
     }
   }, [currentStore?.id, user?.id]); // Only re-run when IDs change, not full objects
@@ -124,7 +134,16 @@ export function PermissionProvider({ children }: { children: React.ReactNode }) 
             _store_id: currentStore.id
           });
 
+        console.log('🔍 Permission Debug:', {
+          user: user?.email,
+          store: currentStore?.name,
+          error,
+          dbRoleData,
+          hasData: !!dbRoleData?.[0]
+        });
+
         if (error || !dbRoleData?.[0]) {
+          console.log('❌ No role data found, setting userRole to null');
           setUserRole(null);
           setLoading(false);
           return;

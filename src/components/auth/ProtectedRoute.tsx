@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useStore } from '@/contexts/StoreContext';
+import { useUser, useAuthLoading } from '@/stores/authStore';
+import { useCurrentStore, useStoreLoading, useHasValidStoreSelection } from '@/stores/storeStore';
 import { usePermissions, ProtectedPage } from '@/contexts/PermissionContext';
 import { useAccessControl, AccessControlWrapper } from '@/middleware/accessControlNew';
 import { sessionManager } from '@/lib/sessionManager';
-import { usePageLoading } from '@/contexts/LoadingContext';
+import { usePageLoading } from '@/stores/loadingStore';
 import { Loader2, Mail } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Shield, AlertTriangle } from 'lucide-react';
@@ -27,8 +27,11 @@ export function ProtectedRoute({
   fallbackPath = '/dashboard',
   showUnauthorizedMessage = true
 }: ProtectedRouteProps) {
-  const { user, loading: authLoading } = useAuth();
-  const { currentStore, loading: storeLoading, hasValidStoreSelection } = useStore();
+  const user = useUser();
+  const authLoading = useAuthLoading();
+  const currentStore = useCurrentStore();
+  const storeLoading = useStoreLoading();
+  const hasValidStoreSelection = useHasValidStoreSelection();
   const { canAccessPage, loading: permissionLoading } = usePermissions();
   const setPageLoading = usePageLoading();
   const location = useLocation();

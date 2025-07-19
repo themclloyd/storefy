@@ -30,8 +30,8 @@ import {
   Play
 } from "lucide-react";
 import { format, isAfter, isBefore, addDays } from "date-fns";
-import { useStore } from "@/contexts/StoreContext";
-import { useAuth } from "@/contexts/AuthContext";
+import { useCurrentStore } from "@/stores/storeStore";
+import { useUser } from "@/stores/authStore";
 import { SecureAction, SecureButton } from "@/components/auth/SecureAction";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -67,8 +67,8 @@ interface RecurringExpensesViewProps {
 }
 
 export function RecurringExpensesView({ categories, onExpenseAdded }: RecurringExpensesViewProps) {
-  const { currentStore } = useStore();
-  const { user } = useAuth();
+  const currentStore = useCurrentStore();
+  const user = useUser();
   const { formatCurrency } = useTax();
   const [loading, setLoading] = useState(true);
   const [recurringExpenses, setRecurringExpenses] = useState<RecurringExpense[]>([]);

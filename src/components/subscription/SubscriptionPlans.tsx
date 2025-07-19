@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Check, Star, Loader2, Calendar, Lock, Zap, Crown, Gift, CreditCard } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useUser } from '@/stores/authStore';
 import { subscriptionService, SubscriptionPlan } from '@/services/subscription';
 import { useSubscription } from '@/hooks/useSubscription';
 import { toast } from 'sonner';

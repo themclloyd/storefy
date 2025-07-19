@@ -36,11 +36,12 @@ export async function checkUserAccess(): Promise<UserAccessStatus> {
  * React hook for access control
  */
 import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useUser, useAuthLoading } from '@/stores/authStore';
 import { useNavigate } from 'react-router-dom';
 
 export function useAccessControl() {
-  const { user, loading: authLoading } = useAuth();
+  const user = useUser();
+  const authLoading = useAuthLoading();
   const navigate = useNavigate();
   const [accessStatus, setAccessStatus] = useState<UserAccessStatus | null>(null);
   const [loading, setLoading] = useState(true);

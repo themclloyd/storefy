@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useUser, useSignIn, useSignUp } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,7 +18,9 @@ export function AuthPage() {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
-  const { signIn, signUp, user } = useAuth();
+  const signIn = useSignIn();
+  const signUp = useSignUp();
+  const user = useUser();
   const navigate = useNavigate();
 
   useEffect(() => {

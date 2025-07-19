@@ -6,6 +6,7 @@ export default defineConfig(({ command }) => ({
   server: {
     host: "localhost",
     port: 8080,
+    strictPort: true, // Fail if port is already in use
     open: true,
     hmr: {
       port: 8080,

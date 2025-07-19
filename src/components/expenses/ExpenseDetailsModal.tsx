@@ -28,7 +28,7 @@ import {
   ExternalLink
 } from "lucide-react";
 import { format } from "date-fns";
-import { useStore } from "@/contexts/StoreContext";
+import { useCurrentStore } from "@/stores/storeStore";
 import { supabase } from "@/integrations/supabase/client";
 import { useTax } from "@/hooks/useTax";
 import { toast } from "sonner";

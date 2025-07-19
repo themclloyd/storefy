@@ -1,18 +1,22 @@
-import { useStore } from '@/contexts/StoreContext';
+import { useStores, useCurrentStore, useSelectStore, useStoreLoading } from '@/stores/storeStore';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Building2, Users, Crown, UserCheck, Store, ArrowRight, LogOut, Plus, MapPin } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useUser, useSignOut } from '@/stores/authStore';
 import { CreateStoreDialog } from './CreateStoreDialog';
 import { StoreSelectorSkeleton, CompactStoreSelectorSkeleton } from '@/components/ui/store-selector-skeleton';
 
 export function PremiumStoreSelector() {
-  const { stores, currentStore, selectStore, loading } = useStore();
-  const { user, signOut } = useAuth();
+  const stores = useStores();
+  const currentStore = useCurrentStore();
+  const selectStore = useSelectStore();
+  const loading = useStoreLoading();
+  const user = useUser();
+  const signOut = useSignOut();
 
-  // Show skeleton while loading stores
-  if (loading) {
-    return stores.length === 0 ? <CompactStoreSelectorSkeleton /> : <StoreSelectorSkeleton />;
+  // Show skeleton while loading stores (only if no stores are available yet)
+  if (loading && stores.length === 0) {
+    return <CompactStoreSelectorSkeleton />;
   }
 
   const getRoleIcon = (role: string) => {

@@ -1,6 +1,6 @@
 import React from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useStore } from '@/contexts/StoreContext';
+import { useUser, useAuthLoading } from '@/stores/authStore';
+import { useStores, useStoreLoading } from '@/stores/storeStore';
 import { Navigate } from 'react-router-dom';
 import { PremiumStoreSelector } from '@/components/stores/PremiumStoreSelector';
 import { Loader2 } from 'lucide-react';

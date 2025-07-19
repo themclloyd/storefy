@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth } from '@/contexts/AuthContext';
+import { useUser } from '@/stores/authStore';
 import { SubscriptionPlans } from '@/components/subscription/SubscriptionPlans';
 import { SubscriptionStatus } from '@/components/subscription/SubscriptionStatus';
 import { SubscriptionHistory } from '@/components/subscription/SubscriptionHistory';

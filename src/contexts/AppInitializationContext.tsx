@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
-import { useAuth } from './AuthContext';
+import { useUser, useAuthInitialized } from '@/stores/authStore';
 import { sessionManager } from '@/lib/sessionManager';
 
 /**
@@ -42,7 +42,8 @@ interface AppInitializationContextType {
 const AppInitializationContext = createContext<AppInitializationContextType | undefined>(undefined);
 
 export function AppInitializationProvider({ children }: { children: React.ReactNode }) {
-  const { user, loading: authLoading } = useAuth();
+  const user = useUser();
+  const authInitialized = useAuthInitialized();
   const [phase, setPhase] = useState<InitializationPhase>('starting');
   const [error, setError] = useState<string | null>(null);
 
@@ -74,7 +75,7 @@ export function AppInitializationProvider({ children }: { children: React.ReactN
     const hasPinSessionChanged = lastPinSessionRef.current !== hasPinSession;
 
     // Skip if already initialized and no meaningful changes
-    if (initializationRef.current && !hasUserChanged && !hasPinSessionChanged && !authLoading) {
+    if (initializationRef.current && !hasUserChanged && !hasPinSessionChanged && authInitialized) {
       return;
     }
 
@@ -83,7 +84,7 @@ export function AppInitializationProvider({ children }: { children: React.ReactN
     lastPinSessionRef.current = hasPinSession;
 
     initializeApp();
-  }, [user?.id, authLoading, hasPinSession]); // Only depend on user ID, not full user object
+  }, [user?.id, authInitialized, hasPinSession]); // Only depend on user ID, not full user object
 
   const initializeApp = async () => {
     try {
@@ -92,16 +93,16 @@ export function AppInitializationProvider({ children }: { children: React.ReactN
 
       // Phase 1: Check authentication
       setPhase('checking-auth');
-      console.log('📋 Phase 1: Checking authentication...', { 
-        authLoading, 
-        hasUser: !!user, 
-        hasPinSession 
+      console.log('📋 Phase 1: Checking authentication...', {
+        authInitialized,
+        hasUser: !!user,
+        hasPinSession
       });
 
       // Wait for auth to complete loading
-      if (authLoading) {
+      if (!authInitialized) {
         console.log('⏳ Waiting for auth to complete...');
-        return; // Will re-run when authLoading changes
+        return; // Will re-run when authInitialized changes
       }
 
       // Phase 2: Determine auth type

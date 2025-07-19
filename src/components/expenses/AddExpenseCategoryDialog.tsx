@@ -22,8 +22,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Palette } from "lucide-react";
-import { useStore } from "@/contexts/StoreContext";
-import { useAuth } from "@/contexts/AuthContext";
+import { useCurrentStore } from "@/stores/storeStore";
+import { useUser } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -62,8 +62,8 @@ export function AddExpenseCategoryDialog({
   onOpenChange, 
   onCategoryAdded 
 }: AddExpenseCategoryDialogProps) {
-  const { currentStore } = useStore();
-  const { user } = useAuth();
+  const currentStore = useCurrentStore();
+  const user = useUser();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<CategoryFormData>({

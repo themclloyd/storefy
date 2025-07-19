@@ -84,10 +84,19 @@ export const useStoreStore = create<StoreStore>()(
           const store = state.stores.find(s => s.id === storeId);
           if (store) {
             get().setCurrentStore(store);
-            
-            // Persist selection
-            localStorage.setItem('storefy_selected_store', storeId);
-            
+
+            // Persist selection in format compatible with Context system
+            const user = useAuthStore.getState().user;
+            if (user) {
+              const selectionData = {
+                storeId: storeId,
+                userId: user.id,
+                timestamp: Date.now()
+              };
+              localStorage.setItem('storefy_selected_store', JSON.stringify(selectionData));
+              console.log('💾 Store selection saved:', selectionData);
+            }
+
             console.log('🏪 Store selected:', store.name);
           }
         },
@@ -171,12 +180,33 @@ export const useStoreStore = create<StoreStore>()(
               await get().refreshStores();
               
               // Try to restore last selected store
-              const lastStoreId = localStorage.getItem('storefy_selected_store');
-              if (lastStoreId) {
-                const state = get();
-                const store = state.stores.find(s => s.id === lastStoreId);
-                if (store) {
-                  get().setCurrentStore(store);
+              const storedSelection = localStorage.getItem('storefy_selected_store');
+              if (storedSelection) {
+                try {
+                  // Handle both old string format and new JSON format
+                  let storeId: string;
+                  if (storedSelection.startsWith('{')) {
+                    const parsed = JSON.parse(storedSelection);
+                    storeId = parsed.storeId;
+                    // Validate user matches
+                    if (parsed.userId !== user.id) {
+                      console.log('❌ Stored selection belongs to different user, clearing');
+                      localStorage.removeItem('storefy_selected_store');
+                      return;
+                    }
+                  } else {
+                    storeId = storedSelection;
+                  }
+
+                  const state = get();
+                  const store = state.stores.find(s => s.id === storeId);
+                  if (store) {
+                    get().setCurrentStore(store);
+                    console.log('🔄 Restored store selection:', store.name);
+                  }
+                } catch (parseError) {
+                  console.error('Failed to parse stored selection:', parseError);
+                  localStorage.removeItem('storefy_selected_store');
                 }
               }
             }
@@ -214,11 +244,26 @@ export const useIsOwner = () => useStoreStore((state) => state.isOwner);
 export const useCanManage = () => useStoreStore((state) => state.canManage);
 export const useHasValidStoreSelection = () => useStoreStore((state) => state.hasValidStoreSelection);
 
-// Action selectors
-export const useStoreActions = () => useStoreStore((state) => ({
-  selectStore: state.selectStore,
-  updateCurrentStore: state.updateCurrentStore,
-  refreshStores: state.refreshStores,
-  clearStoreSelection: state.clearStoreSelection,
-  initialize: state.initialize,
-}));
+// Individual action selectors to prevent infinite loops
+export const useSelectStore = () => useStoreStore((state) => state.selectStore);
+export const useUpdateCurrentStore = () => useStoreStore((state) => state.updateCurrentStore);
+export const useRefreshStores = () => useStoreStore((state) => state.refreshStores);
+export const useClearStoreSelection = () => useStoreStore((state) => state.clearStoreSelection);
+export const useStoreInitialize = () => useStoreStore((state) => state.initialize);
+
+// Combined action selectors with proper memoization
+export const useStoreActions = () => {
+  const selectStore = useSelectStore();
+  const updateCurrentStore = useUpdateCurrentStore();
+  const refreshStores = useRefreshStores();
+  const clearStoreSelection = useClearStoreSelection();
+  const initialize = useStoreInitialize();
+
+  return React.useMemo(() => ({
+    selectStore,
+    updateCurrentStore,
+    refreshStores,
+    clearStoreSelection,
+    initialize,
+  }), [selectStore, updateCurrentStore, refreshStores, clearStoreSelection, initialize]);
+};

@@ -35,8 +35,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { CalendarIcon, Loader2 } from "lucide-react";
 import { format, addMonths, addYears, addDays } from "date-fns";
 import { cn } from "@/lib/utils";
-import { useStore } from "@/contexts/StoreContext";
-import { useAuth } from "@/contexts/AuthContext";
+import { useCurrentStore } from "@/stores/storeStore";
+import { useUser } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ExpenseCategory } from "./types";
@@ -71,8 +71,8 @@ export function RecurringExpenseDialog({
   onExpenseAdded, 
   categories 
 }: RecurringExpenseDialogProps) {
-  const { currentStore } = useStore();
-  const { user } = useAuth();
+  const currentStore = useCurrentStore();
+  const user = useUser();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<RecurringExpenseFormData>({

@@ -1,3 +1,4 @@
+import React from 'react';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { User, Session } from '@supabase/supabase-js';
@@ -168,10 +169,23 @@ export const useSession = () => useAuthStore((state) => state.session);
 export const useAuthLoading = () => useAuthStore((state) => state.loading);
 export const useAuthInitialized = () => useAuthStore((state) => state.initialized);
 
-// Action selectors
-export const useAuthActions = () => useAuthStore((state) => ({
-  signIn: state.signIn,
-  signUp: state.signUp,
-  signOut: state.signOut,
-  initialize: state.initialize,
-}));
+// Individual action selectors to prevent infinite loops
+export const useSignIn = () => useAuthStore((state) => state.signIn);
+export const useSignUp = () => useAuthStore((state) => state.signUp);
+export const useSignOut = () => useAuthStore((state) => state.signOut);
+export const useAuthInitializeAction = () => useAuthStore((state) => state.initialize);
+
+// Combined action selectors with proper memoization
+export const useAuthActions = () => {
+  const signIn = useSignIn();
+  const signUp = useSignUp();
+  const signOut = useSignOut();
+  const initialize = useAuthInitializeAction();
+
+  return React.useMemo(() => ({
+    signIn,
+    signUp,
+    signOut,
+    initialize,
+  }), [signIn, signUp, signOut, initialize]);
+};

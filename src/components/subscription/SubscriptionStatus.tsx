@@ -14,13 +14,13 @@ import {
   Package,
   Loader2
 } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useUser } from '@/stores/authStore';
 import { subscriptionService, UserSubscription, SubscriptionUsage } from '@/services/subscription';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
 export function SubscriptionStatus() {
-  const { user } = useAuth();
+  const user = useUser();
   const [subscription, setSubscription] = useState<UserSubscription | null>(null);
   const [usage, setUsage] = useState<SubscriptionUsage | null>(null);
   const [loading, setLoading] = useState(true);

@@ -1,6 +1,6 @@
 import { useEffect, useState, Suspense, lazy } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useStore } from "@/contexts/StoreContext";
+import { useUser, useAuthLoading } from "@/stores/authStore";
+import { useCurrentStore, useStores, useStoreLoading, useIsOwner } from "@/stores/storeStore";
 import { usePermissions } from "@/contexts/PermissionContext";
 import { useRoleBasedNavigation } from "@/hooks/useRoleBasedAccess";
 import { useNavigate, useSearchParams, useLocation, Navigate } from "react-router-dom";
@@ -41,8 +41,12 @@ interface IndexProps {
 }
 
 const Index = ({ activeView: propActiveView = 'dashboard' }: IndexProps) => {
-  const { user, loading: authLoading } = useAuth();
-  const { currentStore, stores, loading: storeLoading, isOwner } = useStore();
+  const user = useUser();
+  const authLoading = useAuthLoading();
+  const currentStore = useCurrentStore();
+  const stores = useStores();
+  const storeLoading = useStoreLoading();
+  const isOwner = useIsOwner();
   const setPageLoading = usePageLoading();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();

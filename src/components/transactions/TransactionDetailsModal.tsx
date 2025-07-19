@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useStore } from "@/contexts/StoreContext";
-import { useAuth } from "@/contexts/AuthContext";
+import { useCurrentStore } from "@/stores/storeStore";
+import { useUser } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { usePaymentMethods } from "@/hooks/usePaymentMethods";
@@ -84,6 +84,8 @@ interface OrderItem {
   } | null;
 }
 
+
+
 interface LaybyDetails {
   id: string;
   layby_number: string;
@@ -129,12 +131,13 @@ export function TransactionDetailsModal({
   onOpenChange,
   onTransactionUpdate
 }: TransactionDetailsModalProps) {
-  const { currentStore } = useStore();
-  const { user } = useAuth();
+  const currentStore = useCurrentStore();
+  const user = useUser();
   const { getPaymentMethodDisplay, getPaymentMethodBadgeVariant } = usePaymentMethods();
   const [loading, setLoading] = useState(false);
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
   const [laybyDetails, setLaybyDetails] = useState<LaybyDetails | null>(null);
+
   const [editingNotes, setEditingNotes] = useState(false);
   const [notes, setNotes] = useState(transaction.notes || "");
   const [savingNotes, setSavingNotes] = useState(false);

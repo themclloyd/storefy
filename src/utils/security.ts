@@ -31,6 +31,8 @@ export const CSP_CONFIG = {
   ],
   'connect-src': [
     "'self'",
+    'http://localhost:8080',
+    'ws://localhost:8080',
     'https://*.supabase.co',
     'wss://*.supabase.co',
     'https://api.vercel.com',

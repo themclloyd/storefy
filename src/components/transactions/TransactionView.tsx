@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useStore } from "@/contexts/StoreContext";
-import { useAuth } from "@/contexts/AuthContext";
+import { useCurrentStore } from "@/stores/storeStore";
+import { useUser } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useTax } from "@/hooks/useTax";
@@ -13,11 +13,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Receipt, DollarSign, TrendingUp, Calendar as CalendarIcon, Download, Filter, Eye, Clock } from "lucide-react";
+import { Search, Receipt, DollarSign, TrendingUp, Calendar as CalendarIcon, Download, Filter, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { TransactionDetailsModal } from "./TransactionDetailsModal";
-import { LaybyView } from "../layby/LaybyView";
+
 import { ErrorBoundary } from "../ErrorBoundary";
 
 interface Transaction {
@@ -37,8 +36,8 @@ interface Transaction {
 }
 
 export function TransactionView() {
-  const { currentStore } = useStore();
-  const { user } = useAuth();
+  const currentStore = useCurrentStore();
+  const user = useUser();
   const { formatCurrency } = useTax();
   const { getPaymentOptions, getPaymentMethodDisplay, getPaymentMethodBadgeVariant } = usePaymentMethods();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -50,7 +49,7 @@ export function TransactionView() {
   const [dateTo, setDateTo] = useState<Date>();
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [showTransactionDetails, setShowTransactionDetails] = useState(false);
-  const [activeTab, setActiveTab] = useState("transactions");
+
 
   useEffect(() => {
     if (currentStore) {
@@ -206,38 +205,20 @@ export function TransactionView() {
       <div className="space-y-6 p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Transactions & Layby</h1>
+            <h1 className="text-3xl font-bold text-foreground">Transactions</h1>
             <p className="text-muted-foreground mt-2">
-              View and manage all store transactions and layby orders
+              View and manage all store transactions
             </p>
           </div>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
-            <TabsTrigger value="transactions" className="flex items-center gap-2">
-              <Receipt className="w-4 h-4" />
-              Transactions
-            </TabsTrigger>
-            <TabsTrigger value="layby" className="flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              Layby Orders
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="transactions" className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <h2 className="text-xl font-semibold text-foreground">Transaction History</h2>
-                <p className="text-muted-foreground">
-                  View and manage all store transactions
-                </p>
-              </div>
-              <Button variant="outline" onClick={exportTransactions} disabled={filteredTransactions.length === 0}>
-                <Download className="w-4 h-4 mr-2" />
-                Export CSV
-              </Button>
-            </div>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div></div>
+          <Button variant="outline" onClick={exportTransactions} disabled={filteredTransactions.length === 0}>
+            <Download className="w-4 h-4 mr-2" />
+            Export CSV
+          </Button>
+        </div>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -492,12 +473,7 @@ export function TransactionView() {
                 onTransactionUpdate={fetchTransactions}
               />
             )}
-          </TabsContent>
 
-          <TabsContent value="layby" className="space-y-6">
-            <LaybyView />
-          </TabsContent>
-        </Tabs>
       </div>
     </ErrorBoundary>
   );

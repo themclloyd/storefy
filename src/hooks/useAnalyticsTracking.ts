@@ -1,8 +1,8 @@
 import { useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { analytics, AnalyticsEvent } from '@/utils/analytics';
-import { useAuth } from '@/contexts/AuthContext';
-import { useStore } from '@/contexts/StoreContext';
+import { useUser } from '@/stores/authStore';
+import { useCurrentStore } from '@/stores/storeStore';
 
 // Performance tracking hook
 export const usePerformanceTracking = () => {
@@ -28,8 +28,8 @@ export const usePerformanceTracking = () => {
 // Page tracking hook
 export const usePageTracking = () => {
   const location = useLocation();
-  const { user } = useAuth();
-  const { currentStore } = useStore();
+  const user = useUser();
+  const currentStore = useCurrentStore();
 
   useEffect(() => {
     // Set analytics context
@@ -49,7 +49,7 @@ export const usePageTracking = () => {
 
 // Business event tracking hook
 export const useBusinessTracking = () => {
-  const { currentStore } = useStore();
+  const currentStore = useCurrentStore();
 
   const trackTransaction = useCallback((data: {
     amount: number;
@@ -168,7 +168,7 @@ export const useBusinessTracking = () => {
 
 // Feature usage tracking hook
 export const useFeatureTracking = () => {
-  const { currentStore } = useStore();
+  const currentStore = useCurrentStore();
 
   const trackFeatureUsage = useCallback((feature: string, context?: string) => {
     analytics.trackEvent('feature_used', {
@@ -196,7 +196,7 @@ export const useErrorTracking = () => {
 
 // Authentication tracking hook
 export const useAuthTracking = () => {
-  const { currentStore } = useStore();
+  const currentStore = useCurrentStore();
 
   const trackLogin = useCallback((method: 'email' | 'pin' | 'store_code') => {
     analytics.trackEvent('user_login', {

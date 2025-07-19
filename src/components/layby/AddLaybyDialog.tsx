@@ -21,8 +21,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Plus } from "lucide-react";
-import { useStore } from "@/contexts/StoreContext";
-import { useAuth } from "@/contexts/AuthContext";
+import { useCurrentStore } from "@/stores/storeStore";
+import { useUser } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useTax } from "@/hooks/useTax";
@@ -44,8 +44,8 @@ interface AddLaybyDialogProps {
 }
 
 export function AddLaybyDialog({ open, onOpenChange, onLaybyAdded }: AddLaybyDialogProps) {
-  const { currentStore } = useStore();
-  const { user } = useAuth();
+  const currentStore = useCurrentStore();
+  const user = useUser();
   const { formatCurrency } = useTax();
   const [loading, setLoading] = useState(false);
 

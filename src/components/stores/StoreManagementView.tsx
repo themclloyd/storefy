@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { useStore } from '@/contexts/StoreContext';
+import { useStores, useCurrentStore, useStoreActions } from '@/stores/storeStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Badge } from '@/components/ui/badge';
 import { Building2, Plus, Users, Crown, UserCheck, Settings, BarChart3, Eye, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { useUser } from '@/stores/authStore';
 import { toast } from 'sonner';
 
 interface StoreStats {

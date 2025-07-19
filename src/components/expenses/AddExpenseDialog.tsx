@@ -29,8 +29,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { CalendarIcon, Loader2, Upload, X } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { useStore } from "@/contexts/StoreContext";
-import { useAuth } from "@/contexts/AuthContext";
+import { useCurrentStore } from "@/stores/storeStore";
+import { useUser } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -72,8 +72,8 @@ export function AddExpenseDialog({
   onExpenseAdded, 
   categories 
 }: AddExpenseDialogProps) {
-  const { currentStore } = useStore();
-  const { user } = useAuth();
+  const currentStore = useCurrentStore();
+  const user = useUser();
   const [loading, setLoading] = useState(false);
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
 

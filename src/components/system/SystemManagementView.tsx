@@ -35,7 +35,7 @@ import { DatabaseManagement } from './DatabaseManagement';
 import { AnonymousAnalytics } from './AnonymousAnalytics';
 import { PrivacySettings } from './PrivacySettings';
 import { ModernSystemDashboard } from './ModernSystemDashboard';
-import { useAuth } from '@/contexts/AuthContext';
+import { useUser } from '@/stores/authStore';
 import { usePermissions } from '@/contexts/PermissionContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -44,7 +44,7 @@ interface SystemManagementViewProps {
 }
 
 export function SystemManagementView({ onViewChange }: SystemManagementViewProps = {}) {
-  const { user } = useAuth();
+  const user = useUser();
   const { userRole } = usePermissions();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');

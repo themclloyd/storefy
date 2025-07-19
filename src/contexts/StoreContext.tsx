@@ -6,6 +6,7 @@ import { sessionManager } from '@/lib/sessionManager';
 import { pageStateManager } from '@/lib/pageStateManager';
 import { useAppInitialization } from './AppInitializationContext';
 import { debounceAsync } from '@/utils/debounce';
+import { useStoreStore } from '@/stores/storeStore';
 
 interface Store {
   id: string;
@@ -268,6 +269,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       setCurrentStore(store);
       setUserRole(store.role || null);
 
+      // Also update Zustand store for consistency
+      const zustandStore = useStoreStore.getState();
+      zustandStore.setCurrentStore(store);
+      console.log('🔄 Zustand store updated with selected store');
+
       // For main users (not PIN users), persist store selection
       if (!pinData && user) {
         console.log('💾 Saving store selection to localStorage');
@@ -405,6 +411,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       }
     } else {
       console.log('No stored store selection found');
+
+      // Auto-select if user has only one store
+      if (stores.length === 1) {
+        console.log('🎯 Auto-selecting single store:', stores[0].name);
+        selectStore(stores[0].id);
+      }
     }
   }, [stores, user, pinData, currentStore]);
 

@@ -1,4 +1,4 @@
-import { useAuth } from '@/contexts/AuthContext';
+import { useUser } from '@/stores/authStore';
 import { supabase } from '@/integrations/supabase/client';
 import { sessionManager } from '@/lib/sessionManager';
 
@@ -6,7 +6,7 @@ import { sessionManager } from '@/lib/sessionManager';
  * Hook for data operations that automatically handles PIN sessions
  */
 export function useStoreData() {
-  const { user } = useAuth();
+  const user = useUser();
 
   // Check for PIN session using session manager
   const pinData = sessionManager.getPinSession();

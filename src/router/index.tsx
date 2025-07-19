@@ -12,15 +12,15 @@ const RouterAppLayout = lazy(() => import('@/components/layout/RouterAppLayout')
 const Dashboard = lazy(() => import('@/components/dashboard/SimpleDashboard').then(m => ({ default: m.SimpleDashboard })));
 const POSView = lazy(() => import('@/components/pos/POSView').then(m => ({ default: m.POSView })));
 const InventoryView = lazy(() => import('@/components/inventory/InventoryView').then(m => ({ default: m.InventoryView })));
-const CategoriesView = lazy(() => import('@/components/categories/CategoriesView').then(m => ({ default: m.CategoriesView })));
-const SuppliersView = lazy(() => import('@/components/suppliers/SuppliersView').then(m => ({ default: m.SuppliersView })));
+const CategoriesView = lazy(() => import('@/components/inventory/CategoriesView').then(m => ({ default: m.CategoriesView })));
+const SuppliersView = lazy(() => import('@/components/inventory/SuppliersView').then(m => ({ default: m.SuppliersView })));
 const CustomersView = lazy(() => import('@/components/customers/CustomersView').then(m => ({ default: m.CustomersView })));
 const LaybyView = lazy(() => import('@/components/layby/LaybyView').then(m => ({ default: m.LaybyView })));
 const TransactionView = lazy(() => import('@/components/transactions/TransactionView').then(m => ({ default: m.TransactionView })));
 const ReportsView = lazy(() => import('@/components/reports/ReportsView').then(m => ({ default: m.ReportsView })));
 const ExpenseView = lazy(() => import('@/components/expenses/ExpenseView').then(m => ({ default: m.ExpenseView })));
 const AnalyticsView = lazy(() => import('@/components/analytics/AnalyticsView').then(m => ({ default: m.AnalyticsView })));
-const ShowcaseView = lazy(() => import('@/components/showcase/ShowcaseView').then(m => ({ default: m.ShowcaseView })));
+const ShowcaseView = lazy(() => import('@/components/showcase/ShowcaseManagementView').then(m => ({ default: m.ShowcaseManagementView })));
 const SettingsView = lazy(() => import('@/components/settings/SettingsView').then(m => ({ default: m.SettingsView })));
 const SubscriptionPage = lazy(() => import('@/pages/SubscriptionPage'));
 const PaymentResultPage = lazy(() => import('@/pages/PaymentResultPage'));
@@ -97,6 +97,10 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <AppProviders />,
+    errorElement: <div className="p-8 text-center">
+      <h1 className="text-2xl font-bold text-red-600 mb-4">Application Error</h1>
+      <p className="text-gray-600">Please refresh the page or contact support if the issue persists.</p>
+    </div>,
     children: [
       {
         index: true,

@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useUser } from '@/stores/authStore';
 import { subscriptionService, UserSubscription, SubscriptionPlan, SubscriptionUsage, UserAccessStatus } from '@/services/subscription';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 export function useSubscription() {
-  const { user } = useAuth();
+  const user = useUser();
   const [subscription, setSubscription] = useState<UserSubscription | null>(null);
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [usage, setUsage] = useState<SubscriptionUsage | null>(null);

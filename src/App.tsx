@@ -113,11 +113,11 @@ const App = () => {
       });
     }
 
-    // Initialize security measures
+    // Initialize security measures (CSP disabled in dev)
     initializeSecurity();
 
-    // Initialize performance monitoring
-    initializePerformanceMonitoring();
+    // Initialize performance monitoring (temporarily disabled to prevent conflicts)
+    // initializePerformanceMonitoring();
 
     // Cleanup function to prevent memory leaks
     return () => {

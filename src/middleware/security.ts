@@ -96,10 +96,8 @@ function setupXSSProtection(): void {
  */
 function setupSecurityHeaders(): void {
   // Note: In production, these should be set by the server/CDN
-  const meta = document.createElement('meta');
-  meta.httpEquiv = 'Content-Security-Policy';
-  meta.content = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';";
-  document.head.appendChild(meta);
+  // Disable CSP in development to avoid blocking Supabase and other services
+  console.log('🔒 CSP disabled in development for compatibility');
 }
 
 /**

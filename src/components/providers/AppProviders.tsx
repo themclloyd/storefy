@@ -7,11 +7,12 @@ import { HiddenAdminAccess } from '@/components/system/HiddenAdminAccess';
 import { PageLoading } from '@/components/ui/modern-loading';
 import { useStoreInitialization } from '@/hooks/useStoreInitialization';
 import { useGlobalLoading } from '@/stores/loadingStore';
+import { PermissionProvider } from '@/contexts/PermissionContext';
+import { StoreProvider } from '@/contexts/StoreContext';
 import { AppInitializationScreen } from '@/components/initialization/AppInitializationScreen';
 
 export function AppProviders() {
   const { isReady } = useStoreInitialization();
-  const globalLoading = useGlobalLoading();
 
   // Show initialization screen while stores are initializing
   if (!isReady) {
@@ -20,23 +21,19 @@ export function AppProviders() {
 
   // Once initialized, render the main app with minimal providers
   return (
-    <AnalyticsProvider>
-      <SessionActivityTracker>
-        <HiddenAdminAccess>
-          <SessionWarning />
-
-          {/* Global loading overlay */}
-          {globalLoading.isLoading && globalLoading.loadingType === 'page' && (
-            <div className="fixed inset-0 z-[9999] bg-background/80 backdrop-blur-sm">
-              <PageLoading text={globalLoading.loadingText} />
-            </div>
-          )}
-
-          <Suspense fallback={<PageLoading text="Loading application..." />}>
-            <Outlet />
-          </Suspense>
-        </HiddenAdminAccess>
-      </SessionActivityTracker>
-    </AnalyticsProvider>
+    <StoreProvider>
+      <PermissionProvider>
+        <AnalyticsProvider>
+          <SessionActivityTracker>
+            <HiddenAdminAccess>
+              <SessionWarning />
+              <Suspense fallback={<PageLoading text="Loading application..." />}>
+                <Outlet />
+              </Suspense>
+            </HiddenAdminAccess>
+          </SessionActivityTracker>
+        </AnalyticsProvider>
+      </PermissionProvider>
+    </StoreProvider>
   );
 }

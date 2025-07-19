@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useStore } from '@/contexts/StoreContext';
+import { useStores, useCurrentStore, useStoreActions } from '@/stores/storeStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Badge } from '@/components/ui/badge';
 import { Building2, Plus, Users, Crown, UserCheck, Store, Sparkles, ArrowRight, LogOut, ShoppingBag, MapPin, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { useUser, useSignOut } from '@/stores/authStore';
 import { toast } from 'sonner';
 import { PremiumStoreSelector } from './PremiumStoreSelector';
 
@@ -19,8 +19,11 @@ export function StoreSelector() {
 
 // Keep the old implementation as backup
 export function LegacyStoreSelector() {
-  const { stores, currentStore, selectStore, refreshStores, clearStoreSelection } = useStore();
-  const { user, signOut } = useAuth();
+  const stores = useStores();
+  const currentStore = useCurrentStore();
+  const { selectStore, refreshStores, clearStoreSelection } = useStoreActions();
+  const user = useUser();
+  const signOut = useSignOut();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [newStoreName, setNewStoreName] = useState('');
   const [newStoreAddress, setNewStoreAddress] = useState('');

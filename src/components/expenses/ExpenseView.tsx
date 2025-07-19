@@ -28,8 +28,8 @@ import {
   Repeat
 } from "lucide-react";
 import { format } from "date-fns";
-import { useStore } from "@/contexts/StoreContext";
-import { useAuth } from "@/contexts/AuthContext";
+import { useCurrentStore } from "@/stores/storeStore";
+import { useUser } from "@/stores/authStore";
 import { SecureAction, SecureButton } from "@/components/auth/SecureAction";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -69,8 +69,8 @@ interface ExpenseCategory {
 }
 
 export function ExpenseView() {
-  const { currentStore } = useStore();
-  const { user } = useAuth();
+  const currentStore = useCurrentStore();
+  const user = useUser();
   const { formatCurrency } = useTax();
 
   const [expenses, setExpenses] = useState<Expense[]>([]);

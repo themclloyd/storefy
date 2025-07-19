@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useStore } from '@/contexts/StoreContext';
-import { useAuth } from '@/contexts/AuthContext';
+import { useStores, useCurrentStore, useSelectStore } from '@/stores/storeStore';
+import { useUser } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -14,8 +14,10 @@ import { Badge } from '@/components/ui/badge';
 import { Building2, ChevronDown, Crown, UserCheck, Users, Check } from 'lucide-react';
 
 export function CompactStoreSelector() {
-  const { stores, currentStore, selectStore } = useStore();
-  const { user } = useAuth();
+  const stores = useStores();
+  const currentStore = useCurrentStore();
+  const selectStore = useSelectStore();
+  const user = useUser();
 
   const getRoleIcon = (role: string) => {
     switch (role) {

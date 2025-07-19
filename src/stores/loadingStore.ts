@@ -95,12 +95,14 @@ export const useLoadingStore = create<LoadingStore>()(
   )
 );
 
-// Selectors for optimized re-renders
-export const useGlobalLoading = () => useLoadingStore((state) => ({
-  isLoading: state.isLoading,
-  loadingText: state.loadingText,
-  loadingType: state.loadingType,
-}));
+// Selectors for optimized re-renders with proper memoization
+export const useGlobalLoading = () => {
+  return useLoadingStore((state) => ({
+    isLoading: state.isLoading,
+    loadingText: state.loadingText,
+    loadingType: state.loadingType,
+  }), (a, b) => a.isLoading === b.isLoading && a.loadingText === b.loadingText && a.loadingType === b.loadingType);
+};
 
 export const useIsLoading = () => useLoadingStore((state) => state.isLoading);
 export const useLoadingText = () => useLoadingStore((state) => state.loadingText);

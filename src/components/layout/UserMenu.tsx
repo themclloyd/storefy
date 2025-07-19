@@ -1,4 +1,4 @@
-import { useAuth } from '@/contexts/AuthContext';
+import { useUser, useSignOut } from '@/stores/authStore';
 import { useRoleBasedNavigation } from '@/hooks/useRoleBasedAccess';
 import { sessionManager } from '@/lib/sessionManager';
 import { Button } from '@/components/ui/button';
@@ -29,7 +29,8 @@ interface UserMenuProps {
 }
 
 export function UserMenu({ onViewChange }: UserMenuProps) {
-  const { user, signOut } = useAuth();
+  const user = useUser();
+  const signOut = useSignOut();
   const { userRole } = useRoleBasedNavigation();
   const navigate = useNavigate();
 

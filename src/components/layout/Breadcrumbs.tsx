@@ -1,4 +1,4 @@
-import { useStore } from '@/contexts/StoreContext';
+import { useCurrentStore } from '@/stores/storeStore';
 import { ChevronRight, Building2 } from 'lucide-react';
 
 interface BreadcrumbsProps {
@@ -6,7 +6,9 @@ interface BreadcrumbsProps {
 }
 
 export function Breadcrumbs({ activeView }: BreadcrumbsProps) {
-  const { currentStore } = useStore();
+  const currentStore = useCurrentStore();
+
+  // Force refresh to clear cache
 
   // Check for PIN session
   const pinSession = localStorage.getItem('pin_session');
@@ -78,7 +80,7 @@ export function Breadcrumbs({ activeView }: BreadcrumbsProps) {
   const showSection = sectionName !== pageName;
 
   return (
-    <nav className="flex items-center space-x-1 text-sm text-muted-foreground">
+    <nav className="flex items-center space-x-1 text-xs text-muted-foreground">
       {/* Store Name */}
       <div className="flex items-center gap-1">
         <Building2 className="w-4 h-4" />

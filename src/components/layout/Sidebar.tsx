@@ -5,7 +5,7 @@ import { CompactStoreSelector } from "@/components/stores/CompactStoreSelector";
 import { UserMenu } from "@/components/layout/UserMenu";
 
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { useUser } from "@/stores/authStore";
 import { usePermissions } from "@/contexts/PermissionContext";
 import {
   Sidebar as SidebarPrimitive,
@@ -24,19 +24,22 @@ import {
 interface SidebarProps {
   activeView: string;
   onViewChange: (view: string) => void;
+  collapsible?: "icon" | "offcanvas" | "none";
 }
 
 
 
-export function Sidebar({ activeView, onViewChange }: SidebarProps) {
+export function Sidebar({ activeView, onViewChange, collapsible = "icon" }: SidebarProps) {
   const { state } = useSidebar();
   const { getNavigationItems } = useRoleBasedNavigation();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const user = useUser();
   const { userRole } = usePermissions();
 
   // Get role-based navigation items
   const navigationItems = getNavigationItems();
+
+  // Debug logging (removed for cleaner console)
 
   // Get all navigation items (already filtered by role permissions)
   const filteredMainNav = navigationItems;
@@ -45,7 +48,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
     <SidebarPrimitive
       side="left"
       variant="sidebar"
-      collapsible="icon"
+      collapsible={collapsible}
       className="border-r border-border/40 bg-sidebar"
     >
       <SidebarHeader className="border-b border-border/40 bg-sidebar">
@@ -93,7 +96,10 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
                   <SidebarMenuItem key={item.id}>
                     <SidebarMenuButton
                       isActive={activeView === item.id}
-                      onClick={() => onViewChange(item.id)}
+                      onClick={() => {
+                        navigate(`/app/${item.id}`);
+                        onViewChange(item.id);
+                      }}
                       tooltip={state === "collapsed" ? item.label : undefined}
                       className="h-11 md:h-10 px-2 md:px-3 justify-start gap-2 md:gap-3 text-sm md:text-base"
                     >
@@ -114,7 +120,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
             <SidebarMenu className="space-y-1">
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  onClick={() => navigate('/subscription')}
+                  onClick={() => navigate('/app/subscription')}
                   tooltip={state === "collapsed" ? "Subscription" : undefined}
                   className="h-10 px-3 justify-start gap-3"
                 >

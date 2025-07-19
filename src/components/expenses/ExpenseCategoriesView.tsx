@@ -12,8 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Search, Plus, FolderOpen, Edit, Trash2, Loader2, Palette } from "lucide-react";
-import { useStore } from "@/contexts/StoreContext";
-import { useAuth } from "@/contexts/AuthContext";
+import { useCurrentStore } from "@/stores/storeStore";
+import { useUser } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AddExpenseCategoryDialog } from "./AddExpenseCategoryDialog";
@@ -40,8 +40,8 @@ export function ExpenseCategoriesView({
   onOpenChange, 
   onCategoriesUpdated 
 }: ExpenseCategoriesViewProps) {
-  const { currentStore } = useStore();
-  const { user } = useAuth();
+  const currentStore = useCurrentStore();
+  const user = useUser();
 
   const [categories, setCategories] = useState<ExpenseCategory[]>([]);
   const [filteredCategories, setFilteredCategories] = useState<ExpenseCategory[]>([]);

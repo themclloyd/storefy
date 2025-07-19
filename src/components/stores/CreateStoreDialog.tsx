@@ -5,8 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Plus, MapPin } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
-import { useStore } from '@/contexts/StoreContext';
+import { useUser } from '@/stores/authStore';
+import { useStoreActions } from '@/stores/storeStore';
 import { toast } from 'sonner';
 
 interface CreateStoreDialogProps {

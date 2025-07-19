@@ -3,7 +3,8 @@
  * Implements Web Vitals, error tracking, and performance analytics
  */
 
-import { getCLS, getFID, getFCP, getLCP, getTTFB, onINP } from 'web-vitals';
+// Try different import approaches for web-vitals v5
+import * as webVitals from 'web-vitals';
 
 // Performance metrics interface
 interface PerformanceMetric {
@@ -48,11 +49,17 @@ export class PerformanceMonitor {
   initialize(): void {
     if (this.isInitialized) return;
 
+    // Check if browser supports performance monitoring
+    if (typeof window === 'undefined' || !window.performance) {
+      console.warn('Performance monitoring not supported in this environment');
+      return;
+    }
+
     this.setupWebVitals();
     this.setupErrorTracking();
     this.setupResourceMonitoring();
     this.setupNavigationTiming();
-    
+
     this.isInitialized = true;
     console.log('📊 Performance monitoring initialized');
   }
@@ -61,35 +68,54 @@ export class PerformanceMonitor {
    * Set up Web Vitals monitoring
    */
   private setupWebVitals(): void {
-    // Largest Contentful Paint (LCP)
-    getLCP((metric) => {
-      this.recordMetric('LCP', metric.value, this.getRating(metric.value, [2500, 4000]));
-    });
+    try {
+      // Check if web-vitals functions are available
+      if (webVitals.onLCP) {
+        // Largest Contentful Paint (LCP)
+        webVitals.onLCP((metric) => {
+          this.recordMetric('LCP', metric.value, this.getRating(metric.value, [2500, 4000]));
+        });
+      }
 
-    // First Input Delay (FID)
-    getFID((metric) => {
-      this.recordMetric('FID', metric.value, this.getRating(metric.value, [100, 300]));
-    });
+      if (webVitals.onFID) {
+        // First Input Delay (FID)
+        webVitals.onFID((metric) => {
+          this.recordMetric('FID', metric.value, this.getRating(metric.value, [100, 300]));
+        });
+      }
 
-    // Cumulative Layout Shift (CLS)
-    getCLS((metric) => {
-      this.recordMetric('CLS', metric.value, this.getRating(metric.value, [0.1, 0.25]));
-    });
+      if (webVitals.onCLS) {
+        // Cumulative Layout Shift (CLS)
+        webVitals.onCLS((metric) => {
+          this.recordMetric('CLS', metric.value, this.getRating(metric.value, [0.1, 0.25]));
+        });
+      }
 
-    // First Contentful Paint (FCP)
-    getFCP((metric) => {
-      this.recordMetric('FCP', metric.value, this.getRating(metric.value, [1800, 3000]));
-    });
+      if (webVitals.onFCP) {
+        // First Contentful Paint (FCP)
+        webVitals.onFCP((metric) => {
+          this.recordMetric('FCP', metric.value, this.getRating(metric.value, [1800, 3000]));
+        });
+      }
 
-    // Time to First Byte (TTFB)
-    getTTFB((metric) => {
-      this.recordMetric('TTFB', metric.value, this.getRating(metric.value, [800, 1800]));
-    });
+      if (webVitals.onTTFB) {
+        // Time to First Byte (TTFB)
+        webVitals.onTTFB((metric) => {
+          this.recordMetric('TTFB', metric.value, this.getRating(metric.value, [800, 1800]));
+        });
+      }
 
-    // Interaction to Next Paint (INP) - New metric for 2025
-    onINP((metric) => {
-      this.recordMetric('INP', metric.value, this.getRating(metric.value, [200, 500]));
-    });
+      if (webVitals.onINP) {
+        // Interaction to Next Paint (INP) - New metric for 2025
+        webVitals.onINP((metric) => {
+          this.recordMetric('INP', metric.value, this.getRating(metric.value, [200, 500]));
+        });
+      }
+
+      console.log('📊 Web Vitals monitoring setup completed');
+    } catch (error) {
+      console.warn('Web Vitals monitoring setup failed:', error);
+    }
   }
 
   /**
