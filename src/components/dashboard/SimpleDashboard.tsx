@@ -11,11 +11,9 @@ import {
   AlertTriangle,
   ArrowUpRight,
   Eye,
-  Loader2,
   BarChart3,
   PieChart
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useCurrentStore } from '@/stores/storeStore';
 import { useStoreData } from '@/hooks/useSupabaseClient';
 import { useTax } from '@/hooks/useTax';
@@ -30,8 +28,7 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
-  Legend
+  Tooltip
 } from 'recharts';
 
 interface DashboardProps {

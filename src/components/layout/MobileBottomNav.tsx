@@ -19,11 +19,11 @@ interface MobileBottomNavProps {
 }
 
 const navigationItems = [
-  { id: "analytics", label: "Analytics", icon: TrendingUp },
   { id: "dashboard", label: "Home", icon: Home },
   { id: "pos", label: "POS", icon: ShoppingCart },
   { id: "showcase", label: "Showcase", icon: Globe },
-  { id: "inventory", label: "Stock", icon: Package }
+  { id: "inventory", label: "Stock", icon: Package },
+  { id: "customers", label: "Customers", icon: Users }
 ];
 
 export function MobileBottomNav({ activeView, onViewChange }: MobileBottomNavProps) {

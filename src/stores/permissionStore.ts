@@ -295,16 +295,13 @@ export const usePermissionStore = create<PermissionStore>()(
   )
 );
 
-// Selectors for optimized re-renders
+// Selectors for optimized re-renders (removed unused selectors)
 export const useUserRole = () => usePermissionStore((state) => state.userRole);
-export const usePermissionLoading = () => usePermissionStore((state) => state.loading);
-export const usePermissionInitialized = () => usePermissionStore((state) => state.initialized);
 export const useHasPermission = () => usePermissionStore((state) => state.hasPermission);
 export const useCanAccessPage = () => usePermissionStore((state) => state.canAccessPage);
 // Individual action selectors to avoid object recreation
 export const useLoadPermissions = () => usePermissionStore((state) => state.loadPermissions);
 export const useCheckPermission = () => usePermissionStore((state) => state.checkPermission);
-export const useCheckPageAccess = () => usePermissionStore((state) => state.checkPageAccess);
 export const useRefreshPermissions = () => usePermissionStore((state) => state.refreshPermissions);
 export const useLogSecurityEvent = () => usePermissionStore((state) => state.logSecurityEvent);
 export const useResetPermissions = () => usePermissionStore((state) => state.reset);
@@ -312,7 +309,7 @@ export const useResetPermissions = () => usePermissionStore((state) => state.res
 // Combined hook for backward compatibility
 export const usePermissions = () => {
   const userRole = useUserRole();
-  const loading = usePermissionLoading();
+  const loading = usePermissionStore((state) => state.loading);
   const hasPermission = useHasPermission();
   const canAccessPage = useCanAccessPage();
   const loadPermissions = useLoadPermissions();

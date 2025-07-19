@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import React from 'react';
 
 interface LoadingState {
   isLoading: boolean;
@@ -105,42 +104,9 @@ export const useGlobalLoading = () => {
   }), (a, b) => a.isLoading === b.isLoading && a.loadingText === b.loadingText && a.loadingType === b.loadingType);
 };
 
-export const useIsLoading = () => useLoadingStore((state) => state.isLoading);
-export const useLoadingText = () => useLoadingStore((state) => state.loadingText);
-
-// Action selectors
-export const useLoadingActions = () => useLoadingStore((state) => ({
-  setPageLoading: state.setPageLoading,
-  setComponentLoading: state.setComponentLoading,
-  setActionLoading: state.setActionLoading,
-  clearLoading: state.clearLoading,
-}));
+// Action selectors (removed unused individual selectors)
 
 // Hook aliases for backward compatibility
 export const usePageLoading = () => useLoadingStore((state) => state.setPageLoading);
 export const useComponentLoading = () => useLoadingStore((state) => state.setComponentLoading);
 export const useActionLoading = () => useLoadingStore((state) => state.setActionLoading);
-
-// Global Loading Overlay Component
-export function GlobalLoadingOverlay() {
-  const { isLoading, loadingText, loadingType } = useGlobalLoading();
-
-  if (!isLoading || loadingType !== 'page') {
-    return null;
-  }
-
-  // Dynamically import PageLoading to avoid circular dependency
-  const PageLoading = React.lazy(() =>
-    import('@/components/ui/modern-loading').then(module => ({
-      default: module.PageLoading
-    }))
-  );
-
-  return (
-    <div className="fixed inset-0 z-[9999] bg-background/80 backdrop-blur-sm">
-      <React.Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
-        <PageLoading text={loadingText} />
-      </React.Suspense>
-    </div>
-  );
-}

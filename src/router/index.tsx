@@ -9,7 +9,8 @@ const LandingPage = lazy(() => import('@/pages/LandingPage'));
 const AuthPage = lazy(() => import('@/pages/AuthPage'));
 const PinLoginPage = lazy(() => import('@/pages/PinLoginPage'));
 const RouterAppLayout = lazy(() => import('@/components/layout/RouterAppLayout'));
-const Dashboard = lazy(() => import('@/components/dashboard/SimpleDashboard').then(m => ({ default: m.SimpleDashboard })));
+const Dashboard = lazy(() => import('@/components/dashboard/DashboardWithNavigation').then(m => ({ default: m.DashboardWithNavigation })));
+const ReportsView = lazy(() => import('@/components/reports/ReportsWithNavigation').then(m => ({ default: m.ReportsWithNavigation })));
 const POSView = lazy(() => import('@/components/pos/POSView').then(m => ({ default: m.POSView })));
 const InventoryView = lazy(() => import('@/components/inventory/InventoryView').then(m => ({ default: m.InventoryView })));
 const CategoriesView = lazy(() => import('@/components/inventory/CategoriesView').then(m => ({ default: m.CategoriesView })));
@@ -17,9 +18,8 @@ const SuppliersView = lazy(() => import('@/components/inventory/SuppliersView').
 const CustomersView = lazy(() => import('@/components/customers/CustomersView').then(m => ({ default: m.CustomersView })));
 const LaybyView = lazy(() => import('@/components/layby/LaybyView').then(m => ({ default: m.LaybyView })));
 const TransactionView = lazy(() => import('@/components/transactions/TransactionView').then(m => ({ default: m.TransactionView })));
-const ReportsView = lazy(() => import('@/components/reports/ReportsView').then(m => ({ default: m.ReportsView })));
+
 const ExpenseView = lazy(() => import('@/components/expenses/ExpenseView').then(m => ({ default: m.ExpenseView })));
-const AnalyticsView = lazy(() => import('@/components/analytics/AnalyticsView').then(m => ({ default: m.AnalyticsView })));
 const ShowcaseView = lazy(() => import('@/components/showcase/ShowcaseManagementView').then(m => ({ default: m.ShowcaseManagementView })));
 const PublicStoreShowcase = lazy(() => import('@/components/showcase/PublicStoreShowcase').then(m => ({ default: m.PublicStoreShowcase })));
 const SettingsView = lazy(() => import('@/components/settings/SettingsView').then(m => ({ default: m.SettingsView })));
@@ -152,7 +152,18 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <Dashboard onViewChange={() => {}} />,
+            element: <Dashboard />,
+          },
+        ],
+      },
+      {
+        path: 'reports',
+        element: <RouterAppLayout />,
+        loader: protectedLoader,
+        children: [
+          {
+            index: true,
+            element: <ReportsView />,
           },
         ],
       },
@@ -233,17 +244,7 @@ export const router = createBrowserRouter([
           },
         ],
       },
-      {
-        path: 'reports',
-        element: <RouterAppLayout />,
-        loader: protectedLoader,
-        children: [
-          {
-            index: true,
-            element: <ReportsView />,
-          },
-        ],
-      },
+
       {
         path: 'expenses',
         element: <RouterAppLayout />,
@@ -255,17 +256,7 @@ export const router = createBrowserRouter([
           },
         ],
       },
-      {
-        path: 'analytics',
-        element: <RouterAppLayout />,
-        loader: protectedLoader,
-        children: [
-          {
-            index: true,
-            element: <AnalyticsView />,
-          },
-        ],
-      },
+
       {
         path: 'showcase',
         element: <RouterAppLayout />,
@@ -353,10 +344,7 @@ export const router = createBrowserRouter([
     path: '/expenses',
     loader: () => redirect('/app/expenses'),
   },
-  {
-    path: '/analytics',
-    loader: () => redirect('/app/analytics'),
-  },
+
   {
     path: '/showcase',
     loader: () => redirect('/app/showcase'),

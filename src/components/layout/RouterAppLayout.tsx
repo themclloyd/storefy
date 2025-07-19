@@ -1,5 +1,5 @@
 import { Suspense, useEffect } from 'react';
-import { Outlet, useLoaderData, useLocation } from 'react-router-dom';
+import { Outlet, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { CompactStoreSelector } from '@/components/stores/CompactStoreSelector';
@@ -18,6 +18,7 @@ interface AppLayoutData {
 export default function RouterAppLayout() {
   const data = useLoaderData() as AppLayoutData;
   const location = useLocation();
+  const navigate = useNavigate();
   const setPageLoading = usePageLoading();
 
   // Clear loading when layout mounts
@@ -35,8 +36,8 @@ export default function RouterAppLayout() {
 
   // Handle view changes by navigating
   const handleViewChange = (view: string) => {
-    // Navigation is handled by React Router Link components in Sidebar
     console.log('🔄 View change requested:', view);
+    navigate(`/app/${view}`);
   };
 
   return (
@@ -57,13 +58,13 @@ export default function RouterAppLayout() {
               <SidebarTrigger />
               <span className="text-sm font-medium text-muted-foreground">
                 {currentView === 'dashboard' ? 'Dashboard' :
+                 currentView === 'reports' ? 'Reports & Analytics' :
                  currentView === 'pos' ? 'POS System' :
                  currentView === 'inventory' ? 'Inventory' :
                  currentView === 'customers' ? 'Customers' :
                  currentView === 'transactions' ? 'Transactions' :
                  currentView === 'expenses' ? 'Expenses' :
                  currentView === 'layby' ? 'Layby' :
-                 currentView === 'analytics' ? 'Analytics' :
                  currentView === 'subscription' ? 'Subscription' :
                  'Dashboard'}
               </span>

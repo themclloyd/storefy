@@ -58,8 +58,6 @@ export function UserMenu({ onViewChange }: UserMenuProps) {
     navigate('/subscription');
   };
 
-
-
   const getRoleIcon = (role: string) => {
     switch (role) {
       case 'owner':
@@ -159,8 +157,6 @@ export function UserMenu({ onViewChange }: UserMenuProps) {
             Subscription
           </DropdownMenuItem>
         )}
-
-
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={handleSignOut}

@@ -66,7 +66,7 @@ export function ReceiptDialog({
   const receiptRef = useRef<HTMLDivElement>(null);
   const { formatCurrency } = useTax();
 
-  const handlePrint = () => {
+  const handlePrint = (): void => {
     if (receiptRef.current) {
       // Create a secure print stylesheet
       const printStyles = `
@@ -133,7 +133,7 @@ export function ReceiptDialog({
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = (): void => {
     try {
       const doc = new jsPDF({
         orientation: 'portrait',
@@ -224,7 +224,6 @@ export function ReceiptDialog({
       doc.save(`receipt-${orderNumber}.pdf`);
       toast.success('Receipt PDF downloaded successfully');
     } catch (error) {
-      console.error('Error generating PDF:', error);
       toast.error('Failed to generate PDF receipt');
     }
   };

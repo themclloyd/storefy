@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { supabase } from '@/integrations/supabase/client';
@@ -311,7 +312,7 @@ export const useStoreActions = () => {
   const clearStoreSelection = useClearStoreSelection();
   const initialize = useStoreInitialize();
 
-  return React.useMemo(() => ({
+  return useMemo(() => ({
     selectStore,
     updateCurrentStore,
     refreshStores,

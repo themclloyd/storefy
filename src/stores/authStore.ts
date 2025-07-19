@@ -1,4 +1,4 @@
-import React from 'react';
+import { useMemo } from 'react';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { User, Session } from '@supabase/supabase-js';
@@ -198,7 +198,7 @@ export const useAuthActions = () => {
   const signOut = useSignOut();
   const initialize = useAuthInitializeAction();
 
-  return React.useMemo(() => ({
+  return useMemo(() => ({
     signIn,
     signUp,
     signOut,

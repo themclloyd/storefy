@@ -24,6 +24,7 @@ const LaybyView = lazy(() => import("@/components/layby/LaybyView").then(module 
 const TransactionView = lazy(() => import("@/components/transactions/TransactionView").then(module => ({ default: module.TransactionView })));
 const CustomersView = lazy(() => import("@/components/customers/CustomersView").then(module => ({ default: module.CustomersView })));
 const ReportsView = lazy(() => import("@/components/reports/ReportsView").then(module => ({ default: module.ReportsView })));
+
 const SettingsView = lazy(() => import("@/components/settings/SettingsView").then(module => ({ default: module.SettingsView })));
 const StoreManagementView = lazy(() => import("@/components/stores/StoreManagementView").then(module => ({ default: module.StoreManagementView })));
 const AnalyticsView = lazy(() => import("@/components/analytics/AnalyticsView").then(module => ({ default: module.AnalyticsView })));
@@ -87,7 +88,7 @@ const Index = ({ activeView: propActiveView = 'dashboard' }: IndexProps) => {
     // Navigate using React Router
     const viewToPath = {
       'dashboard': '/dashboard',
-      'analytics': '/analytics',
+      'reports': '/reports',
       'pos': '/pos',
       'inventory': '/inventory',
       'categories': '/categories',
@@ -96,7 +97,6 @@ const Index = ({ activeView: propActiveView = 'dashboard' }: IndexProps) => {
       'layby': '/layby',
       'transactions': '/transactions',
       'customers': '/customers',
-      'reports': '/reports',
       'showcase': '/showcase',
       'settings': '/settings',
       'stores': '/stores'
@@ -144,14 +144,15 @@ const Index = ({ activeView: propActiveView = 'dashboard' }: IndexProps) => {
         setActiveView('dashboard');
         navigate('/dashboard', { replace: true });
       }
-      return <SimpleDashboard />;
+      return <SimpleDashboard onViewChange={handleViewChange} />;
     }
 
     switch (activeView) {
       case 'dashboard':
-        return <SimpleDashboard />;
-      case 'analytics':
-        return <AnalyticsView />;
+        return <SimpleDashboard onViewChange={handleViewChange} />;
+      case 'reports':
+        return <ReportsView onViewChange={handleViewChange} />;
+
       case 'pos':
         return <POSView />;
       case 'inventory':
@@ -164,8 +165,6 @@ const Index = ({ activeView: propActiveView = 'dashboard' }: IndexProps) => {
         return <TransactionView />;
       case 'customers':
         return <CustomersView />;
-      case 'reports':
-        return <ReportsView />;
       case 'showcase':
         return <ShowcaseManagementView />;
       case 'settings':
@@ -173,7 +172,7 @@ const Index = ({ activeView: propActiveView = 'dashboard' }: IndexProps) => {
       case 'stores':
         return <StoreManagementView />;
       default:
-        return <SimpleDashboard />;
+        return <SimpleDashboard onViewChange={handleViewChange} />;
     }
   };
 

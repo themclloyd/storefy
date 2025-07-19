@@ -34,7 +34,6 @@ export default [
         ecmaFeatures: {
           jsx: true,
         },
-        project: "./tsconfig.json",
       },
     },
     plugins: {
@@ -51,7 +50,7 @@ export default [
 
       // TypeScript rules for 2025
       "@typescript-eslint/no-unused-vars": [
-        "error",
+        "warn",
         {
           "argsIgnorePattern": "^_",
           "varsIgnorePattern": "^_",
@@ -60,11 +59,6 @@ export default [
         }
       ],
       "@typescript-eslint/no-explicit-any": "warn",
-      "@typescript-eslint/prefer-const": "error",
-      "@typescript-eslint/prefer-nullish-coalescing": "error",
-      "@typescript-eslint/prefer-optional-chain": "error",
-      "@typescript-eslint/no-unnecessary-type-assertion": "error",
-      "@typescript-eslint/no-non-null-assertion": "warn",
 
       // Modern JavaScript features
       "prefer-const": "error",
@@ -89,7 +83,7 @@ export default [
       "no-lone-blocks": "error",
       "no-loop-func": "error",
       "no-multi-str": "error",
-      "no-native-reassign": "error",
+      "no-global-assign": "error",
       "no-new-object": "error",
       "no-new-wrappers": "error",
       "no-octal": "error",

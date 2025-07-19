@@ -81,14 +81,12 @@ export function OrderHistoryDialog({ open, onOpenChange }: OrderHistoryDialogPro
         .limit(50);
 
       if (error) {
-        console.error('Error fetching orders:', error);
         toast.error('Failed to load orders');
         return;
       }
 
       setOrders(data || []);
     } catch (error) {
-      console.error('Error fetching orders:', error);
       toast.error('Failed to load orders');
     } finally {
       setLoading(false);
@@ -107,7 +105,6 @@ export function OrderHistoryDialog({ open, onOpenChange }: OrderHistoryDialogPro
         .eq('id', orderId);
 
       if (error) {
-        console.error('Error refunding order:', error);
         toast.error('Failed to refund order');
         return;
       }
@@ -115,7 +112,6 @@ export function OrderHistoryDialog({ open, onOpenChange }: OrderHistoryDialogPro
       toast.success(`Order ${orderNumber} has been refunded`);
       fetchOrders(); // Refresh the list
     } catch (error) {
-      console.error('Error refunding order:', error);
       toast.error('Failed to refund order');
     }
   };

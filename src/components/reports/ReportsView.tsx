@@ -7,9 +7,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { BarChart3, TrendingUp, Calendar as CalendarIcon, Download, DollarSign, ShoppingCart, Users, Package, Loader2, ArrowUpRight, ArrowDownRight, Filter, RefreshCw, Eye, TrendingDown } from "lucide-react";
+import { BarChart3, TrendingUp, Calendar as CalendarIcon, Download, DollarSign, ShoppingCart, Users, Package, Loader2, ArrowUpRight, ArrowDownRight, Filter, RefreshCw, Eye, TrendingDown, ArrowLeft } from "lucide-react";
 import { useCurrentStore } from "@/stores/storeStore";
 import { useUser } from "@/stores/authStore";
+import { useTax } from "@/hooks/useTax";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format, subDays, startOfMonth, endOfMonth, startOfWeek, endOfWeek } from "date-fns";
@@ -102,9 +103,14 @@ interface CustomerAnalytics {
   }>;
 }
 
-export function ReportsView() {
+interface ReportsViewProps {
+  onViewChange?: (view: string) => void;
+}
+
+export function ReportsView({ onViewChange }: ReportsViewProps = {}) {
   const currentStore = useCurrentStore();
   const user = useUser();
+  const { formatCurrency } = useTax();
   const [salesData, setSalesData] = useState<SalesData[]>([]);
   const [topProducts, setTopProducts] = useState<TopProduct[]>([]);
   const [recentDiscounts, setRecentDiscounts] = useState<DiscountData[]>([]);
@@ -257,13 +263,13 @@ export function ReportsView() {
         // Sales Data
         ['Sales Overview'],
         ['Period', 'Sales', 'Orders', 'Customers'],
-        ...salesData.map(data => [data.period, data.sales.toFixed(2), data.orders, data.customers]),
+        ...salesData.map(data => [data.period, formatCurrency(data.sales), data.orders, data.customers]),
         [''],
 
         // Top Products
         ['Top Products'],
         ['Product', 'Sales Count', 'Revenue'],
-        ...topProducts.map(product => [product.name, product.sales, product.revenue.toFixed(2)]),
+        ...topProducts.map(product => [product.name, product.sales, formatCurrency(product.revenue)]),
         [''],
 
         // Inventory Analytics
@@ -271,7 +277,7 @@ export function ReportsView() {
         ['Total Products', inventoryAnalytics?.totalProducts || 0],
         ['Low Stock Items', inventoryAnalytics?.lowStockItems || 0],
         ['Out of Stock Items', inventoryAnalytics?.outOfStockItems || 0],
-        ['Total Value', `$${inventoryAnalytics?.totalValue.toFixed(2) || '0.00'}`],
+        ['Total Value', formatCurrency(inventoryAnalytics?.totalValue || 0)],
         [''],
 
         // Customer Analytics
@@ -525,7 +531,7 @@ export function ReportsView() {
     const metrics: KPIMetric[] = [
       {
         title: "Total Revenue",
-        value: `$${current.totalRevenue.toFixed(2)}`,
+        value: formatCurrency(current.totalRevenue),
         change: calculateChange(current.totalRevenue, previous.totalRevenue),
         trend: current.totalRevenue > previous.totalRevenue ? 'up' : current.totalRevenue < previous.totalRevenue ? 'down' : 'neutral',
         icon: DollarSign,
@@ -549,7 +555,7 @@ export function ReportsView() {
       },
       {
         title: "Avg Order Value",
-        value: `$${current.avgOrderValue.toFixed(2)}`,
+        value: formatCurrency(current.avgOrderValue),
         change: calculateChange(current.avgOrderValue, previous.avgOrderValue),
         trend: current.avgOrderValue > previous.avgOrderValue ? 'up' : current.avgOrderValue < previous.avgOrderValue ? 'down' : 'neutral',
         icon: TrendingUp,
@@ -729,11 +735,24 @@ export function ReportsView() {
     <div id="reports-container" className="space-y-6">
       {/* Header with Controls */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Reports & Analytics</h1>
-          <p className="text-muted-foreground mt-2">
-            Track your business performance and insights
-          </p>
+        <div className="flex items-center gap-4">
+          {onViewChange && (
+            <Button
+              onClick={() => onViewChange('dashboard')}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Dashboard
+            </Button>
+          )}
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Reports & Analytics</h1>
+            <p className="text-muted-foreground mt-2">
+              Detailed insights and performance metrics for your store
+            </p>
+          </div>
         </div>
 
         <div className="flex items-center gap-3">
@@ -939,7 +958,7 @@ export function ReportsView() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-success">${product.revenue.toFixed(2)}</p>
+                      <p className="font-bold text-success">{formatCurrency(product.revenue)}</p>
                       <p className="text-sm text-muted-foreground">Revenue</p>
                     </div>
                   </div>
@@ -980,7 +999,7 @@ export function ReportsView() {
                       <p className="text-sm text-muted-foreground">Used {discount.usage} times</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-warning">${discount.discount.toFixed(2)}</p>
+                      <p className="font-bold text-warning">{formatCurrency(discount.discount)}</p>
                       <p className="text-sm text-muted-foreground">Total discount</p>
                     </div>
                   </div>
@@ -1111,7 +1130,7 @@ export function ReportsView() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-2xl font-bold text-success">
-                      ${inventoryAnalytics?.totalValue.toFixed(2) || '0.00'}
+                      {formatCurrency(inventoryAnalytics?.totalValue || 0)}
                     </p>
                     <p className="text-sm text-muted-foreground">Total Value</p>
                   </div>
@@ -1322,7 +1341,7 @@ export function ReportsView() {
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-success">${customer.total_spent.toFixed(2)}</p>
+                          <p className="font-bold text-success">{formatCurrency(customer.total_spent)}</p>
                         </div>
                       </div>
                     ))

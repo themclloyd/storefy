@@ -1,13 +1,25 @@
-import { useState, useEffect } from "react";
+import { useEffect, useCallback, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { ShoppingCart, Plus, Minus, Trash2, Percent, DollarSign, CreditCard, Search, Loader2, User, UserPlus, History, Grid3X3, List, LayoutGrid, X } from "lucide-react";
+import {
+  ShoppingCart, Plus, Minus, Trash2, Percent, DollarSign,
+  CreditCard, Search, Loader2, User, UserPlus, History,
+  Grid3X3, List, LayoutGrid, X
+} from "lucide-react";
 import { useCurrentStore } from "@/stores/storeStore";
 import { useUser } from "@/stores/authStore";
+import {
+  usePOSStore,
+  useCart,
+  useProducts,
+  useCustomers,
+  type Product,
+  type Customer
+} from "@/stores/posStore";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { usePaymentMethods } from "@/hooks/usePaymentMethods";
@@ -18,42 +30,7 @@ import { OrderHistoryDialog } from "./OrderHistoryDialog";
 import { AddCustomerDialog } from "./AddCustomerDialog";
 import { useAnalytics } from "@/hooks/useAnalyticsTracking";
 
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  sku: string;
-  stock_quantity: number;
-  image_url: string | null;
-}
-
-interface Product {
-  id: string;
-  name: string;
-  sku: string;
-  price: number;
-  stock_quantity: number;
-  category_id: string | null;
-  categories?: { name: string } | null;
-  image_url: string | null;
-  is_active: boolean;
-}
-
-interface Category {
-  id: string;
-  name: string;
-}
-
-interface Customer {
-  id: string;
-  name: string;
-  email: string | null;
-  phone: string | null;
-  status: string;
-  total_orders: number;
-  total_spent: number;
-}
+// Interfaces are now imported from the POS store
 
 export function POSView() {
   const currentStore = useCurrentStore();
@@ -62,220 +39,115 @@ export function POSView() {
   const { calculateItemsTax, formatCurrency } = useTax();
   const { trackTransaction, trackSearch, trackFeatureUsage } = useAnalytics();
 
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [discountType, setDiscountType] = useState<"percent" | "fixed">("percent");
-  const [discountValue, setDiscountValue] = useState("");
-  const [discountCode, setDiscountCode] = useState("");
+  // Zustand store state - using only individual property selectors to avoid infinite loops
+  // Cart state - use simple selectors where possible
+  const cart = useCart();
+  const addToCart = usePOSStore(state => state.addToCart);
+  const updateQuantity = usePOSStore(state => state.updateQuantity);
+  const removeFromCart = usePOSStore(state => state.removeFromCart);
+  const clearCart = usePOSStore(state => state.clearCart);
+  const getCartQuantity = usePOSStore(state => state.getCartQuantity);
 
-  // Product management state
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<"grid" | "compact" | "list">("compact");
+  // Product state
+  const products = useProducts();
+  const searchTerm = usePOSStore(state => state.searchTerm);
+  const selectedCategory = usePOSStore(state => state.selectedCategory);
+  const viewMode = usePOSStore(state => state.viewMode);
+  const categories = usePOSStore(state => state.categories);
+  const loading = usePOSStore(state => state.loading);
+  const setSearchTerm = usePOSStore(state => state.setSearchTerm);
+  const setSelectedCategory = usePOSStore(state => state.setSelectedCategory);
+  const setViewMode = usePOSStore(state => state.setViewMode);
+  const setCategories = usePOSStore(state => state.setCategories);
+  const setLoading = usePOSStore(state => state.setLoading);
 
-  // Customer management state
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-  const [customerSearchTerm, setCustomerSearchTerm] = useState("");
-  const [showCustomerSearch, setShowCustomerSearch] = useState(false);
+  // Customer state
+  const customers = useCustomers();
+  const selectedCustomer = usePOSStore(state => state.selectedCustomer);
+  const customerSearchTerm = usePOSStore(state => state.customerSearchTerm);
+  const showCustomerSearch = usePOSStore(state => state.showCustomerSearch);
+  const setSelectedCustomer = usePOSStore(state => state.setSelectedCustomer);
+  const setCustomerSearchTerm = usePOSStore(state => state.setCustomerSearchTerm);
+  const setShowCustomerSearch = usePOSStore(state => state.setShowCustomerSearch);
 
-  // Order processing state
-  const [paymentMethod, setPaymentMethod] = useState<string>("cash");
-  const [isProcessingOrder, setIsProcessingOrder] = useState(false);
+  // Discount state
+  const discountType = usePOSStore(state => state.discountType);
+  const discountValue = usePOSStore(state => state.discountValue);
+  const discountCode = usePOSStore(state => state.discountCode);
+  const setDiscountType = usePOSStore(state => state.setDiscountType);
+  const setDiscountValue = usePOSStore(state => state.setDiscountValue);
+  const setDiscountCode = usePOSStore(state => state.setDiscountCode);
 
-  // Receipt state
-  const [showReceipt, setShowReceipt] = useState(false);
-  const [lastOrder, setLastOrder] = useState<any>(null);
+  // Order state
+  const paymentMethod = usePOSStore(state => state.paymentMethod);
+  const isProcessingOrder = usePOSStore(state => state.isProcessingOrder);
+  const setPaymentMethod = usePOSStore(state => state.setPaymentMethod);
+  const setIsProcessingOrder = usePOSStore(state => state.setIsProcessingOrder);
 
-  // Order history state
-  const [showOrderHistory, setShowOrderHistory] = useState(false);
+  // UI state
+  const showReceipt = usePOSStore(state => state.showReceipt);
+  const lastOrder = usePOSStore(state => state.lastOrder);
+  const showOrderHistory = usePOSStore(state => state.showOrderHistory);
+  const showAddCustomer = usePOSStore(state => state.showAddCustomer);
+  const showMobileCart = usePOSStore(state => state.showMobileCart);
+  const setShowReceipt = usePOSStore(state => state.setShowReceipt);
+  const setLastOrder = usePOSStore(state => state.setLastOrder);
+  const setShowOrderHistory = usePOSStore(state => state.setShowOrderHistory);
+  const setShowAddCustomer = usePOSStore(state => state.setShowAddCustomer);
+  const setShowMobileCart = usePOSStore(state => state.setShowMobileCart);
 
-  // Add customer state
-  const [showAddCustomer, setShowAddCustomer] = useState(false);
-
-  // Mobile cart state
-  const [showMobileCart, setShowMobileCart] = useState(false);
-
-  // Tax calculation state
-  const [taxCalculation, setTaxCalculation] = useState<any>(null);
+  // Tax state
+  const taxCalculation = usePOSStore(state => state.taxCalculation);
+  const setTaxCalculation = usePOSStore(state => state.setTaxCalculation);
 
   // Fetch products, categories, and customers
   useEffect(() => {
-    if (currentStore) {
-      fetchProducts();
-      fetchCategories();
-      fetchCustomers();
+    if (currentStore?.id) {
+      // Call functions directly from store to avoid dependency issues
+      usePOSStore.getState().fetchProducts(currentStore.id);
+      usePOSStore.getState().fetchCategories(currentStore.id);
+      usePOSStore.getState().fetchCustomers(currentStore.id);
     }
-  }, [currentStore]);
+  }, [currentStore?.id]); // Only depend on store ID
 
-  // Calculate tax when cart changes
-  useEffect(() => {
-    const calculateCartTax = async () => {
-      if (cart.length === 0 || !currentStore) {
-        setTaxCalculation(null);
-        return;
-      }
-
-      try {
-        const cartItems = cart.map(item => ({
-          price: item.price,
-          quantity: item.quantity,
-          taxable: true // All items are taxable by default
-        }));
-
-        const subtotalBeforeDiscount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        const discountAmount = discountValue ?
-          (discountType === "percent" ? subtotalBeforeDiscount * (parseFloat(discountValue) / 100) : parseFloat(discountValue)) : 0;
-
-        // Calculate tax on discounted amount
-        const taxableAmount = Math.max(0, subtotalBeforeDiscount - discountAmount);
-        const calculation = await calculateItemsTax([{ price: taxableAmount, quantity: 1, taxable: true }]);
-
-        setTaxCalculation(calculation);
-      } catch (error) {
-        console.error('Error calculating tax:', error);
-        setTaxCalculation(null);
-      }
-    };
-
-    calculateCartTax();
-  }, [cart, discountValue, discountType, currentStore, calculateItemsTax]);
-
-  const fetchProducts = async () => {
-    if (!currentStore) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('products')
-        .select(`
-          id,
-          name,
-          sku,
-          price,
-          stock_quantity,
-          category_id,
-          image_url,
-          is_active,
-          categories (name)
-        `)
-        .eq('store_id', currentStore.id)
-        .eq('is_active', true)
-        .order('name');
-
-      if (error) {
-        console.error('Error fetching products:', error);
-        toast.error('Failed to load products');
-        return;
-      }
-
-      setProducts(data || []);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      toast.error('Failed to load products');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchCategories = async () => {
-    if (!currentStore) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('id, name')
-        .eq('store_id', currentStore.id)
-        .order('name');
-
-      if (error) {
-        console.error('Error fetching categories:', error);
-        return;
-      }
-
-      setCategories(data || []);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    }
-  };
-
-  const fetchCustomers = async () => {
-    if (!currentStore) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('customers')
-        .select('id, name, email, phone, status, total_orders, total_spent')
-        .eq('store_id', currentStore.id)
-        .eq('status', 'active')
-        .order('name');
-
-      if (error) {
-        console.error('Error fetching customers:', error);
-        return;
-      }
-
-      setCustomers(data || []);
-    } catch (error) {
-      console.error('Error fetching customers:', error);
-    }
-  };
-
-  const addToCart = (product: Product) => {
-    // Check stock availability
-    const existingItem = cart.find(item => item.id === product.id);
-    const currentCartQuantity = existingItem ? existingItem.quantity : 0;
-
-    if (currentCartQuantity >= product.stock_quantity) {
-      toast.error(`Only ${product.stock_quantity} items available in stock`);
+  // Memoized tax calculation function
+  const calculateCartTax = useCallback(async () => {
+    if (cart.length === 0 || !currentStore) {
+      setTaxCalculation(null);
       return;
     }
 
-    if (existingItem) {
-      setCart(cart.map(item =>
-        item.id === product.id
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      ));
-    } else {
-      setCart([...cart, {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        quantity: 1,
-        sku: product.sku,
-        stock_quantity: product.stock_quantity,
-        image_url: product.image_url
-      }]);
-    }
+    try {
+      const subtotalBeforeDiscount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const discountAmount = discountValue ?
+        (discountType === "percent" ? subtotalBeforeDiscount * (parseFloat(discountValue) / 100) : parseFloat(discountValue)) : 0;
 
-    // Track feature usage
+      // Calculate tax on discounted amount
+      const taxableAmount = Math.max(0, subtotalBeforeDiscount - discountAmount);
+      const calculation = await calculateItemsTax([{ price: taxableAmount, quantity: 1, taxable: true }]);
+
+      setTaxCalculation(calculation);
+    } catch (error) {
+      // Reset tax calculation on error
+      setTaxCalculation(null);
+      toast.error('Failed to calculate tax');
+    }
+  }, [cart, discountValue, discountType, currentStore, calculateItemsTax, setTaxCalculation]);
+
+  // Calculate tax when dependencies change
+  useEffect(() => {
+    calculateCartTax();
+  }, [calculateCartTax]);
+
+  // Fetch functions are now in the POS store
+
+  // Cart management functions are now in the POS store
+
+  // Enhanced addToCart with analytics tracking
+  const handleAddToCart = useCallback((product: Product) => {
+    addToCart(product);
     trackFeatureUsage('pos_add_to_cart', `product_${product.id}`);
-  };
-
-  const updateQuantity = (id: string, quantity: number) => {
-    if (quantity <= 0) {
-      setCart(cart.filter(item => item.id !== id));
-    } else {
-      // Check stock availability
-      const cartItem = cart.find(item => item.id === id);
-      if (cartItem && quantity > cartItem.stock_quantity) {
-        toast.error(`Only ${cartItem.stock_quantity} items available in stock`);
-        return;
-      }
-
-      setCart(cart.map(item =>
-        item.id === id ? { ...item, quantity } : item
-      ));
-    }
-  };
-
-  // Helper function to get quantity of a product in cart
-  const getCartQuantity = (productId: string) => {
-    const cartItem = cart.find(item => item.id === productId);
-    return cartItem ? cartItem.quantity : 0;
-  };
+  }, [addToCart, trackFeatureUsage]);
 
   // Helper function to check if order is ready to process
   const isOrderValid = () => {
@@ -284,8 +156,8 @@ export function POSView() {
   };
 
   // Function to show validation errors when user clicks disabled button
-  const showValidationErrors = () => {
-    const validationErrors = [];
+  const showValidationErrors = (): void => {
+    const validationErrors: string[] = [];
 
     if (cart.length === 0) {
       validationErrors.push('Add products to your cart');
@@ -337,12 +209,14 @@ export function POSView() {
   };
 
   // Filter products based on search and category
-  const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.sku?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = !selectedCategory || product.category_id === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredProducts = useMemo(() => {
+    return products.filter(product => {
+      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           product.sku?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = !selectedCategory || product.category_id === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [products, searchTerm, selectedCategory]);
 
   // Track product search with debouncing
   useEffect(() => {
@@ -363,16 +237,16 @@ export function POSView() {
   );
 
   // Generate order number
-  const generateOrderNumber = () => {
+  const generateOrderNumber = (): string => {
     const timestamp = Date.now().toString().slice(-6);
     const random = Math.floor(Math.random() * 100).toString().padStart(2, '0');
     return `ORD-${timestamp}${random}`;
   };
 
   // Process order
-  const processOrder = async () => {
+  const processOrder = async (): Promise<void> => {
     // Comprehensive validation
-    const validationErrors = [];
+    const validationErrors: string[] = [];
 
     // 1. Validate system requirements
     if (!currentStore || !user) {
@@ -459,7 +333,6 @@ export function POSView() {
         .single();
 
       if (orderError) {
-        console.error('Error creating order:', orderError);
         toast.error('Failed to create order');
         return;
       }
@@ -501,8 +374,7 @@ export function POSView() {
         .rpc('generate_transaction_number', { store_id_param: currentStore.id });
 
       if (transactionNumberError) {
-        console.error('Error generating transaction number:', transactionNumberError);
-        // Don't fail the order for this, but log it
+        // Don't fail the order for this, continue without transaction number
       } else {
         const { error: transactionError } = await supabase
           .from('transactions')
@@ -521,8 +393,7 @@ export function POSView() {
           });
 
         if (transactionError) {
-          console.error('Error creating transaction record:', transactionError);
-          // Don't fail the order for this, but log it
+          // Don't fail the order for this, continue without transaction record
         }
       }
 
@@ -537,8 +408,7 @@ export function POSView() {
           .eq('id', selectedCustomer.id);
 
         if (customerError) {
-          console.error('Error updating customer stats:', customerError);
-          // Don't fail the order for this
+          // Don't fail the order for this, continue without updating customer stats
         }
       }
 
@@ -578,7 +448,7 @@ export function POSView() {
       });
 
       // Reset cart and form
-      setCart([]);
+      clearCart();
       setDiscountValue("");
       setDiscountCode("");
       setSelectedCustomer(null);
@@ -587,22 +457,36 @@ export function POSView() {
       fetchProducts();
 
     } catch (error) {
-      console.error('Error processing order:', error);
       toast.error('Failed to process order');
     } finally {
       setIsProcessingOrder(false);
     }
   };
 
-  // Calculate totals using tax utility
-  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const discountAmount = discountValue ?
-    (discountType === "percent" ? subtotal * (parseFloat(discountValue) / 100) : parseFloat(discountValue)) : 0;
+  // Calculate totals using tax utility - memoized for performance
+  const subtotal = useMemo(() => {
+    return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  }, [cart]);
+
+  const discountAmount = useMemo(() => {
+    if (!discountValue) return 0;
+    return discountType === "percent"
+      ? subtotal * (parseFloat(discountValue) / 100)
+      : parseFloat(discountValue);
+  }, [discountValue, discountType, subtotal]);
 
   // Use tax calculation from hook or fallback to simple calculation
-  const taxRate = taxCalculation?.taxRate || currentStore?.tax_rate || 0;
-  const taxAmount = taxCalculation?.taxAmount || ((subtotal - discountAmount) * taxRate);
-  const total = Math.max(0, subtotal - discountAmount + taxAmount);
+  const taxRate = useMemo(() => {
+    return taxCalculation?.taxRate || currentStore?.tax_rate || 0;
+  }, [taxCalculation, currentStore]);
+
+  const taxAmount = useMemo(() => {
+    return taxCalculation?.taxAmount || ((subtotal - discountAmount) * taxRate);
+  }, [taxCalculation, subtotal, discountAmount, taxRate]);
+
+  const total = useMemo(() => {
+    return Math.max(0, subtotal - discountAmount + taxAmount);
+  }, [subtotal, discountAmount, taxAmount]);
 
   return (
     <>
@@ -728,7 +612,7 @@ export function POSView() {
                       <Card
                         key={product.id}
                         className="cursor-pointer hover:shadow-md transition-shadow overflow-hidden"
-                        onClick={() => addToCart(product)}
+                        onClick={() => handleAddToCart(product)}
                       >
                         {/* Product Image */}
                         <div className="aspect-[4/3] bg-muted overflow-hidden">
@@ -788,7 +672,7 @@ export function POSView() {
                                 disabled={product.stock_quantity === 0}
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  addToCart(product);
+                                  handleAddToCart(product);
                                 }}
                               >
                                 <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -808,7 +692,7 @@ export function POSView() {
                       <Card
                         key={product.id}
                         className="cursor-pointer hover:shadow-lg transition-shadow overflow-hidden"
-                        onClick={() => addToCart(product)}
+                        onClick={() => handleAddToCart(product)}
                       >
                         {/* Product Image */}
                         <div className="aspect-[4/3] bg-muted overflow-hidden">
@@ -868,7 +752,7 @@ export function POSView() {
                                 disabled={product.stock_quantity === 0}
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  addToCart(product);
+                                  handleAddToCart(product);
                                 }}
                               >
                                 <Plus className="w-5 h-5" />
@@ -888,7 +772,7 @@ export function POSView() {
                       <Card
                         key={product.id}
                         className="cursor-pointer hover:shadow-md transition-shadow"
-                        onClick={() => addToCart(product)}
+                        onClick={() => handleAddToCart(product)}
                       >
                         <CardContent className="p-4">
                           <div className="flex items-center">
@@ -951,7 +835,7 @@ export function POSView() {
                                     disabled={product.stock_quantity === 0}
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      addToCart(product);
+                                      handleAddToCart(product);
                                     }}
                                   >
                                     <Plus className="w-4 h-4" />

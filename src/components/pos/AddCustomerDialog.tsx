@@ -101,7 +101,6 @@ export function AddCustomerDialog({
         .single();
 
       if (error) {
-        console.error('Error adding customer:', error);
         toast.error('Failed to add customer');
         return;
       }
@@ -122,7 +121,6 @@ export function AddCustomerDialog({
       form.reset();
       onOpenChange(false);
     } catch (error) {
-      console.error('Error adding customer:', error);
       toast.error('Failed to add customer');
     } finally {
       setLoading(false);

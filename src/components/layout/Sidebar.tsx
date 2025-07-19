@@ -1,12 +1,11 @@
 
 import { Store, CreditCard } from "lucide-react";
-import { useRoleBasedNavigation } from "@/hooks/useRoleBasedAccess";
-import { CompactStoreSelector } from "@/components/stores/CompactStoreSelector";
-import { UserMenu } from "@/components/layout/UserMenu";
-
 import { useNavigate } from "react-router-dom";
+import { useRoleBasedNavigation } from "@/hooks/useRoleBasedAccess";
 import { useUser } from "@/stores/authStore";
 import { usePermissions } from "@/stores/permissionStore";
+import { CompactStoreSelector } from "@/components/stores/CompactStoreSelector";
+import { UserMenu } from "@/components/layout/UserMenu";
 import {
   Sidebar as SidebarPrimitive,
   SidebarContent,
@@ -27,8 +26,6 @@ interface SidebarProps {
   collapsible?: "icon" | "offcanvas" | "none";
 }
 
-
-
 export function Sidebar({ activeView, onViewChange, collapsible = "icon" }: SidebarProps) {
   const { state } = useSidebar();
   const { getNavigationItems } = useRoleBasedNavigation();
@@ -36,17 +33,8 @@ export function Sidebar({ activeView, onViewChange, collapsible = "icon" }: Side
   const user = useUser();
   const { userRole } = usePermissions();
 
-  // Get role-based navigation items
+  // Get role-based navigation items (already filtered by permissions)
   const navigationItems = getNavigationItems();
-
-  // Debug sidebar navigation
-  console.log('🔧 Sidebar - User role:', userRole, 'Navigation items count:', navigationItems.length);
-  console.log('🔧 Sidebar - Navigation items:', navigationItems.map(item => item.label));
-
-  // Debug logging (removed for cleaner console)
-
-  // Get all navigation items (already filtered by role permissions)
-  const filteredMainNav = navigationItems;
 
   return (
     <SidebarPrimitive
@@ -87,12 +75,11 @@ export function Sidebar({ activeView, onViewChange, collapsible = "icon" }: Side
           <SidebarGroupLabel className="text-xs md:text-sm">Main</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
-              {filteredMainNav.map((item) => {
+              {navigationItems.map((item) => {
                 const Icon = item.icon;
 
                 // Skip items without valid icons
                 if (!Icon) {
-                  console.warn(`Navigation item ${item.id} has no icon`);
                   return null;
                 }
 
