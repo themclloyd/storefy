@@ -29,8 +29,7 @@ import {
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 import { useCurrentStore } from "@/stores/storeStore";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { usePOSStore } from "@/stores/posStore";
 
 const customerSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -58,13 +57,14 @@ interface AddCustomerDialogProps {
   onCustomerAdded: (customer: Customer) => void;
 }
 
-export function AddCustomerDialog({ 
-  open, 
-  onOpenChange, 
-  onCustomerAdded 
+export function AddCustomerDialog({
+  open,
+  onOpenChange,
+  onCustomerAdded
 }: AddCustomerDialogProps) {
   const currentStore = useCurrentStore();
   const [loading, setLoading] = useState(false);
+  const addCustomer = usePOSStore(state => state.addCustomer);
 
   const form = useForm<CustomerFormData>({
     resolver: zodResolver(customerSchema),
@@ -79,49 +79,28 @@ export function AddCustomerDialog({
 
   const onSubmit = async (data: CustomerFormData) => {
     if (!currentStore) {
-      toast.error('No store selected');
       return;
     }
 
     setLoading(true);
     try {
-      const { data: customerData, error } = await supabase
-        .from('customers')
-        .insert({
-          store_id: currentStore.id,
-          name: data.name,
-          email: data.email || null,
-          phone: data.phone || null,
-          address: data.address || null,
-          status: data.status,
-          total_orders: 0,
-          total_spent: 0,
-        })
-        .select()
-        .single();
+      const customerData = await addCustomer(currentStore.id, data);
 
-      if (error) {
-        toast.error('Failed to add customer');
-        return;
+      if (customerData) {
+        // Call the callback with the new customer data
+        onCustomerAdded({
+          id: customerData.id,
+          name: customerData.name,
+          email: customerData.email,
+          phone: customerData.phone,
+          status: customerData.status,
+          total_orders: customerData.total_orders,
+          total_spent: customerData.total_spent,
+        });
+
+        form.reset();
+        onOpenChange(false);
       }
-
-      toast.success('Customer added successfully');
-      
-      // Call the callback with the new customer data
-      onCustomerAdded({
-        id: customerData.id,
-        name: customerData.name,
-        email: customerData.email,
-        phone: customerData.phone,
-        status: customerData.status,
-        total_orders: customerData.total_orders,
-        total_spent: customerData.total_spent,
-      });
-      
-      form.reset();
-      onOpenChange(false);
-    } catch (error) {
-      toast.error('Failed to add customer');
     } finally {
       setLoading(false);
     }

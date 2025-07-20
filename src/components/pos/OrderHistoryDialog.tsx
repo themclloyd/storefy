@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -10,19 +10,18 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Search, 
-  Calendar, 
-  DollarSign, 
-  User, 
-  Receipt, 
+import {
+  Search,
+  Calendar,
+  DollarSign,
+  User,
+  Receipt,
   RefreshCw,
   AlertTriangle,
   CheckCircle
 } from "lucide-react";
 import { useCurrentStore } from "@/stores/storeStore";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { usePOSStore, useOrders, useOrdersLoading } from "@/stores/posStore";
 
 interface Order {
   id: string;
@@ -45,74 +44,33 @@ interface OrderHistoryDialogProps {
 
 export function OrderHistoryDialog({ open, onOpenChange }: OrderHistoryDialogProps) {
   const currentStore = useCurrentStore();
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+
+  // Use Zustand store state
+  const orders = useOrders();
+  const loading = useOrdersLoading();
+  const searchTerm = usePOSStore(state => state.orderSearchTerm);
+  const statusFilter = usePOSStore(state => state.orderStatusFilter);
+  const setSearchTerm = usePOSStore(state => state.setOrderSearchTerm);
+  const setStatusFilter = usePOSStore(state => state.setOrderStatusFilter);
+  const fetchOrders = usePOSStore(state => state.fetchOrders);
+  const refundOrder = usePOSStore(state => state.refundOrder);
 
   useEffect(() => {
-    if (open && currentStore) {
-      fetchOrders();
+    if (open && currentStore?.id) {
+      fetchOrders(currentStore.id);
     }
-  }, [open, currentStore]);
-
-  const fetchOrders = async () => {
-    if (!currentStore) return;
-
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('orders')
-        .select(`
-          id,
-          order_number,
-          total,
-          status,
-          payment_method,
-          created_at,
-          customer_id,
-          customers (
-            name,
-            email
-          )
-        `)
-        .eq('store_id', currentStore.id)
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      if (error) {
-        toast.error('Failed to load orders');
-        return;
-      }
-
-      setOrders(data || []);
-    } catch (error) {
-      toast.error('Failed to load orders');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [open, currentStore?.id, fetchOrders]);
 
   const handleRefund = async (orderId: string, orderNumber: string) => {
     if (!confirm(`Are you sure you want to refund order ${orderNumber}?`)) {
       return;
     }
 
-    try {
-      const { error } = await supabase
-        .from('orders')
-        .update({ status: 'refunded' })
-        .eq('id', orderId);
+    await refundOrder(orderId, orderNumber);
 
-      if (error) {
-        toast.error('Failed to refund order');
-        return;
-      }
-
-      toast.success(`Order ${orderNumber} has been refunded`);
-      fetchOrders(); // Refresh the list
-    } catch (error) {
-      toast.error('Failed to refund order');
+    // Refresh orders after refund
+    if (currentStore?.id) {
+      fetchOrders(currentStore.id);
     }
   };
 
@@ -178,7 +136,11 @@ export function OrderHistoryDialog({ open, onOpenChange }: OrderHistoryDialogPro
             <option value="cancelled">Cancelled</option>
             <option value="refunded">Refunded</option>
           </select>
-          <Button onClick={fetchOrders} variant="outline" size="sm">
+          <Button
+            onClick={() => currentStore?.id && fetchOrders(currentStore.id)}
+            variant="outline"
+            size="sm"
+          >
             <RefreshCw className="w-4 h-4 mr-2" />
             Refresh
           </Button>

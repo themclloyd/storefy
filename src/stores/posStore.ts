@@ -74,6 +74,12 @@ interface POSState {
   showAddCustomer: boolean;
   showMobileCart: boolean;
   taxCalculation: any;
+
+  // Order history state
+  orders: any[];
+  ordersLoading: boolean;
+  orderSearchTerm: string;
+  orderStatusFilter: string;
 }
 
 // Store Actions
@@ -106,6 +112,7 @@ interface POSActions {
   setCustomerSearchTerm: (term: string) => void;
   setShowCustomerSearch: (show: boolean) => void;
   fetchCustomers: (storeId: string) => Promise<void>;
+  addCustomer: (storeId: string, customerData: any) => Promise<Customer | null>;
   
   // Order actions
   setPaymentMethod: (method: string) => void;
@@ -119,6 +126,14 @@ interface POSActions {
   setShowAddCustomer: (show: boolean) => void;
   setShowMobileCart: (show: boolean) => void;
   setTaxCalculation: (calculation: any) => void;
+
+  // Order history actions
+  setOrders: (orders: any[]) => void;
+  setOrdersLoading: (loading: boolean) => void;
+  setOrderSearchTerm: (term: string) => void;
+  setOrderStatusFilter: (filter: string) => void;
+  fetchOrders: (storeId: string) => Promise<void>;
+  refundOrder: (orderId: string, orderNumber: string) => Promise<void>;
   
   // Reset actions
   resetPOS: () => void;
@@ -158,6 +173,12 @@ const initialState: POSState = {
   showAddCustomer: false,
   showMobileCart: false,
   taxCalculation: null,
+
+  // Order history state
+  orders: [],
+  ordersLoading: false,
+  orderSearchTerm: "",
+  orderStatusFilter: "all",
 };
 
 export const usePOSStore = create<POSStore>()(
@@ -328,6 +349,44 @@ export const usePOSStore = create<POSStore>()(
           }
         },
 
+        addCustomer: async (storeId: string, customerData: any) => {
+          try {
+            const { data, error } = await supabase
+              .from('customers')
+              .insert({
+                store_id: storeId,
+                name: customerData.name,
+                email: customerData.email || null,
+                phone: customerData.phone || null,
+                address: customerData.address || null,
+                status: customerData.status,
+                total_orders: 0,
+                total_spent: 0,
+              })
+              .select()
+              .single();
+
+            if (error) {
+              toast.error('Failed to add customer');
+              return null;
+            }
+
+            toast.success('Customer added successfully');
+
+            // Add to local customers list
+            const { customers } = get();
+            set({
+              customers: [...customers, data],
+              selectedCustomer: data // Auto-select the new customer
+            }, false, 'addCustomer');
+
+            return data;
+          } catch (error) {
+            toast.error('Failed to add customer');
+            return null;
+          }
+        },
+
         // Order actions
         setPaymentMethod: (method) => set({ paymentMethod: method }, false, 'setPaymentMethod'),
         setIsProcessingOrder: (processing) => set({ isProcessingOrder: processing }, false, 'setIsProcessingOrder'),
@@ -347,6 +406,70 @@ export const usePOSStore = create<POSStore>()(
         setShowAddCustomer: (show) => set({ showAddCustomer: show }, false, 'setShowAddCustomer'),
         setShowMobileCart: (show) => set({ showMobileCart: show }, false, 'setShowMobileCart'),
         setTaxCalculation: (calculation) => set({ taxCalculation: calculation }, false, 'setTaxCalculation'),
+
+        // Order history actions
+        setOrders: (orders) => set({ orders }, false, 'setOrders'),
+        setOrdersLoading: (loading) => set({ ordersLoading: loading }, false, 'setOrdersLoading'),
+        setOrderSearchTerm: (term) => set({ orderSearchTerm: term }, false, 'setOrderSearchTerm'),
+        setOrderStatusFilter: (filter) => set({ orderStatusFilter: filter }, false, 'setOrderStatusFilter'),
+
+        fetchOrders: async (storeId: string) => {
+          set({ ordersLoading: true }, false, 'fetchOrders:start');
+          try {
+            const { data, error } = await supabase
+              .from('orders')
+              .select(`
+                id,
+                order_number,
+                total,
+                status,
+                payment_method,
+                created_at,
+                customer_id,
+                customers (
+                  name,
+                  email
+                )
+              `)
+              .eq('store_id', storeId)
+              .order('created_at', { ascending: false })
+              .limit(50);
+
+            if (error) {
+              toast.error('Failed to load orders');
+              return;
+            }
+
+            set({ orders: data || [] }, false, 'fetchOrders:success');
+          } catch (error) {
+            toast.error('Failed to load orders');
+          } finally {
+            set({ ordersLoading: false }, false, 'fetchOrders:end');
+          }
+        },
+
+        refundOrder: async (orderId: string, orderNumber: string) => {
+          try {
+            const { error } = await supabase
+              .from('orders')
+              .update({ status: 'refunded' })
+              .eq('id', orderId);
+
+            if (error) {
+              toast.error('Failed to refund order');
+              return;
+            }
+
+            toast.success(`Order ${orderNumber} has been refunded`);
+
+            // Refresh orders after refund
+            const { fetchOrders } = get();
+            const currentStore = get().selectedCustomer; // This should be store context
+            // We'll need to pass storeId from component for now
+          } catch (error) {
+            toast.error('Failed to refund order');
+          }
+        },
 
         // Reset actions
         resetPOS: () => set(initialState, false, 'resetPOS'),
@@ -371,3 +494,5 @@ export const usePOSStore = create<POSStore>()(
 export const useCart = () => usePOSStore((state) => state.cart);
 export const useProducts = () => usePOSStore((state) => state.products);
 export const useCustomers = () => usePOSStore((state) => state.customers);
+export const useOrders = () => usePOSStore((state) => state.orders);
+export const useOrdersLoading = () => usePOSStore((state) => state.ordersLoading);
