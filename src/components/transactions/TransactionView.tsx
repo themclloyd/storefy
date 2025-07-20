@@ -1,10 +1,14 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useCurrentStore } from "@/stores/storeStore";
 import { useUser } from "@/stores/authStore";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 import { useTax } from "@/hooks/useTax";
 import { usePaymentMethods } from "@/hooks/usePaymentMethods";
+import {
+  useTransactionStore,
+  useTransactions,
+  useFilteredTransactions,
+  type Transaction
+} from "@/stores/transactionStore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -19,84 +23,39 @@ import { TransactionDetailsModal } from "./TransactionDetailsModal";
 
 import { ErrorBoundary } from "../ErrorBoundary";
 
-interface Transaction {
-  id: string;
-  transaction_number: string;
-  transaction_type: string;
-  amount: number;
-  payment_method: string;
-  reference_id: string;
-  reference_type: string;
-  customer_id: string;
-  customer_name: string;
-  processed_by: string;
-  description: string;
-  notes: string;
-  created_at: string;
-}
+
 
 export function TransactionView() {
   const currentStore = useCurrentStore();
   const user = useUser();
   const { formatCurrency } = useTax();
   const { getPaymentOptions, getPaymentMethodDisplay, getPaymentMethodBadgeVariant } = usePaymentMethods();
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [typeFilter, setTypeFilter] = useState("all");
-  const [paymentMethodFilter, setPaymentMethodFilter] = useState("all");
-  const [dateFrom, setDateFrom] = useState<Date>();
-  const [dateTo, setDateTo] = useState<Date>();
-  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
-  const [showTransactionDetails, setShowTransactionDetails] = useState(false);
+
+  // Use Zustand store state
+  const transactions = useTransactions();
+  const filteredTransactions = useFilteredTransactions();
+  const loading = useTransactionStore(state => state.loading);
+  const filters = useTransactionStore(state => state.filters);
+  const selectedTransaction = useTransactionStore(state => state.selectedTransaction);
+  const showTransactionDetails = useTransactionStore(state => state.showTransactionDetails);
+  const todayRevenue = useTransactionStore(state => state.todayRevenue);
+  const totalTransactions = useTransactionStore(state => state.totalTransactions);
+
+  // Actions from Zustand
+  const setFilters = useTransactionStore(state => state.setFilters);
+  const resetFilters = useTransactionStore(state => state.resetFilters);
+  const setSelectedTransaction = useTransactionStore(state => state.setSelectedTransaction);
+  const setShowTransactionDetails = useTransactionStore(state => state.setShowTransactionDetails);
+  const fetchTransactions = useTransactionStore(state => state.fetchTransactions);
 
 
   useEffect(() => {
-    if (currentStore) {
-      fetchTransactions();
+    if (currentStore?.id) {
+      fetchTransactions(currentStore.id);
     }
-  }, [currentStore]);
+  }, [currentStore?.id, fetchTransactions]);
 
-  const fetchTransactions = async () => {
-    if (!currentStore) return;
 
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('transactions')
-        .select('*')
-        .eq('store_id', currentStore.id)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching transactions:', error);
-        toast.error('Failed to load transactions');
-        return;
-      }
-
-      setTransactions(data || []);
-    } catch (error) {
-      console.error('Error fetching transactions:', error);
-      toast.error('Failed to load transactions');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filteredTransactions = transactions.filter(transaction => {
-    const matchesSearch = transaction.transaction_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         transaction.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         transaction.description?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesType = typeFilter === "all" || transaction.transaction_type === typeFilter;
-    const matchesPaymentMethod = paymentMethodFilter === "all" || transaction.payment_method === paymentMethodFilter;
-    
-    const transactionDate = new Date(transaction.created_at);
-    const matchesDateFrom = !dateFrom || transactionDate >= dateFrom;
-    const matchesDateTo = !dateTo || transactionDate <= dateTo;
-    
-    return matchesSearch && matchesType && matchesPaymentMethod && matchesDateFrom && matchesDateTo;
-  });
 
   const getTransactionTypeBadge = (type: string) => {
     const typeConfig = {
@@ -118,8 +77,7 @@ export function TransactionView() {
     return <Badge variant={variant}>{label}</Badge>;
   };
 
-  // Calculate statistics
-  const totalTransactions = filteredTransactions.length;
+  // Calculate additional statistics (totalTransactions and todayRevenue come from store)
   const totalRevenue = filteredTransactions
     .filter(t => ['sale', 'layby_payment', 'layby_deposit'].includes(t.transaction_type))
     .reduce((sum, t) => sum + t.amount, 0);
@@ -128,24 +86,10 @@ export function TransactionView() {
     .reduce((sum, t) => sum + t.amount, 0);
   const netRevenue = totalRevenue - totalRefunds;
 
-  const todayTransactions = filteredTransactions.filter(t => {
-    const transactionDate = new Date(t.created_at);
-    const today = new Date();
-    return transactionDate.toDateString() === today.toDateString();
-  });
-
-  const todayRevenue = todayTransactions
-    .filter(t => ['sale', 'layby_payment', 'layby_deposit'].includes(t.transaction_type))
-    .reduce((sum, t) => sum + t.amount, 0);
-
 
 
   const clearFilters = () => {
-    setSearchTerm("");
-    setTypeFilter("all");
-    setPaymentMethodFilter("all");
-    setDateFrom(undefined);
-    setDateTo(undefined);
+    resetFilters();
   };
 
   const handleTransactionClick = (transaction: Transaction) => {
@@ -274,7 +218,7 @@ export function TransactionView() {
 
 
       {/* Summary Report */}
-      {(dateFrom || dateTo || typeFilter !== "all" || paymentMethodFilter !== "all") && (
+      {(filters.dateFrom || filters.dateTo || filters.typeFilter !== "all" || filters.paymentMethodFilter !== "all") && (
         <Card className="card-professional">
           <CardHeader>
             <CardTitle className="text-lg">Filtered Summary</CardTitle>
@@ -315,15 +259,15 @@ export function TransactionView() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
                   placeholder="Search by transaction number, customer, or description..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  value={filters.searchTerm}
+                  onChange={(e) => setFilters({ searchTerm: e.target.value })}
                   className="pl-10"
                 />
               </div>
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <Select value={filters.typeFilter} onValueChange={(value) => setFilters({ typeFilter: value })}>
                 <SelectTrigger className="w-40">
                   <SelectValue placeholder="Transaction Type" />
                 </SelectTrigger>
@@ -338,7 +282,7 @@ export function TransactionView() {
                 </SelectContent>
               </Select>
 
-              <Select value={paymentMethodFilter} onValueChange={setPaymentMethodFilter}>
+              <Select value={filters.paymentMethodFilter} onValueChange={(value) => setFilters({ paymentMethodFilter: value })}>
                 <SelectTrigger className="w-40">
                   <SelectValue placeholder="Payment Method" />
                 </SelectTrigger>
@@ -373,14 +317,14 @@ export function TransactionView() {
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="w-40">
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {dateFrom ? format(dateFrom, "MMM dd") : "From Date"}
+                    {filters.dateFrom ? format(filters.dateFrom, "MMM dd") : "From Date"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={dateFrom}
-                    onSelect={setDateFrom}
+                    selected={filters.dateFrom}
+                    onSelect={(date) => setFilters({ dateFrom: date })}
                     initialFocus
                   />
                 </PopoverContent>
@@ -390,14 +334,14 @@ export function TransactionView() {
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="w-40">
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {dateTo ? format(dateTo, "MMM dd") : "To Date"}
+                    {filters.dateTo ? format(filters.dateTo, "MMM dd") : "To Date"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={dateTo}
-                    onSelect={setDateTo}
+                    selected={filters.dateTo}
+                    onSelect={(date) => setFilters({ dateTo: date })}
                     initialFocus
                   />
                 </PopoverContent>
@@ -470,7 +414,7 @@ export function TransactionView() {
                 transaction={selectedTransaction}
                 open={showTransactionDetails}
                 onOpenChange={setShowTransactionDetails}
-                onTransactionUpdate={fetchTransactions}
+                onTransactionUpdate={() => currentStore?.id && fetchTransactions(currentStore.id)}
               />
             )}
 
