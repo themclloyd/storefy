@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,144 +8,55 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Clock, Plus, Search, DollarSign, Calendar, User, Package, AlertCircle, CheckCircle, XCircle, CreditCard, History, Settings, Eye } from "lucide-react";
 import { useCurrentStore } from "@/stores/storeStore";
 import { useUser } from "@/stores/authStore";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 import { useTax } from "@/hooks/useTax";
 import { format } from "date-fns";
+import {
+  useLaybyStore,
+  useLaybyOrders,
+  useFilteredLaybyOrders,
+  useLaybyStats,
+  type LaybyOrder
+} from "@/stores/laybyStore";
 import { AddLaybyDialog } from "./AddLaybyDialog";
 import { LaybyDetailsModal } from "./LaybyDetailsModal";
 import { LaybyPaymentDialog } from "./LaybyPaymentDialog";
 import { LaybySettingsDialog } from "./LaybySettingsDialog";
 
-interface LaybyOrder {
-  id: string;
-  layby_number: string;
-  customer_name: string;
-  customer_phone: string | null;
-  customer_email: string | null;
-  total_amount: number;
-  deposit_amount: number;
-  balance_remaining: number;
-  status: string;
-  due_date: string | null;
-  created_at: string;
-  completion_date: string | null;
-  notes: string | null;
-  payment_schedule_type: string | null;
-  interest_rate: number | null;
-  interest_amount: number | null;
-  inventory_reserved: boolean | null;
-  layby_items?: LaybyItem[];
-}
 
-interface LaybyItem {
-  id: string;
-  quantity: number;
-  unit_price: number;
-  total_price: number;
-  product_id: string;
-  products: {
-    id: string;
-    name: string;
-    sku: string;
-    is_active: boolean;
-  } | null;
-}
-
-interface LaybyStats {
-  total: number;
-  active: number;
-  overdue: number;
-  completed: number;
-  totalValue: number;
-  outstandingBalance: number;
-  depositsCollected: number;
-}
 
 export function LaybyView() {
   const currentStore = useCurrentStore();
   const user = useUser();
   const { formatCurrency } = useTax();
-  const [laybyOrders, setLaybyOrders] = useState<LaybyOrder[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [stats, setStats] = useState<LaybyStats>({
-    total: 0,
-    active: 0,
-    overdue: 0,
-    completed: 0,
-    totalValue: 0,
-    outstandingBalance: 0,
-    depositsCollected: 0
-  });
 
-  // Modal states
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
-  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
-  const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
-  const [selectedLayby, setSelectedLayby] = useState<LaybyOrder | null>(null);
+  // Use Zustand store state
+  const laybyOrders = useLaybyOrders();
+  const filteredOrders = useFilteredLaybyOrders();
+  const stats = useLaybyStats();
+  const loading = useLaybyStore(state => state.loading);
+  const filters = useLaybyStore(state => state.filters);
+  const selectedLayby = useLaybyStore(state => state.selectedLayby);
+
+  // Dialog states from Zustand
+  const showAddDialog = useLaybyStore(state => state.showAddDialog);
+  const showDetailsModal = useLaybyStore(state => state.showDetailsModal);
+  const showPaymentDialog = useLaybyStore(state => state.showPaymentDialog);
+  const showSettingsDialog = useLaybyStore(state => state.showSettingsDialog);
+
+  // Actions from Zustand
+  const setFilters = useLaybyStore(state => state.setFilters);
+  const setSelectedLayby = useLaybyStore(state => state.setSelectedLayby);
+  const setShowAddDialog = useLaybyStore(state => state.setShowAddDialog);
+  const setShowDetailsModal = useLaybyStore(state => state.setShowDetailsModal);
+  const setShowPaymentDialog = useLaybyStore(state => state.setShowPaymentDialog);
+  const setShowSettingsDialog = useLaybyStore(state => state.setShowSettingsDialog);
+  const fetchLaybyOrders = useLaybyStore(state => state.fetchLaybyOrders);
 
   useEffect(() => {
-    if (currentStore) {
-      fetchLaybyOrders();
+    if (currentStore?.id) {
+      fetchLaybyOrders(currentStore.id);
     }
-  }, [currentStore]);
-
-  const fetchLaybyOrders = async () => {
-    if (!currentStore) return;
-
-    try {
-      setLoading(true);
-
-      // Fetch layby orders with items
-      const { data, error } = await supabase
-        .from('layby_orders')
-        .select(`
-          *,
-          layby_items (
-            id,
-            quantity,
-            unit_price,
-            total_price,
-            product_id,
-            products (id, name, sku, is_active)
-          )
-        `)
-        .eq('store_id', currentStore.id)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching layby orders:', error);
-        toast.error('Failed to load layby orders');
-        return;
-      }
-
-      const orders = data || [];
-      setLaybyOrders(orders);
-
-      // Calculate stats
-      const newStats: LaybyStats = {
-        total: orders.length,
-        active: orders.filter(o => o.status === 'active').length,
-        overdue: orders.filter(o => o.status === 'overdue').length,
-        completed: orders.filter(o => o.status === 'completed').length,
-        totalValue: orders.reduce((sum, o) => sum + o.total_amount, 0),
-        outstandingBalance: orders
-          .filter(o => o.status === 'active' || o.status === 'overdue')
-          .reduce((sum, o) => sum + o.balance_remaining, 0),
-        depositsCollected: orders.reduce((sum, o) => sum + o.deposit_amount, 0)
-      };
-
-      setStats(newStats);
-    } catch (error) {
-      console.error('Error fetching layby orders:', error);
-      toast.error('Failed to load layby orders');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [currentStore?.id, fetchLaybyOrders]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -164,25 +75,21 @@ export function LaybyView() {
 
   const handleViewDetails = (layby: LaybyOrder) => {
     setSelectedLayby(layby);
-    setDetailsModalOpen(true);
+    setShowDetailsModal(true);
   };
 
   const handleMakePayment = (layby: LaybyOrder) => {
     setSelectedLayby(layby);
-    setPaymentDialogOpen(true);
+    setShowPaymentDialog(true);
   };
 
   const handleLaybyUpdated = () => {
-    fetchLaybyOrders();
+    if (currentStore?.id) {
+      fetchLaybyOrders(currentStore.id);
+    }
   };
 
-  const filteredOrders = laybyOrders.filter(order => {
-    const matchesSearch = order.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.layby_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (order.customer_phone && order.customer_phone.includes(searchTerm));
-    const matchesStatus = statusFilter === "all" || order.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+
 
   if (loading) {
     return (
@@ -208,13 +115,13 @@ export function LaybyView() {
         <div className="flex flex-wrap gap-2">
           <Button
             variant="outline"
-            onClick={() => setSettingsDialogOpen(true)}
+            onClick={() => setShowSettingsDialog(true)}
           >
             <Settings className="w-4 h-4 mr-2" />
             Settings
           </Button>
           <Button
-            onClick={() => setAddDialogOpen(true)}
+            onClick={() => setShowAddDialog(true)}
           >
             <Plus className="w-4 h-4 mr-2" />
             New Layby Order
@@ -282,15 +189,15 @@ export function LaybyView() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
                   placeholder="Search by customer name, layby number, or phone..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  value={filters.searchTerm}
+                  onChange={(e) => setFilters({ searchTerm: e.target.value })}
                   className="pl-10"
                 />
               </div>
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <Select value={filters.statusFilter} onValueChange={(value) => setFilters({ statusFilter: value })}>
                 <SelectTrigger className="w-40">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
@@ -325,7 +232,7 @@ export function LaybyView() {
                 {filteredOrders.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                      {searchTerm || statusFilter !== "all" ? "No layby orders match your filters" : "No layby orders found"}
+                      {filters.searchTerm || filters.statusFilter !== "all" ? "No layby orders match your filters" : "No layby orders found"}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -374,29 +281,29 @@ export function LaybyView() {
 
       {/* Modals */}
       <AddLaybyDialog
-        open={addDialogOpen}
-        onOpenChange={setAddDialogOpen}
+        open={showAddDialog}
+        onOpenChange={setShowAddDialog}
         onLaybyAdded={handleLaybyUpdated}
       />
 
       <LaybyDetailsModal
-        open={detailsModalOpen}
-        onOpenChange={setDetailsModalOpen}
+        open={showDetailsModal}
+        onOpenChange={setShowDetailsModal}
         laybyOrder={selectedLayby}
         onLaybyUpdated={handleLaybyUpdated}
         onPaymentRequested={handleMakePayment}
       />
 
       <LaybyPaymentDialog
-        open={paymentDialogOpen}
-        onOpenChange={setPaymentDialogOpen}
+        open={showPaymentDialog}
+        onOpenChange={setShowPaymentDialog}
         laybyOrder={selectedLayby}
         onPaymentProcessed={handleLaybyUpdated}
       />
 
       <LaybySettingsDialog
-        open={settingsDialogOpen}
-        onOpenChange={setSettingsDialogOpen}
+        open={showSettingsDialog}
+        onOpenChange={setShowSettingsDialog}
         onSettingsUpdated={handleLaybyUpdated}
       />
     </div>
