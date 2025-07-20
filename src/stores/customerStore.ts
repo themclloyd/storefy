@@ -15,7 +15,6 @@ export interface Customer {
   status: string | null;
   created_at: string;
   last_order_date?: string | null;
-  notes?: string | null;
 }
 
 export interface Order {
@@ -160,11 +159,12 @@ export const useCustomerStore = create<CustomerStore>()(
         setCustomers: (customers) => {
           set({ customers }, false, 'setCustomers');
           // Auto-apply filters when customers change
-          get().applyFilters();
+          setTimeout(() => get().applyFilters(), 0);
         },
         
         fetchCustomers: async (storeId: string) => {
           try {
+            console.log('🔍 Fetching customers for store:', storeId);
             set({ loading: true }, false, 'fetchCustomers:start');
             const { data, error } = await supabase
               .from('customers')
@@ -177,33 +177,44 @@ export const useCustomerStore = create<CustomerStore>()(
                 total_orders,
                 total_spent,
                 status,
-                created_at,
-                notes
+                created_at
               `)
               .eq('store_id', storeId)
               .order('name');
 
+            console.log('📊 Customer fetch result:', { data, error });
+
             if (error) {
               console.error('Error fetching customers:', error);
-              toast.error('Failed to load customers');
+              console.error('Error details:', error.message, error.details, error.hint);
+              toast.error(`Failed to load customers: ${error.message}`);
+              set({ loading: false }, false, 'fetchCustomers:error');
               return;
             }
 
-            // For each customer, get their last order date
+            // For each customer, get their last order date (with error handling)
             const customersWithLastOrder = await Promise.all(
               (data || []).map(async (customer) => {
-                const { data: lastOrder } = await supabase
-                  .from('orders')
-                  .select('created_at')
-                  .eq('customer_id', customer.id)
-                  .order('created_at', { ascending: false })
-                  .limit(1)
-                  .single();
+                try {
+                  const { data: lastOrder } = await supabase
+                    .from('orders')
+                    .select('created_at')
+                    .eq('customer_id', customer.id)
+                    .order('created_at', { ascending: false })
+                    .limit(1)
+                    .single();
 
-                return {
-                  ...customer,
-                  last_order_date: lastOrder?.created_at || null,
-                };
+                  return {
+                    ...customer,
+                    last_order_date: lastOrder?.created_at || null,
+                  };
+                } catch (orderError) {
+                  // If fetching last order fails, just return customer without last order date
+                  return {
+                    ...customer,
+                    last_order_date: null,
+                  };
+                }
               })
             );
 
@@ -232,7 +243,6 @@ export const useCustomerStore = create<CustomerStore>()(
                 phone: customerData.phone || null,
                 address: customerData.address || null,
                 status: customerData.status || 'active',
-                notes: customerData.notes || null,
                 total_orders: 0,
                 total_spent: 0,
               })

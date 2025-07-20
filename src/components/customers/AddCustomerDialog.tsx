@@ -39,7 +39,6 @@ const customerSchema = z.object({
   phone: z.string().optional(),
   address: z.string().optional(),
   status: z.enum(["active", "inactive", "vip"]).default("active"),
-  notes: z.string().optional(),
 });
 
 type CustomerFormData = z.infer<typeof customerSchema>;
@@ -64,7 +63,6 @@ export function AddCustomerDialog({ open, onOpenChange, onCustomerAdded }: AddCu
       phone: "",
       address: "",
       status: "active",
-      notes: "",
     },
   });
 
@@ -226,24 +224,7 @@ export function AddCustomerDialog({ open, onOpenChange, onCustomerAdded }: AddCu
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Notes</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="Additional notes about the customer..."
-                      className="resize-none"
-                      rows={3}
-                      {...field} 
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
 
             <div className="flex justify-end gap-3 pt-4">
               <Button

@@ -40,7 +40,6 @@ const customerSchema = z.object({
   phone: z.string().optional(),
   address: z.string().optional(),
   status: z.enum(["active", "inactive", "vip"]).default("active"),
-  notes: z.string().optional(),
 });
 
 type CustomerFormData = z.infer<typeof customerSchema>;
@@ -87,7 +86,6 @@ export function EditCustomerDialog({
       phone: "",
       address: "",
       status: "active",
-      notes: "",
     },
   });
 
@@ -100,7 +98,6 @@ export function EditCustomerDialog({
         phone: customer.phone || "",
         address: customer.address || "",
         status: (customer.status as "active" | "inactive" | "vip") || "active",
-        notes: "",
       });
     }
     // Reset delete confirmation state when customer changes
