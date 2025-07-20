@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useCustomerStore } from "@/stores/customerStore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,98 +52,22 @@ interface FilterOptions {
   dateTo: Date | undefined;
 }
 
-interface CustomerFiltersProps {
-  customers: Customer[];
-  onFilteredCustomersChange: (filtered: Customer[]) => void;
-}
-
-export function CustomerFilters({ customers, onFilteredCustomersChange }: CustomerFiltersProps) {
-  const [filters, setFilters] = useState<FilterOptions>({
-    searchTerm: "",
-    status: "all",
-    minSpent: "",
-    maxSpent: "",
-    minOrders: "",
-    maxOrders: "",
-    dateFrom: undefined,
-    dateTo: undefined,
-  });
+export function CustomerFilters() {
+  // Use Zustand store state
+  const searchTerm = useCustomerStore(state => state.searchTerm);
+  const filters = useCustomerStore(state => state.filters);
+  const setSearchTerm = useCustomerStore(state => state.setSearchTerm);
+  const setFilters = useCustomerStore(state => state.setFilters);
+  const resetFilters = useCustomerStore(state => state.resetFilters);
 
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-
-  const applyFilters = (newFilters: FilterOptions) => {
-    let filtered = [...customers];
-
-    // Text search
-    if (newFilters.searchTerm) {
-      const searchLower = newFilters.searchTerm.toLowerCase();
-      filtered = filtered.filter(customer => 
-        customer.name.toLowerCase().includes(searchLower) ||
-        (customer.email && customer.email.toLowerCase().includes(searchLower)) ||
-        (customer.phone && customer.phone.includes(newFilters.searchTerm))
-      );
-    }
-
-    // Status filter
-    if (newFilters.status !== "all") {
-      filtered = filtered.filter(customer => customer.status === newFilters.status);
-    }
-
-    // Spending range filter
-    if (newFilters.minSpent) {
-      const minSpent = parseFloat(newFilters.minSpent);
-      filtered = filtered.filter(customer => (customer.total_spent || 0) >= minSpent);
-    }
-    if (newFilters.maxSpent) {
-      const maxSpent = parseFloat(newFilters.maxSpent);
-      filtered = filtered.filter(customer => (customer.total_spent || 0) <= maxSpent);
-    }
-
-    // Orders range filter
-    if (newFilters.minOrders) {
-      const minOrders = parseInt(newFilters.minOrders);
-      filtered = filtered.filter(customer => (customer.total_orders || 0) >= minOrders);
-    }
-    if (newFilters.maxOrders) {
-      const maxOrders = parseInt(newFilters.maxOrders);
-      filtered = filtered.filter(customer => (customer.total_orders || 0) <= maxOrders);
-    }
-
-    // Date range filter
-    if (newFilters.dateFrom) {
-      filtered = filtered.filter(customer => 
-        new Date(customer.created_at) >= newFilters.dateFrom!
-      );
-    }
-    if (newFilters.dateTo) {
-      filtered = filtered.filter(customer => 
-        new Date(customer.created_at) <= newFilters.dateTo!
-      );
-    }
-
-    onFilteredCustomersChange(filtered);
-  };
 
   const updateFilter = (key: keyof FilterOptions, value: any) => {
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
-    applyFilters(newFilters);
   };
 
-  const clearAllFilters = () => {
-    const clearedFilters: FilterOptions = {
-      searchTerm: "",
-      status: "all",
-      minSpent: "",
-      maxSpent: "",
-      minOrders: "",
-      maxOrders: "",
-      dateFrom: undefined,
-      dateTo: undefined,
-    };
-    setFilters(clearedFilters);
-    applyFilters(clearedFilters);
-  };
+
 
   const getActiveFilterCount = () => {
     let count = 0;
@@ -167,8 +92,8 @@ export function CustomerFilters({ customers, onFilteredCustomersChange }: Custom
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
                 placeholder="Search customers by name, email, or phone..."
-                value={filters.searchTerm}
-                onChange={(e) => updateFilter('searchTerm', e.target.value)}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
             </div>
@@ -206,7 +131,7 @@ export function CustomerFilters({ customers, onFilteredCustomersChange }: Custom
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={clearAllFilters}
+                onClick={resetFilters}
                 className="flex items-center gap-2"
               >
                 <X className="w-4 h-4" />

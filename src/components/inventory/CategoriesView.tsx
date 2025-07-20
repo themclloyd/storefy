@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { useCurrentStore } from "@/stores/storeStore";
 import { useUser } from "@/stores/authStore";
 import { useInventoryStore, useCategories, type Category } from "@/stores/inventoryStore";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 import { AddCategoryDialog } from "./AddCategoryDialog";
 import { EditCategoryDialog } from "./EditCategoryDialog";
 import { DeleteCategoryDialog } from "./DeleteCategoryDialog";
@@ -23,6 +24,7 @@ interface CategoriesViewProps {
 export function CategoriesView({ onClose, onViewCategoryProducts }: CategoriesViewProps) {
   const currentStore = useCurrentStore();
   const user = useUser();
+  const navigate = useNavigate();
 
   // Use Zustand store state
   const categories = useCategories();
@@ -95,7 +97,17 @@ export function CategoriesView({ onClose, onViewCategoryProducts }: CategoriesVi
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={onClose}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              // If onClose is a no-op (empty function), navigate to inventory
+              if (onClose.toString() === '() => {}') {
+                navigate('/app/inventory');
+              } else {
+                onClose();
+              }
+            }}
+          >
             Back to Inventory
           </Button>
           <Button

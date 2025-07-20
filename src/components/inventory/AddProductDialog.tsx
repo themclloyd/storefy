@@ -35,6 +35,7 @@ import { useCurrentStore } from "@/stores/storeStore";
 import { useUser } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useInventoryStore, useCategories, useSuppliers } from "@/stores/inventoryStore";
 
 const productSchema = z.object({
   name: z.string().min(1, "Product name is required"),
@@ -71,8 +72,14 @@ interface AddProductDialogProps {
 export function AddProductDialog({ open, onOpenChange, onProductAdded }: AddProductDialogProps) {
   const currentStore = useCurrentStore();
   const user = useUser();
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+
+  // Use Zustand store state
+  const categories = useCategories();
+  const suppliers = useSuppliers();
+  const fetchCategories = useInventoryStore(state => state.fetchCategories);
+  const fetchSuppliers = useInventoryStore(state => state.fetchSuppliers);
+
+  // Local state for form-specific data
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -97,46 +104,13 @@ export function AddProductDialog({ open, onOpenChange, onProductAdded }: AddProd
   });
 
   useEffect(() => {
-    if (open && currentStore) {
-      fetchCategories();
-      fetchSuppliers();
+    if (open && currentStore?.id) {
+      fetchCategories(currentStore.id);
+      fetchSuppliers(currentStore.id);
     }
-  }, [open, currentStore]);
+  }, [open, currentStore?.id, fetchCategories, fetchSuppliers]);
 
-  const fetchCategories = async () => {
-    if (!currentStore) return;
 
-    try {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('id, name')
-        .eq('store_id', currentStore.id)
-        .order('name');
-
-      if (error) throw error;
-      setCategories(data || []);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    }
-  };
-
-  const fetchSuppliers = async () => {
-    if (!currentStore) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('suppliers')
-        .select('id, name')
-        .eq('store_id', currentStore.id)
-        .eq('is_active', true)
-        .order('name');
-
-      if (error) throw error;
-      setSuppliers(data || []);
-    } catch (error) {
-      console.error('Error fetching suppliers:', error);
-    }
-  };
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

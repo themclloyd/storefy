@@ -9,6 +9,7 @@ import { useCurrentStore } from "@/stores/storeStore";
 import { useUser } from "@/stores/authStore";
 import { useInventoryStore, useSuppliers, type Supplier } from "@/stores/inventoryStore";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 import { AddSupplierDialog } from "./AddSupplierDialog";
 import { EditSupplierDialog } from "./EditSupplierDialog";
 import { DeleteSupplierDialog } from "./DeleteSupplierDialog";
@@ -23,6 +24,7 @@ interface SuppliersViewProps {
 export function SuppliersView({ onClose, onViewSupplierProducts }: SuppliersViewProps) {
   const currentStore = useCurrentStore();
   const user = useUser();
+  const navigate = useNavigate();
 
   // Use Zustand store state
   const suppliers = useSuppliers();
@@ -98,7 +100,17 @@ export function SuppliersView({ onClose, onViewSupplierProducts }: SuppliersView
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={onClose}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              // If onClose is a no-op (empty function), navigate to inventory
+              if (onClose.toString() === '() => {}') {
+                navigate('/app/inventory');
+              } else {
+                onClose();
+              }
+            }}
+          >
             Back to Inventory
           </Button>
           <Button 

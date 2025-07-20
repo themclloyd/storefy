@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -6,34 +6,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ArrowLeft, Package, AlertTriangle, Edit, Trash2, TrendingUp, Loader2, History } from "lucide-react";
 import { useCurrentStore } from "@/stores/storeStore";
 import { useUser } from "@/stores/authStore";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { useInventoryStore, useProducts, type Product } from "@/stores/inventoryStore";
 import { EditProductDialog } from "./EditProductDialog";
 import { DeleteProductDialog } from "./DeleteProductDialog";
 import { StockAdjustmentDialog } from "./StockAdjustmentDialog";
 import { ProductHistoryModal } from "./ProductHistoryModal";
 
-interface Product {
-  id: string;
-  name: string;
-  sku: string;
-  description: string;
-  price: number;
-  cost: number;
-  stock_quantity: number;
-  low_stock_threshold: number;
-  category_id: string;
-  supplier_id: string;
-  image_url: string;
-  is_active: boolean;
-  created_at?: string;
-  categories?: {
-    name: string;
-  };
-  suppliers?: {
-    name: string;
-  };
-}
+
 
 interface FilteredInventoryViewProps {
   filterType: 'category' | 'supplier';
@@ -42,74 +21,47 @@ interface FilteredInventoryViewProps {
   onBack: () => void;
 }
 
-export function FilteredInventoryView({ 
-  filterType, 
-  filterId, 
-  filterName, 
-  onBack 
+export function FilteredInventoryView({
+  filterType,
+  filterId,
+  filterName,
+  onBack
 }: FilteredInventoryViewProps) {
   const currentStore = useCurrentStore();
   const user = useUser();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  
-  // Dialog states
-  const [showEditDialog, setShowEditDialog] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [showStockDialog, setShowStockDialog] = useState(false);
-  const [showHistoryModal, setShowHistoryModal] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  // Use Zustand store state
+  const allProducts = useProducts();
+  const loading = useInventoryStore(state => state.loading);
+  const showEditDialog = useInventoryStore(state => state.showEditDialog);
+  const showDeleteDialog = useInventoryStore(state => state.showDeleteDialog);
+  const showStockDialog = useInventoryStore(state => state.showStockDialog);
+  const showHistoryModal = useInventoryStore(state => state.showHistoryModal);
+  const selectedProduct = useInventoryStore(state => state.selectedProduct);
+
+  // Actions from Zustand
+  const setShowEditDialog = useInventoryStore(state => state.setShowEditDialog);
+  const setShowDeleteDialog = useInventoryStore(state => state.setShowDeleteDialog);
+  const setShowStockDialog = useInventoryStore(state => state.setShowStockDialog);
+  const setShowHistoryModal = useInventoryStore(state => state.setShowHistoryModal);
+  const setSelectedProduct = useInventoryStore(state => state.setSelectedProduct);
+  const fetchProducts = useInventoryStore(state => state.fetchProducts);
+
+  // Filter products based on the filter type
+  const products = allProducts.filter(product => {
+    if (filterType === 'category') {
+      return product.category_id === filterId;
+    } else if (filterType === 'supplier') {
+      return product.supplier_id === filterId;
+    }
+    return false;
+  });
 
   useEffect(() => {
-    if (currentStore && user) {
-      fetchProducts();
+    if (currentStore?.id && user) {
+      fetchProducts(currentStore.id);
     }
-  }, [currentStore, user, filterId, filterType]);
-
-  const fetchProducts = async () => {
-    if (!currentStore) return;
-
-    try {
-      const filterColumn = filterType === 'category' ? 'category_id' : 'supplier_id';
-      
-      const { data, error } = await supabase
-        .from('products')
-        .select(`
-          id,
-          name,
-          sku,
-          description,
-          price,
-          cost,
-          stock_quantity,
-          low_stock_threshold,
-          category_id,
-          supplier_id,
-          image_url,
-          is_active,
-          created_at,
-          categories (name),
-          suppliers (name)
-        `)
-        .eq('store_id', currentStore.id)
-        .eq(filterColumn, filterId)
-        .eq('is_active', true)
-        .order('name');
-
-      if (error) {
-        console.error('Error fetching products:', error);
-        toast.error('Failed to load products');
-        return;
-      }
-
-      setProducts(data || []);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      toast.error('Failed to load products');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [currentStore?.id, user, fetchProducts]);
 
   const lowStockItems = products.filter(item => item.stock_quantity <= item.low_stock_threshold);
   const totalValue = products.reduce((sum, item) => sum + (item.price * item.stock_quantity), 0);
@@ -144,7 +96,9 @@ export function FilteredInventoryView({
   };
 
   const handleProductUpdated = () => {
-    fetchProducts();
+    if (currentStore?.id) {
+      fetchProducts(currentStore.id);
+    }
     handleDialogClose();
   };
 

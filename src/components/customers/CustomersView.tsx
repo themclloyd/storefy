@@ -9,8 +9,13 @@ import { Search, Plus, Users, Phone, Mail, Edit, Eye, Loader2, Download, BarChar
 import { useCurrentStore } from "@/stores/storeStore";
 import { useUser } from "@/stores/authStore";
 import { useStoreData } from "@/hooks/useSupabaseClient";
-import { toast } from "sonner";
 import { useTax } from "@/hooks/useTax";
+import {
+  useCustomerStore,
+  useCustomers,
+  useFilteredCustomers,
+  type Customer
+} from "@/stores/customerStore";
 import { AddCustomerDialog } from "./AddCustomerDialog";
 import { EditCustomerDialog } from "./EditCustomerDialog";
 import { CustomerDetailsModal } from "./CustomerDetailsModal";
@@ -19,18 +24,7 @@ import { CustomerStatusDialog } from "./CustomerStatusDialog";
 import { CustomerAnalytics } from "./CustomerAnalytics";
 import { CustomerFilters } from "./CustomerFilters";
 
-interface Customer {
-  id: string;
-  name: string;
-  email: string | null;
-  phone: string | null;
-  address: string | null;
-  total_orders: number | null;
-  total_spent: number | null;
-  status: string | null;
-  created_at: string;
-  last_order_date?: string | null;
-}
+
 
 export function CustomersView() {
   const currentStore = useCurrentStore();
@@ -38,102 +32,67 @@ export function CustomersView() {
   const { from, currentStoreId, isPinSession } = useStoreData();
   const { formatCurrency } = useTax();
 
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
-  const [exportDialogOpen, setExportDialogOpen] = useState(false);
-  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-  const [showAnalytics, setShowAnalytics] = useState(false);
-  const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
+  // Use Zustand store state
+  const customers = useCustomers();
+  const filteredCustomers = useFilteredCustomers();
+  const loading = useCustomerStore(state => state.loading);
+  const selectedCustomer = useCustomerStore(state => state.selectedCustomer);
+  const viewMode = useCustomerStore(state => state.viewMode);
 
-  // Mobile-specific states
-  const [viewMode, setViewMode] = useState<'table' | 'cards'>(() => {
-    return window.innerWidth < 768 ? 'cards' : 'table';
-  });
+  // Dialog states from Zustand
+  const showAddDialog = useCustomerStore(state => state.showAddDialog);
+  const showEditDialog = useCustomerStore(state => state.showEditDialog);
+  const showDetailsModal = useCustomerStore(state => state.showDetailsModal);
+  const showExportDialog = useCustomerStore(state => state.showExportDialog);
+  const showStatusDialog = useCustomerStore(state => state.showStatusDialog);
+  const showAnalytics = useCustomerStore(state => state.showAnalytics);
+
+  // Actions from Zustand
+  const setSelectedCustomer = useCustomerStore(state => state.setSelectedCustomer);
+  const setViewMode = useCustomerStore(state => state.setViewMode);
+  const setShowAddDialog = useCustomerStore(state => state.setShowAddDialog);
+  const setShowEditDialog = useCustomerStore(state => state.setShowEditDialog);
+  const setShowDetailsModal = useCustomerStore(state => state.setShowDetailsModal);
+  const setShowExportDialog = useCustomerStore(state => state.setShowExportDialog);
+  const setShowStatusDialog = useCustomerStore(state => state.setShowStatusDialog);
+  const setShowAnalytics = useCustomerStore(state => state.setShowAnalytics);
+  const fetchCustomers = useCustomerStore(state => state.fetchCustomers);
+
+  // Mobile-specific states (keep local as they're UI-specific)
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [showMobileActions, setShowMobileActions] = useState(false);
 
 
 
   useEffect(() => {
-    if ((currentStore && user) || (currentStoreId && isPinSession)) {
-      fetchCustomers();
-    }
-  }, [currentStore, user, currentStoreId, isPinSession]);
-
-  const fetchCustomers = async () => {
     const storeId = currentStoreId || currentStore?.id;
-    if (!storeId) return;
-
-    try {
-      const { data, error } = await from('customers')
-        .select(`
-          id,
-          name,
-          email,
-          phone,
-          address,
-          total_orders,
-          total_spent,
-          status,
-          created_at
-        `)
-        .eq('store_id', storeId)
-        .order('name');
-
-      if (error) {
-        console.error('Error fetching customers:', error);
-        toast.error('Failed to load customers');
-        return;
-      }
-
-      // For each customer, get their last order date
-      const customersWithLastOrder = await Promise.all(
-        (data || []).map(async (customer) => {
-          const { data: lastOrder } = await from('orders')
-            .select('created_at')
-            .eq('customer_id', customer.id)
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .single();
-
-          return {
-            ...customer,
-            last_order_date: lastOrder?.created_at || null,
-          };
-        })
-      );
-
-      setCustomers(customersWithLastOrder);
-      setFilteredCustomers(customersWithLastOrder);
-    } catch (error) {
-      console.error('Error fetching customers:', error);
-      toast.error('Failed to load customers');
-    } finally {
-      setLoading(false);
+    if (storeId && ((currentStore && user) || (currentStoreId && isPinSession))) {
+      fetchCustomers(storeId);
     }
-  };
+  }, [currentStore, user, currentStoreId, isPinSession, fetchCustomers]);
+
+
 
   const handleViewCustomer = (customer: Customer) => {
     setSelectedCustomer(customer);
-    setDetailsModalOpen(true);
+    setShowDetailsModal(true);
   };
 
   const handleEditCustomer = (customer: Customer) => {
     setSelectedCustomer(customer);
-    setEditDialogOpen(true);
+    setShowEditDialog(true);
   };
 
   const handleCustomerUpdated = () => {
-    fetchCustomers();
+    const storeId = currentStoreId || currentStore?.id;
+    if (storeId) {
+      fetchCustomers(storeId);
+    }
   };
 
   const handleStatusChange = (customer: Customer) => {
     setSelectedCustomer(customer);
-    setStatusDialogOpen(true);
+    setShowStatusDialog(true);
   };
 
   // Remove the old filtering logic since it's now handled by CustomerFilters component
@@ -217,7 +176,7 @@ export function CustomersView() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setExportDialogOpen(true)}
+                onClick={() => setShowExportDialog(true)}
                 disabled={customers.length === 0}
               >
                 <Download className="w-4 h-4 mr-2" />
@@ -227,7 +186,7 @@ export function CustomersView() {
 
             {/* Add Customer Button */}
             <Button
-              onClick={() => setAddDialogOpen(true)}
+              onClick={() => setShowAddDialog(true)}
               size="sm"
               className="hidden sm:flex"
             >
@@ -287,10 +246,7 @@ export function CustomersView() {
       </div>
 
       {/* Filters */}
-      <CustomerFilters
-        customers={customers}
-        onFilteredCustomersChange={setFilteredCustomers}
-      />
+      <CustomerFilters />
 
       {/* Customers Table */}
       <Card className="card-professional">
@@ -497,35 +453,35 @@ export function CustomersView() {
 
       {/* Dialogs and Modals */}
       <AddCustomerDialog
-        open={addDialogOpen}
-        onOpenChange={setAddDialogOpen}
+        open={showAddDialog}
+        onOpenChange={setShowAddDialog}
         onCustomerAdded={handleCustomerUpdated}
       />
 
       <EditCustomerDialog
-        open={editDialogOpen}
-        onOpenChange={setEditDialogOpen}
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
         customer={selectedCustomer}
         onCustomerUpdated={handleCustomerUpdated}
         onCustomerDeleted={handleCustomerUpdated}
       />
 
       <CustomerDetailsModal
-        open={detailsModalOpen}
-        onOpenChange={setDetailsModalOpen}
+        open={showDetailsModal}
+        onOpenChange={setShowDetailsModal}
         customer={selectedCustomer}
         onEditCustomer={handleEditCustomer}
       />
 
       <CustomerExportDialog
-        open={exportDialogOpen}
-        onOpenChange={setExportDialogOpen}
+        open={showExportDialog}
+        onOpenChange={setShowExportDialog}
         customers={filteredCustomers}
       />
 
       <CustomerStatusDialog
-        open={statusDialogOpen}
-        onOpenChange={setStatusDialogOpen}
+        open={showStatusDialog}
+        onOpenChange={setShowStatusDialog}
         customer={selectedCustomer}
         onStatusUpdated={handleCustomerUpdated}
       />
@@ -591,7 +547,7 @@ export function CustomersView() {
           <div className="mt-6 space-y-3">
             <Button
               onClick={() => {
-                setAddDialogOpen(true);
+                setShowAddDialog(true);
                 setShowMobileActions(false);
               }}
               className="w-full justify-start"
@@ -616,7 +572,7 @@ export function CustomersView() {
             <Button
               variant="outline"
               onClick={() => {
-                setExportDialogOpen(true);
+                setShowExportDialog(true);
                 setShowMobileActions(false);
               }}
               disabled={customers.length === 0}
@@ -632,7 +588,7 @@ export function CustomersView() {
       {/* Floating Add Button for Mobile */}
       <div className="sm:hidden fixed bottom-20 right-4 z-40">
         <Button
-          onClick={() => setAddDialogOpen(true)}
+          onClick={() => setShowAddDialog(true)}
           className="h-14 w-14 rounded-full shadow-lg"
           size="sm"
         >
