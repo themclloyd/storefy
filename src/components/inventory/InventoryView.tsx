@@ -11,6 +11,14 @@ import { useUser } from "@/stores/authStore";
 import { SecureAction, SecureButton } from "@/components/auth/SecureAction";
 import { useStoreData } from "@/hooks/useSupabaseClient";
 import { toast } from "sonner";
+import {
+  useInventoryStore,
+  useProducts,
+  useCategories,
+  useSuppliers,
+  type Product,
+  type FilterOptions
+} from "@/stores/inventoryStore";
 import { AddProductDialog } from "./AddProductDialog";
 import { EditProductDialog } from "./EditProductDialog";
 import { DeleteProductDialog } from "./DeleteProductDialog";
@@ -54,122 +62,64 @@ export function InventoryView() {
   const user = useUser();
   const { from, currentStoreId, isPinSession } = useStoreData();
   const { formatCurrency } = useTax();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  // Dialog states
-  const [showAddDialog, setShowAddDialog] = useState(false);
-  const [showEditDialog, setShowEditDialog] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [showStockDialog, setShowStockDialog] = useState(false);
-  const [showPublicVisibilityDialog, setShowPublicVisibilityDialog] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  // Use Zustand store state
+  const products = useProducts();
+  const categories = useCategories();
+  const suppliers = useSuppliers();
+  const searchTerm = useInventoryStore(state => state.searchTerm);
+  const selectedCategory = useInventoryStore(state => state.selectedCategory);
+  const loading = useInventoryStore(state => state.loading);
+  const filters = useInventoryStore(state => state.filters);
+  const filteredView = useInventoryStore(state => state.filteredView);
+  const viewMode = useInventoryStore(state => state.viewMode);
+  const selectedProducts = useInventoryStore(state => state.selectedProducts);
+
+  // Dialog states from Zustand
+  const showAddDialog = useInventoryStore(state => state.showAddDialog);
+  const showEditDialog = useInventoryStore(state => state.showEditDialog);
+  const showDeleteDialog = useInventoryStore(state => state.showDeleteDialog);
+  const showStockDialog = useInventoryStore(state => state.showStockDialog);
+  const showBulkStockDialog = useInventoryStore(state => state.showBulkStockDialog);
+  const showExportDialog = useInventoryStore(state => state.showExportDialog);
+  const showHistoryModal = useInventoryStore(state => state.showHistoryModal);
+  const showPublicVisibilityDialog = useInventoryStore(state => state.showPublicVisibilityDialog);
+  const selectedProduct = useInventoryStore(state => state.selectedProduct);
+
+  // Actions from Zustand
+  const setSearchTerm = useInventoryStore(state => state.setSearchTerm);
+  const setSelectedCategory = useInventoryStore(state => state.setSelectedCategory);
+  const setFilters = useInventoryStore(state => state.setFilters);
+  const setFilteredView = useInventoryStore(state => state.setFilteredView);
+  const setViewMode = useInventoryStore(state => state.setViewMode);
+  const setSelectedProducts = useInventoryStore(state => state.setSelectedProducts);
+  const setShowAddDialog = useInventoryStore(state => state.setShowAddDialog);
+  const setShowEditDialog = useInventoryStore(state => state.setShowEditDialog);
+  const setShowDeleteDialog = useInventoryStore(state => state.setShowDeleteDialog);
+  const setShowStockDialog = useInventoryStore(state => state.setShowStockDialog);
+  const setShowBulkStockDialog = useInventoryStore(state => state.setShowBulkStockDialog);
+  const setShowExportDialog = useInventoryStore(state => state.setShowExportDialog);
+  const setShowHistoryModal = useInventoryStore(state => state.setShowHistoryModal);
+  const setShowPublicVisibilityDialog = useInventoryStore(state => state.setShowPublicVisibilityDialog);
+  const setSelectedProduct = useInventoryStore(state => state.setSelectedProduct);
+  const fetchProducts = useInventoryStore(state => state.fetchProducts);
+  const fetchCategories = useInventoryStore(state => state.fetchCategories);
+  const fetchSuppliers = useInventoryStore(state => state.fetchSuppliers);
+
+  // Local UI states that should remain local
   const [showSuppliersView, setShowSuppliersView] = useState(false);
   const [showCategoriesView, setShowCategoriesView] = useState(false);
-  const [filteredView, setFilteredView] = useState<{
-    type: 'category' | 'supplier';
-    id: string;
-    name: string;
-  } | null>(null);
-
-  // Bulk operations
-  const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
-  const [showBulkStockDialog, setShowBulkStockDialog] = useState(false);
-  const [showExportDialog, setShowExportDialog] = useState(false);
-  const [showHistoryModal, setShowHistoryModal] = useState(false);
-
-  // Advanced filtering
-  const [filters, setFilters] = useState<FilterOptions>({
-    search: "",
-    category: "all",
-    supplier: "all",
-    stockLevel: "all",
-    priceRange: { min: null, max: null },
-    sortBy: "name",
-    sortOrder: "asc",
-  });
-
-  // Mobile-specific states
-  const [viewMode, setViewMode] = useState<'table' | 'cards'>(() => {
-    // Default to cards on mobile, table on desktop
-    return window.innerWidth < 768 ? 'cards' : 'table';
-  });
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [showMobileActions, setShowMobileActions] = useState(false);
 
   useEffect(() => {
-    if ((currentStore && user) || (currentStoreId && isPinSession)) {
-      fetchProducts();
-      fetchCategories();
-    }
-  }, [currentStore, user, currentStoreId, isPinSession]);
-
-  const fetchProducts = async () => {
     const storeId = currentStoreId || currentStore?.id;
-    if (!storeId) return;
-
-    try {
-      const { data, error } = await from('products')
-        .select(`
-          id,
-          name,
-          sku,
-          description,
-          price,
-          cost,
-          stock_quantity,
-          low_stock_threshold,
-          category_id,
-          supplier_id,
-          image_url,
-          is_active,
-          created_at,
-          categories (name),
-          suppliers (name)
-        `)
-        .eq('store_id', storeId)
-        .eq('is_active', true)
-        .order('name');
-
-      if (error) {
-        console.error('Error fetching products:', error);
-        toast.error('Failed to load products');
-        return;
-      }
-
-      setProducts(data || []);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      toast.error('Failed to load products');
-    } finally {
-      setLoading(false);
+    if (storeId && ((currentStore && user) || (currentStoreId && isPinSession))) {
+      fetchProducts(storeId);
+      fetchCategories(storeId);
+      fetchSuppliers(storeId);
     }
-  };
-
-  const fetchCategories = async () => {
-    const storeId = currentStoreId || currentStore?.id;
-    if (!storeId) return;
-
-    try {
-      const { data, error } = await from('categories')
-        .select('name')
-        .eq('store_id', storeId)
-        .order('name');
-
-      if (error) {
-        console.error('Error fetching categories:', error);
-        return;
-      }
-
-      const categoryNames = data?.map(cat => cat.name) || [];
-      setCategories(["all", ...categoryNames]);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    }
-  };
+  }, [currentStore, user, currentStoreId, isPinSession, fetchProducts, fetchCategories, fetchSuppliers]);
 
   const filteredInventory = products.filter(item => {
     // Search filter
@@ -278,44 +228,29 @@ export function InventoryView() {
   };
 
   const handleProductUpdated = () => {
-    fetchProducts();
+    const storeId = currentStoreId || currentStore?.id;
+    if (storeId) {
+      fetchProducts(storeId);
+    }
     handleDialogClose();
   };
 
-  // Bulk operations handlers
+  // Bulk operations handlers - use Zustand actions
+  const selectProduct = useInventoryStore(state => state.selectProduct);
+  const selectAllProducts = useInventoryStore(state => state.selectAllProducts);
+  const resetFilters = useInventoryStore(state => state.resetFilters);
+
   const handleSelectProduct = (product: Product, checked: boolean) => {
-    if (checked) {
-      setSelectedProducts(prev => [...prev, product]);
-    } else {
-      setSelectedProducts(prev => prev.filter(p => p.id !== product.id));
-    }
+    selectProduct(product, checked);
   };
 
   const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedProducts(filteredInventory);
-    } else {
-      setSelectedProducts([]);
-    }
+    selectAllProducts(filteredInventory, checked);
   };
 
   const handleBulkStockAdjustment = (products: Product[]) => {
     setSelectedProducts(products);
     setShowBulkStockDialog(true);
-  };
-
-  const resetFilters = () => {
-    setFilters({
-      search: "",
-      category: "all",
-      supplier: "all",
-      stockLevel: "all",
-      priceRange: { min: null, max: null },
-      sortBy: "name",
-      sortOrder: "asc",
-    });
-    setSearchTerm("");
-    setSelectedCategory("all");
   };
 
   // Show filtered view if requested
@@ -520,13 +455,13 @@ export function InventoryView() {
                 <Input
                   placeholder="Search products by name or SKU..."
                   value={filters.search}
-                  onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                  onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                   className="pl-10"
                 />
               </div>
               <select
                 value={filters.category}
-                onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
+                onChange={(e) => setFilters({ ...filters, category: e.target.value })}
                 className="px-3 py-2 border border-border rounded-md bg-background text-foreground min-w-[150px]"
               >
                 <option value="all">All Categories</option>
@@ -538,7 +473,7 @@ export function InventoryView() {
               </select>
               <select
                 value={filters.stockLevel}
-                onChange={(e) => setFilters(prev => ({ ...prev, stockLevel: e.target.value }))}
+                onChange={(e) => setFilters({ ...filters, stockLevel: e.target.value })}
                 className="px-3 py-2 border border-border rounded-md bg-background text-foreground min-w-[140px]"
               >
                 <option value="all">All Stock</option>
@@ -550,15 +485,7 @@ export function InventoryView() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setFilters({
-                    search: "",
-                    category: "all",
-                    supplier: "all",
-                    stockLevel: "all",
-                    priceRange: { min: null, max: null },
-                    sortBy: "name",
-                    sortOrder: "asc",
-                  })}
+                  onClick={resetFilters}
                 >
                   Clear
                 </Button>
@@ -935,7 +862,7 @@ export function InventoryView() {
                 <Input
                   placeholder="Search by name or SKU..."
                   value={filters.search}
-                  onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                  onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                   className="pl-10"
                 />
               </div>
@@ -946,7 +873,7 @@ export function InventoryView() {
               <label className="text-sm font-medium">Category</label>
               <select
                 value={filters.category}
-                onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
+                onChange={(e) => setFilters({ ...filters, category: e.target.value })}
                 className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
               >
                 <option value="all">All Categories</option>
@@ -963,7 +890,7 @@ export function InventoryView() {
               <label className="text-sm font-medium">Stock Level</label>
               <select
                 value={filters.stockLevel}
-                onChange={(e) => setFilters(prev => ({ ...prev, stockLevel: e.target.value }))}
+                onChange={(e) => setFilters({ ...filters, stockLevel: e.target.value })}
                 className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
               >
                 <option value="all">All Stock Levels</option>
@@ -975,15 +902,7 @@ export function InventoryView() {
 
             <Button
               onClick={() => {
-                setFilters({
-                  search: "",
-                  category: "all",
-                  supplier: "all",
-                  stockLevel: "all",
-                  priceRange: { min: null, max: null },
-                  sortBy: "name",
-                  sortOrder: "asc",
-                });
+                resetFilters();
                 setShowMobileFilters(false);
               }}
               variant="outline"

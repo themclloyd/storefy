@@ -7,19 +7,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Search, Plus, FolderOpen, Edit, Trash2, Loader2, Package } from "lucide-react";
 import { useCurrentStore } from "@/stores/storeStore";
 import { useUser } from "@/stores/authStore";
-import { supabase } from "@/integrations/supabase/client";
+import { useInventoryStore, useCategories, type Category } from "@/stores/inventoryStore";
 import { toast } from "sonner";
 import { AddCategoryDialog } from "./AddCategoryDialog";
 import { EditCategoryDialog } from "./EditCategoryDialog";
 import { DeleteCategoryDialog } from "./DeleteCategoryDialog";
 
-interface Category {
-  id: string;
-  name: string;
-  description: string;
-  created_at: string;
-  product_count?: number;
-}
+
 
 interface CategoriesViewProps {
   onClose: () => void;
@@ -29,63 +23,29 @@ interface CategoriesViewProps {
 export function CategoriesView({ onClose, onViewCategoryProducts }: CategoriesViewProps) {
   const currentStore = useCurrentStore();
   const user = useUser();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showAddDialog, setShowAddDialog] = useState(false);
-  const [showEditDialog, setShowEditDialog] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+
+  // Use Zustand store state
+  const categories = useCategories();
+  const loading = useInventoryStore(state => state.loading);
+  const searchTerm = useInventoryStore(state => state.categorySearchTerm);
+  const showAddDialog = useInventoryStore(state => state.showAddCategoryDialog);
+  const showEditDialog = useInventoryStore(state => state.showEditCategoryDialog);
+  const showDeleteDialog = useInventoryStore(state => state.showDeleteCategoryDialog);
+  const selectedCategory = useInventoryStore(state => state.selectedCategoryEntity);
+
+  // Actions from Zustand
+  const setSearchTerm = useInventoryStore(state => state.setCategorySearchTerm);
+  const setShowAddDialog = useInventoryStore(state => state.setShowAddCategoryDialog);
+  const setShowEditDialog = useInventoryStore(state => state.setShowEditCategoryDialog);
+  const setShowDeleteDialog = useInventoryStore(state => state.setShowDeleteCategoryDialog);
+  const setSelectedCategory = useInventoryStore(state => state.setSelectedCategoryEntity);
+  const fetchCategories = useInventoryStore(state => state.fetchCategories);
 
   useEffect(() => {
-    if (currentStore && user) {
-      fetchCategories();
+    if (currentStore?.id && user) {
+      fetchCategories(currentStore.id);
     }
-  }, [currentStore, user]);
-
-  const fetchCategories = async () => {
-    if (!currentStore) return;
-
-    try {
-      // Fetch categories first
-      const { data: categoriesData, error: categoriesError } = await supabase
-        .from('categories')
-        .select('id, name, description, created_at')
-        .eq('store_id', currentStore.id)
-        .order('name');
-
-      if (categoriesError) {
-        console.error('Error fetching categories:', categoriesError);
-        toast.error('Failed to load categories');
-        return;
-      }
-
-      // Fetch product counts for each category
-      const categoriesWithCount = await Promise.all(
-        (categoriesData || []).map(async (category) => {
-          const { count, error: countError } = await supabase
-            .from('products')
-            .select('*', { count: 'exact', head: true })
-            .eq('category_id', category.id)
-            .eq('is_active', true);
-
-          if (countError) {
-            console.error('Error counting products for category:', countError);
-            return { ...category, product_count: 0 };
-          }
-
-          return { ...category, product_count: count || 0 };
-        })
-      );
-
-      setCategories(categoriesWithCount);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      toast.error('Failed to load categories');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [currentStore?.id, user, fetchCategories]);
 
   const filteredCategories = categories.filter(category =>
     category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -110,7 +70,9 @@ export function CategoriesView({ onClose, onViewCategoryProducts }: CategoriesVi
   };
 
   const handleCategoryUpdated = () => {
-    fetchCategories();
+    if (currentStore?.id) {
+      fetchCategories(currentStore.id);
+    }
     handleDialogClose();
   };
 
@@ -264,7 +226,7 @@ export function CategoriesView({ onClose, onViewCategoryProducts }: CategoriesVi
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {new Date(category.created_at).toLocaleDateString()}
+                        {category.created_at ? new Date(category.created_at).toLocaleDateString() : 'N/A'}
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-1">
@@ -300,7 +262,7 @@ export function CategoriesView({ onClose, onViewCategoryProducts }: CategoriesVi
       <AddCategoryDialog
         open={showAddDialog}
         onOpenChange={setShowAddDialog}
-        onCategoryAdded={fetchCategories}
+        onCategoryAdded={() => currentStore?.id && fetchCategories(currentStore.id)}
       />
 
       <EditCategoryDialog

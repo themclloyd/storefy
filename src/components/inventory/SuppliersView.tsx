@@ -7,24 +7,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Search, Plus, Building2, Edit, Trash2, Loader2, Mail, Phone, Globe } from "lucide-react";
 import { useCurrentStore } from "@/stores/storeStore";
 import { useUser } from "@/stores/authStore";
-import { supabase } from "@/integrations/supabase/client";
+import { useInventoryStore, useSuppliers, type Supplier } from "@/stores/inventoryStore";
 import { toast } from "sonner";
 import { AddSupplierDialog } from "./AddSupplierDialog";
 import { EditSupplierDialog } from "./EditSupplierDialog";
 import { DeleteSupplierDialog } from "./DeleteSupplierDialog";
 
-interface Supplier {
-  id: string;
-  name: string;
-  contact_person: string;
-  email: string;
-  phone: string;
-  address: string;
-  website: string;
-  notes: string;
-  is_active: boolean;
-  created_at: string;
-}
+
 
 interface SuppliersViewProps {
   onClose: () => void;
@@ -34,47 +23,32 @@ interface SuppliersViewProps {
 export function SuppliersView({ onClose, onViewSupplierProducts }: SuppliersViewProps) {
   const currentStore = useCurrentStore();
   const user = useUser();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showAddDialog, setShowAddDialog] = useState(false);
-  const [showEditDialog, setShowEditDialog] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
+
+  // Use Zustand store state
+  const suppliers = useSuppliers();
+  const loading = useInventoryStore(state => state.loading);
+  const searchTerm = useInventoryStore(state => state.supplierSearchTerm);
+  const showAddDialog = useInventoryStore(state => state.showAddSupplierDialog);
+  const showEditDialog = useInventoryStore(state => state.showEditSupplierDialog);
+  const showDeleteDialog = useInventoryStore(state => state.showDeleteSupplierDialog);
+  const selectedSupplier = useInventoryStore(state => state.selectedSupplier);
+
+  // Actions from Zustand
+  const setSearchTerm = useInventoryStore(state => state.setSupplierSearchTerm);
+  const setShowAddDialog = useInventoryStore(state => state.setShowAddSupplierDialog);
+  const setShowEditDialog = useInventoryStore(state => state.setShowEditSupplierDialog);
+  const setShowDeleteDialog = useInventoryStore(state => state.setShowDeleteSupplierDialog);
+  const setSelectedSupplier = useInventoryStore(state => state.setSelectedSupplier);
+  const fetchSuppliers = useInventoryStore(state => state.fetchSuppliers);
 
   useEffect(() => {
-    if (currentStore && user) {
-      fetchSuppliers();
+    if (currentStore?.id && user) {
+      fetchSuppliers(currentStore.id);
     }
-  }, [currentStore, user]);
-
-  const fetchSuppliers = async () => {
-    if (!currentStore) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('suppliers')
-        .select('*')
-        .eq('store_id', currentStore.id)
-        .order('name');
-
-      if (error) {
-        console.error('Error fetching suppliers:', error);
-        toast.error('Failed to load suppliers');
-        return;
-      }
-
-      setSuppliers(data || []);
-    } catch (error) {
-      console.error('Error fetching suppliers:', error);
-      toast.error('Failed to load suppliers');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [currentStore?.id, user, fetchSuppliers]);
 
   const filteredSuppliers = suppliers.filter(supplier =>
-    supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    supplier.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     supplier.contact_person?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     supplier.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -99,7 +73,9 @@ export function SuppliersView({ onClose, onViewSupplierProducts }: SuppliersView
   };
 
   const handleSupplierUpdated = () => {
-    fetchSuppliers();
+    if (currentStore?.id) {
+      fetchSuppliers(currentStore.id);
+    }
     handleDialogClose();
   };
 

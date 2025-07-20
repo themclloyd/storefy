@@ -27,6 +27,7 @@ import { useCurrentStore } from "@/stores/storeStore";
 import { useUser } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { type Category } from "@/stores/inventoryStore";
 
 const categorySchema = z.object({
   name: z.string().min(1, "Category name is required").max(50, "Category name must be 50 characters or less"),
@@ -35,11 +36,7 @@ const categorySchema = z.object({
 
 type CategoryFormData = z.infer<typeof categorySchema>;
 
-interface Category {
-  id: string;
-  name: string;
-  description: string;
-}
+
 
 interface EditCategoryDialogProps {
   open: boolean;

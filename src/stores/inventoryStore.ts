@@ -30,6 +30,8 @@ export interface Category {
   id: string;
   name: string;
   description?: string;
+  product_count?: number;
+  created_at?: string;
 }
 
 export interface Supplier {
@@ -88,6 +90,20 @@ interface InventoryState {
   showHistoryModal: boolean;
   showPublicVisibilityDialog: boolean;
   selectedProduct: Product | null;
+
+  // Category-specific states
+  categorySearchTerm: string;
+  showAddCategoryDialog: boolean;
+  showEditCategoryDialog: boolean;
+  showDeleteCategoryDialog: boolean;
+  selectedCategoryEntity: Category | null;
+
+  // Supplier-specific states
+  supplierSearchTerm: string;
+  showAddSupplierDialog: boolean;
+  showEditSupplierDialog: boolean;
+  showDeleteSupplierDialog: boolean;
+  selectedSupplier: Supplier | null;
 }
 
 // Store Actions
@@ -140,7 +156,21 @@ interface InventoryActions {
   setShowHistoryModal: (show: boolean) => void;
   setShowPublicVisibilityDialog: (show: boolean) => void;
   setSelectedProduct: (product: Product | null) => void;
-  
+
+  // Category actions
+  setCategorySearchTerm: (term: string) => void;
+  setShowAddCategoryDialog: (show: boolean) => void;
+  setShowEditCategoryDialog: (show: boolean) => void;
+  setShowDeleteCategoryDialog: (show: boolean) => void;
+  setSelectedCategoryEntity: (category: Category | null) => void;
+
+  // Supplier actions
+  setSupplierSearchTerm: (term: string) => void;
+  setShowAddSupplierDialog: (show: boolean) => void;
+  setShowEditSupplierDialog: (show: boolean) => void;
+  setShowDeleteSupplierDialog: (show: boolean) => void;
+  setSelectedSupplier: (supplier: Supplier | null) => void;
+
   // Reset actions
   resetInventory: () => void;
 }
@@ -185,6 +215,20 @@ const initialState: InventoryState = {
   showHistoryModal: false,
   showPublicVisibilityDialog: false,
   selectedProduct: null,
+
+  // Category-specific states
+  categorySearchTerm: '',
+  showAddCategoryDialog: false,
+  showEditCategoryDialog: false,
+  showDeleteCategoryDialog: false,
+  selectedCategoryEntity: null,
+
+  // Supplier-specific states
+  supplierSearchTerm: '',
+  showAddSupplierDialog: false,
+  showEditSupplierDialog: false,
+  showDeleteSupplierDialog: false,
+  selectedSupplier: null,
 };
 
 export const useInventoryStore = create<InventoryStore>()(
@@ -381,6 +425,20 @@ export const useInventoryStore = create<InventoryStore>()(
         setShowHistoryModal: (show) => set({ showHistoryModal: show }, false, 'setShowHistoryModal'),
         setShowPublicVisibilityDialog: (show) => set({ showPublicVisibilityDialog: show }, false, 'setShowPublicVisibilityDialog'),
         setSelectedProduct: (product) => set({ selectedProduct: product }, false, 'setSelectedProduct'),
+
+        // Category actions
+        setCategorySearchTerm: (term) => set({ categorySearchTerm: term }, false, 'setCategorySearchTerm'),
+        setShowAddCategoryDialog: (show) => set({ showAddCategoryDialog: show }, false, 'setShowAddCategoryDialog'),
+        setShowEditCategoryDialog: (show) => set({ showEditCategoryDialog: show }, false, 'setShowEditCategoryDialog'),
+        setShowDeleteCategoryDialog: (show) => set({ showDeleteCategoryDialog: show }, false, 'setShowDeleteCategoryDialog'),
+        setSelectedCategoryEntity: (category) => set({ selectedCategoryEntity: category }, false, 'setSelectedCategoryEntity'),
+
+        // Supplier actions
+        setSupplierSearchTerm: (term) => set({ supplierSearchTerm: term }, false, 'setSupplierSearchTerm'),
+        setShowAddSupplierDialog: (show) => set({ showAddSupplierDialog: show }, false, 'setShowAddSupplierDialog'),
+        setShowEditSupplierDialog: (show) => set({ showEditSupplierDialog: show }, false, 'setShowEditSupplierDialog'),
+        setShowDeleteSupplierDialog: (show) => set({ showDeleteSupplierDialog: show }, false, 'setShowDeleteSupplierDialog'),
+        setSelectedSupplier: (supplier) => set({ selectedSupplier: supplier }, false, 'setSelectedSupplier'),
 
         // Reset actions
         resetInventory: () => set(initialState, false, 'resetInventory'),
