@@ -1,5 +1,9 @@
 import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
+import { ResponsiveH1, ResponsiveBodyText, ResponsiveContainer } from "@/components/ui/responsive-typography";
+import { useScreenSize } from "@/hooks/use-mobile";
+import { responsiveSpacing, touchFriendly } from "@/lib/responsive-utils";
+import { cn } from "@/lib/utils";
 
 interface PageHeaderProps {
   title: string;
@@ -9,34 +13,47 @@ interface PageHeaderProps {
   className?: string;
 }
 
-export function PageHeader({ 
-  title, 
-  description, 
-  icon, 
-  actions, 
-  className = "" 
+export function PageHeader({
+  title,
+  description,
+  icon,
+  actions,
+  className = ""
 }: PageHeaderProps) {
+  const { isMobile } = useScreenSize();
+
   return (
-    <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${className}`}>
-      <div className="flex items-center gap-3">
+    <div className={cn(
+      "flex flex-col sm:flex-row sm:items-center justify-between",
+      responsiveSpacing.gap.md,
+      className
+    )}>
+      <div className={cn("flex items-center", responsiveSpacing.gap.sm)}>
         {icon && (
           <div className="flex-shrink-0">
             {icon}
           </div>
         )}
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+          <ResponsiveH1 className="tracking-tight">
             {title}
-          </h1>
+          </ResponsiveH1>
           {description && (
-            <p className="text-sm sm:text-base text-muted-foreground mt-1">
+            <ResponsiveBodyText
+              className="text-muted-foreground mt-1"
+              as="p"
+            >
               {description}
-            </p>
+            </ResponsiveBodyText>
           )}
         </div>
       </div>
       {actions && (
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className={cn(
+          "flex items-center flex-wrap",
+          responsiveSpacing.gap.xs,
+          isMobile && touchFriendly.touchSpacing
+        )}>
           {actions}
         </div>
       )}

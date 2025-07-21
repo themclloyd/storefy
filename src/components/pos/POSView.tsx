@@ -30,6 +30,11 @@ import { OrderHistoryDialog } from "./OrderHistoryDialog";
 import { AddCustomerDialog } from "./AddCustomerDialog";
 import { useAnalytics } from "@/hooks/useAnalyticsTracking";
 import { PageHeader, PageLayout } from "@/components/common/PageHeader";
+import { ResponsiveSearch, QuickSearch } from "@/components/ui/responsive-search";
+import { QuickFilterButtons } from "@/components/ui/responsive-filters";
+import { useScreenSize } from "@/hooks/use-mobile";
+import { responsiveGrid, responsiveSpacing, touchFriendly } from "@/lib/responsive-utils";
+import { cn } from "@/lib/utils";
 
 // Interfaces are now imported from the POS store
 
@@ -492,7 +497,7 @@ export function POSView() {
   return (
     <>
       <PageLayout>
-        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 md:gap-6 h-full">
+        <div className={cn("flex flex-col lg:grid lg:grid-cols-3 h-full", responsiveSpacing.gap.md)}>
       {/* Products Section */}
       <div className="lg:col-span-2 space-y-4 md:space-y-6 flex-1">
         <PageHeader
@@ -570,22 +575,40 @@ export function POSView() {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-4 px-3 sm:px-6">
-            {/* Search and Filter Controls */}
-            <div className="flex flex-col sm:flex-row gap-3">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                <Input
-                  placeholder="Search products..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 h-10 sm:h-9"
-                />
-              </div>
+          <CardContent className={cn("space-y-4", responsiveSpacing.padding.sm)}>
+            {/* Enhanced Responsive Search and Filter Controls */}
+            <ResponsiveSearch
+              searchValue={searchTerm}
+              onSearchChange={setSearchTerm}
+              placeholder="Search products..."
+              compactMode={false}
+            />
+
+            {/* Category Filter - Desktop */}
+            <div className="hidden sm:block">
+              <QuickFilterButtons
+                options={[
+                  { label: "All Categories", value: "" },
+                  ...categories.map(cat => ({
+                    label: cat.name,
+                    value: cat.id,
+                    count: products.filter(p => p.category_id === cat.id).length
+                  }))
+                ]}
+                activeValue={selectedCategory || ""}
+                onChange={(value) => setSelectedCategory(value || null)}
+              />
+            </div>
+
+            {/* Category Filter - Mobile */}
+            <div className="sm:hidden">
               <select
                 value={selectedCategory || ""}
                 onChange={(e) => setSelectedCategory(e.target.value || null)}
-                className="px-3 py-2 h-10 sm:h-9 border border-border rounded-md bg-background text-foreground text-sm min-w-[140px]"
+                className={cn(
+                  "w-full px-3 py-2 border border-border rounded-md bg-background text-foreground text-sm",
+                  touchFriendly.minTouch
+                )}
               >
                 <option value="">All Categories</option>
                 {categories.map((category) => (
@@ -610,7 +633,7 @@ export function POSView() {
               <>
                 {/* Compact View - Enhanced Responsive Grid */}
                 {viewMode === "compact" && (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3 md:gap-4">
+                  <div className={cn(responsiveGrid.products, responsiveSpacing.gap.xs)}>
                     {filteredProducts.map((product) => (
                       <Card
                         key={product.id}
@@ -690,7 +713,7 @@ export function POSView() {
 
                 {/* Grid View - Enhanced Responsive */}
                 {viewMode === "grid" && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  <div className={cn(responsiveGrid.cards, responsiveSpacing.gap.md)}>
                     {filteredProducts.map((product) => (
                       <Card
                         key={product.id}

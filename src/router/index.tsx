@@ -1,4 +1,4 @@
-import { createBrowserRouter, LoaderFunctionArgs, redirect } from 'react-router-dom';
+import { createBrowserRouter, LoaderFunctionArgs, redirect, Navigate } from 'react-router-dom';
 import { lazy } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { sessionManager } from '@/lib/sessionManager';
@@ -117,6 +117,14 @@ export const router = createBrowserRouter([
   {
     path: '/store/:storeCode/catalog',
     element: <PublicStoreShowcase />,
+  },
+  {
+    path: '/shop',
+    element: <PublicStoreShowcase />,
+  },
+  {
+    path: '/shop',
+    element: <Navigate to="/" replace />,
   },
   {
     path: '/shop/:storeSlug',

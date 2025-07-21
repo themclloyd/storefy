@@ -19,6 +19,10 @@ import { useStoreData } from '@/hooks/useSupabaseClient';
 import { useTax } from '@/hooks/useTax';
 import { PageHeader, PageLayout } from '@/components/common/PageHeader';
 import { InlineLoading } from '@/components/ui/modern-loading';
+import { ResponsiveCardGrid } from '@/components/ui/responsive-table';
+import { useScreenSize } from '@/hooks/use-mobile';
+import { responsiveGrid, responsiveSpacing, responsiveText, touchFriendly } from '@/lib/responsive-utils';
+import { cn } from '@/lib/utils';
 import {
   ResponsiveContainer,
   PieChart as RechartsPieChart,
@@ -67,6 +71,7 @@ export function SimpleDashboard({ onViewChange }: DashboardProps) {
   const currentStore = useCurrentStore();
   const { from, currentStoreId, isPinSession } = useStoreData();
   const { formatCurrency } = useTax();
+  const { isMobile, isTablet } = useScreenSize();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<DashboardStats>({
     totalRevenue: 0,
@@ -216,19 +221,19 @@ export function SimpleDashboard({ onViewChange }: DashboardProps) {
         }
       />
 
-      {/* Stats Cards - Mobile 2x2 Grid, Desktop 3 columns */}
-      <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Stats Cards - Enhanced Responsive Grid */}
+      <ResponsiveCardGrid variant="stats" className="mb-6">
         {/* Revenue Card */}
         <Card className="relative overflow-hidden">
-          <CardHeader className="pb-2 px-3 sm:px-4 md:px-6 pt-3 sm:pt-4">
+          <CardHeader className={cn(responsiveSpacing.padding.sm, "pb-2")}>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <div className="flex items-center space-x-2">
                 <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
-                  <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 text-primary" />
+                  <DollarSign className={cn(responsiveSpacing.gap.xs, "text-primary")} />
                 </div>
-                <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Revenue</CardTitle>
+                <CardTitle className={cn(responsiveText.caption, "font-medium")}>Revenue</CardTitle>
               </div>
-              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground hidden sm:block" />
+              <TrendingUp className={cn(responsiveSpacing.gap.xs, "text-muted-foreground hidden sm:block")} />
             </div>
           </CardHeader>
           <CardContent className="px-3 sm:px-4 md:px-6 pb-3 sm:pb-4">
@@ -312,7 +317,7 @@ export function SimpleDashboard({ onViewChange }: DashboardProps) {
             </p>
           </CardContent>
         </Card>
-      </div>
+      </ResponsiveCardGrid>
 
       {/* Additional Charts and Analytics */}
       <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
@@ -433,8 +438,8 @@ export function SimpleDashboard({ onViewChange }: DashboardProps) {
         </Card>
       </div>
 
-      {/* Quick Actions - Responsive Grid */}
-      <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
+      {/* Quick Actions - Enhanced Responsive Grid */}
+      <ResponsiveCardGrid variant="stats">
         <Button
           onClick={() => onViewChange('pos')}
           className="h-14 sm:h-16 flex items-center justify-center gap-2 sm:gap-3 bg-primary hover:bg-primary/90 text-sm sm:text-base"
@@ -469,7 +474,7 @@ export function SimpleDashboard({ onViewChange }: DashboardProps) {
           <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
           <span className="font-medium">Transactions</span>
         </Button>
-      </div>
+      </ResponsiveCardGrid>
 
 
 

@@ -12,6 +12,7 @@ import {
   Globe
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { touchFriendly, responsiveIcon } from "@/lib/responsive-utils";
 
 interface MobileBottomNavProps {
   activeView: string;
@@ -28,8 +29,8 @@ const navigationItems = [
 
 export function MobileBottomNav({ activeView, onViewChange }: MobileBottomNavProps) {
   return (
-    <div className="border-t border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-      <div className="flex items-center justify-around h-16 px-1 safe-area-inset-bottom">
+    <div className="border-t border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 safe-area-inset-bottom">
+      <div className="flex items-center justify-around px-1 py-2">
         {navigationItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeView === item.id;
@@ -39,7 +40,9 @@ export function MobileBottomNav({ activeView, onViewChange }: MobileBottomNavPro
               key={item.id}
               onClick={() => onViewChange(item.id)}
               className={cn(
-                "flex flex-col items-center justify-center px-2 py-2 rounded-xl transition-all duration-200 min-h-[52px] min-w-[52px] touch-manipulation flex-1 max-w-[80px]",
+                "flex flex-col items-center justify-center rounded-xl transition-all duration-200 touch-manipulation flex-1",
+                touchFriendly.minTouch,
+                "px-1 py-2 max-w-[80px]",
                 isActive
                   ? "text-primary bg-primary/15 shadow-sm scale-105"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/50 active:bg-muted/70 active:scale-95"
@@ -48,7 +51,8 @@ export function MobileBottomNav({ activeView, onViewChange }: MobileBottomNavPro
             >
               <Icon
                 className={cn(
-                  "h-5 w-5 mb-1 transition-all duration-200",
+                  responsiveIcon.sm,
+                  "mb-1 transition-all duration-200",
                   isActive && "scale-110"
                 )}
               />

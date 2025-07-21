@@ -15,9 +15,11 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 13% 18%;
 
-    /* Primary - Brand Green #2CA01C */
-    --primary: 111 69% 38%;
+    /* Primary - Green Gradient */
+    --primary: 142 76% 36%;
     --primary-foreground: 0 0% 98%;
+    --primary-gradient: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    --primary-gradient-hover: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
 
     /* Secondary - Neutral Gray */
     --secondary: 220 13% 96%;
@@ -30,6 +32,7 @@
     /* Accent - Success Green */
     --accent: 142 76% 36%;
     --accent-foreground: 0 0% 98%;
+    --accent-gradient: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
 
     /* Destructive - Error Red */
     --destructive: 0 84% 60%;
@@ -38,16 +41,36 @@
     /* Interactive elements */
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 111 69% 38%;
+    --ring: 142 76% 36%;
 
     /* Chart colors - Professional palette */
-    --chart-1: 111 69% 38%;   /* Primary Green */
+    --chart-1: 142 76% 36%;   /* Primary Green */
     --chart-2: 210 100% 50%;  /* Blue */
     --chart-3: 25 95% 53%;    /* Orange */
     --chart-4: 262 83% 58%;   /* Purple */
     --chart-5: 346 87% 43%;   /* Red */
 
     --radius: 0.5rem;
+
+    /* Responsive Typography Scale */
+    --font-size-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+    --font-size-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
+    --font-size-base: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+    --font-size-lg: clamp(1.125rem, 1rem + 0.625vw, 1.25rem);
+    --font-size-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
+    --font-size-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+    --font-size-3xl: clamp(1.875rem, 1.6rem + 1.375vw, 2.5rem);
+    --font-size-4xl: clamp(2.25rem, 1.9rem + 1.75vw, 3rem);
+    --font-size-5xl: clamp(3rem, 2.5rem + 2.5vw, 4rem);
+
+    /* Responsive Spacing Scale */
+    --space-xs: clamp(0.25rem, 0.2rem + 0.25vw, 0.375rem);
+    --space-sm: clamp(0.5rem, 0.4rem + 0.5vw, 0.75rem);
+    --space-md: clamp(1rem, 0.8rem + 1vw, 1.5rem);
+    --space-lg: clamp(1.5rem, 1.2rem + 1.5vw, 2.25rem);
+    --space-xl: clamp(2rem, 1.6rem + 2vw, 3rem);
+    --space-2xl: clamp(3rem, 2.4rem + 3vw, 4.5rem);
+    --space-3xl: clamp(4rem, 3.2rem + 4vw, 6rem);
 
     --sidebar-background: 0 0% 98%;
 
@@ -75,9 +98,11 @@
     --popover: 220 13% 11%;
     --popover-foreground: 220 13% 98%;
 
-    /* Primary - Brand Green #2CA01C (lighter in dark mode) */
-    --primary: 111 69% 45%;
+    /* Primary - Green Gradient (adjusted for dark mode) */
+    --primary: 142 76% 45%;
     --primary-foreground: 220 13% 9%;
+    --primary-gradient: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    --primary-gradient-hover: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
 
     /* Secondary - Dark Gray */
     --secondary: 220 13% 16%;
@@ -90,6 +115,7 @@
     /* Accent - Success Green (adjusted for dark) */
     --accent: 142 76% 45%;
     --accent-foreground: 220 13% 9%;
+    --accent-gradient: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
 
     /* Destructive - Error Red (adjusted for dark) */
     --destructive: 0 84% 65%;
@@ -98,10 +124,10 @@
     /* Interactive elements */
     --border: 220 13% 20%;
     --input: 220 13% 20%;
-    --ring: 111 69% 45%;
+    --ring: 142 76% 45%;
 
     /* Chart colors - Dark mode optimized */
-    --chart-1: 111 69% 45%;   /* Primary Green */
+    --chart-1: 142 76% 45%;   /* Primary Green */
     --chart-2: 210 100% 60%;  /* Blue */
     --chart-3: 25 95% 60%;    /* Orange */
     --chart-4: 262 83% 65%;   /* Purple */
@@ -496,6 +522,93 @@
 
   .safe-area-inset-right {
     padding-right: env(safe-area-inset-right);
+  }
+
+  /* Responsive Typography Utilities */
+  .text-responsive-xs { font-size: var(--font-size-xs); }
+  .text-responsive-sm { font-size: var(--font-size-sm); }
+  .text-responsive-base { font-size: var(--font-size-base); }
+  .text-responsive-lg { font-size: var(--font-size-lg); }
+  .text-responsive-xl { font-size: var(--font-size-xl); }
+  .text-responsive-2xl { font-size: var(--font-size-2xl); }
+  .text-responsive-3xl { font-size: var(--font-size-3xl); }
+  .text-responsive-4xl { font-size: var(--font-size-4xl); }
+  .text-responsive-5xl { font-size: var(--font-size-5xl); }
+
+  /* Responsive Spacing Utilities */
+  .space-responsive-xs { gap: var(--space-xs); }
+  .space-responsive-sm { gap: var(--space-sm); }
+  .space-responsive-md { gap: var(--space-md); }
+  .space-responsive-lg { gap: var(--space-lg); }
+  .space-responsive-xl { gap: var(--space-xl); }
+  .space-responsive-2xl { gap: var(--space-2xl); }
+  .space-responsive-3xl { gap: var(--space-3xl); }
+
+  .p-responsive-xs { padding: var(--space-xs); }
+  .p-responsive-sm { padding: var(--space-sm); }
+  .p-responsive-md { padding: var(--space-md); }
+  .p-responsive-lg { padding: var(--space-lg); }
+  .p-responsive-xl { padding: var(--space-xl); }
+  .p-responsive-2xl { padding: var(--space-2xl); }
+  .p-responsive-3xl { padding: var(--space-3xl); }
+
+  .m-responsive-xs { margin: var(--space-xs); }
+  .m-responsive-sm { margin: var(--space-sm); }
+  .m-responsive-md { margin: var(--space-md); }
+  .m-responsive-lg { margin: var(--space-lg); }
+  .m-responsive-xl { margin: var(--space-xl); }
+  .m-responsive-2xl { margin: var(--space-2xl); }
+  .m-responsive-3xl { margin: var(--space-3xl); }
+
+  /* Enhanced Touch Targets */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+  }
+
+  /* Responsive Container Queries */
+  @container (max-width: 640px) {
+    .container-mobile {
+      padding: var(--space-sm);
+    }
+  }
+
+  @container (min-width: 641px) {
+    .container-desktop {
+      padding: var(--space-lg);
+    }
+  }
+
+  .safe-area-inset-right {
+    padding-right: env(safe-area-inset-right);
+  }
+
+  /* Gradient Button Utilities */
+  .btn-gradient {
+    background: var(--primary-gradient);
+    color: hsl(var(--primary-foreground));
+    border: none;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-gradient:hover {
+    background: var(--primary-gradient-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+  }
+
+  .btn-gradient:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
+  }
+
+  .bg-gradient-primary {
+    background: var(--primary-gradient);
+  }
+
+  .bg-gradient-primary-hover:hover {
+    background: var(--primary-gradient-hover);
   }
 
 

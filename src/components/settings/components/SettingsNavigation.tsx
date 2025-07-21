@@ -45,12 +45,12 @@ export function SettingsNavigation({ currentTab, onTabChange }: SettingsNavigati
             {roleStats.total}
           </Badge>
         </TabsTrigger>
-        
+
         <TabsTrigger value="store" className="flex items-center gap-2">
           <Store className="w-4 h-4" />
           <span className="hidden sm:inline">Store</span>
         </TabsTrigger>
-        
+
         <TabsTrigger value="showcase" className="flex items-center gap-2">
           <Globe className="w-4 h-4" />
           <span className="hidden sm:inline">Showcase</span>
@@ -60,17 +60,17 @@ export function SettingsNavigation({ currentTab, onTabChange }: SettingsNavigati
             </Badge>
           )}
         </TabsTrigger>
-        
+
         <TabsTrigger value="payments" className="flex items-center gap-2">
           <CreditCard className="w-4 h-4" />
           <span className="hidden sm:inline">Payments</span>
         </TabsTrigger>
-        
+
         <TabsTrigger value="notifications" className="flex items-center gap-2">
           <Bell className="w-4 h-4" />
           <span className="hidden sm:inline">Notifications</span>
         </TabsTrigger>
-        
+
         <TabsTrigger value="activity" className="flex items-center gap-2">
           <Activity className="w-4 h-4" />
           <span className="hidden sm:inline">Activity</span>

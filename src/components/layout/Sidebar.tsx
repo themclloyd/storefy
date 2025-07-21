@@ -19,6 +19,9 @@ import {
   SidebarGroupContent,
   useSidebar
 } from "@/components/ui/sidebar";
+import { useScreenSize } from "@/hooks/use-mobile";
+import { responsiveSpacing, responsiveIcon, touchFriendly } from "@/lib/responsive-utils";
+import { cn } from "@/lib/utils";
 
 interface SidebarProps {
   activeView: string;
@@ -32,6 +35,7 @@ export function Sidebar({ activeView, onViewChange, collapsible = "icon" }: Side
   const navigate = useNavigate();
   const user = useUser();
   const { userRole } = usePermissions();
+  const { isMobile, isTablet } = useScreenSize();
 
   // Get role-based navigation items (already filtered by permissions)
   const navigationItems = getNavigationItems();
@@ -44,23 +48,29 @@ export function Sidebar({ activeView, onViewChange, collapsible = "icon" }: Side
       className="border-r border-border/40 bg-sidebar"
     >
       <SidebarHeader className="border-b border-border/40 bg-sidebar">
-        {/* Logo Section - Responsive */}
-        <div className="flex items-center px-3 md:px-4 py-3 md:py-4">
+        {/* Logo Section - Enhanced Responsive */}
+        <div className={cn("flex items-center", responsiveSpacing.padding.sm)}>
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton
                 size="lg"
                 asChild
                 tooltip={state === "collapsed" ? "Storefy - Retail Management" : undefined}
-                className="h-12 md:h-auto"
+                className={cn(
+                  touchFriendly.minTouch,
+                  "h-12 sm:h-14 md:h-auto"
+                )}
               >
-                <a href="#" className="flex items-center gap-2 md:gap-3 px-2 md:px-3 justify-start">
-                  <div className="flex aspect-square size-8 md:size-10 items-center justify-center rounded-lg md:rounded-xl bg-primary text-primary-foreground shadow-lg shrink-0">
-                    <Store className="size-4 md:size-5" />
+                <a href="#" className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 justify-start">
+                  <div className={cn(
+                    "flex aspect-square items-center justify-center rounded-lg sm:rounded-xl bg-primary text-primary-foreground shadow-lg shrink-0",
+                    "size-8 sm:size-9 md:size-10"
+                  )}>
+                    <Store className={cn(responsiveIcon.sm)} />
                   </div>
-                  <div className="grid flex-1 text-left text-sm leading-tight min-w-0">
-                    <span className="truncate font-bold text-foreground text-sm md:text-base">Storefy</span>
-                    <span className="truncate text-xs text-muted-foreground hidden md:block">Retail Management</span>
+                  <div className="grid flex-1 text-left leading-tight min-w-0">
+                    <span className="truncate font-bold text-foreground text-sm sm:text-base">Storefy</span>
+                    <span className="truncate text-xs text-muted-foreground hidden sm:block">Retail Management</span>
                   </div>
                 </a>
               </SidebarMenuButton>
@@ -69,12 +79,12 @@ export function Sidebar({ activeView, onViewChange, collapsible = "icon" }: Side
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="px-3 md:px-4 py-3 md:py-4">
+      <SidebarContent className={cn(responsiveSpacing.padding.sm)}>
         {/* Main Navigation */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xs md:text-sm">Main</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-xs sm:text-sm">Main</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-1">
+            <SidebarMenu className={cn(touchFriendly.touchSpacing)}>
               {navigationItems.map((item) => {
                 const Icon = item.icon;
 
@@ -92,10 +102,13 @@ export function Sidebar({ activeView, onViewChange, collapsible = "icon" }: Side
                         onViewChange(item.id);
                       }}
                       tooltip={state === "collapsed" ? item.label : undefined}
-                      className="h-11 md:h-10 px-2 md:px-3 justify-start gap-2 md:gap-3 text-sm md:text-base"
+                      className={cn(
+                        touchFriendly.minTouch,
+                        "px-2 sm:px-3 justify-start gap-2 sm:gap-3 text-sm sm:text-base"
+                      )}
                     >
-                      <Icon className="size-5 md:size-4 shrink-0" />
-                      <span className="truncate font-medium md:font-normal">{item.label}</span>
+                      <Icon className={cn(responsiveIcon.sm, "shrink-0")} />
+                      <span className="truncate font-medium sm:font-normal">{item.label}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
@@ -106,17 +119,20 @@ export function Sidebar({ activeView, onViewChange, collapsible = "icon" }: Side
 
         {/* Account Section */}
         <SidebarGroup>
-          <SidebarGroupLabel>Account</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-xs sm:text-sm">Account</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-1">
+            <SidebarMenu className={cn(touchFriendly.touchSpacing)}>
               <SidebarMenuItem>
                 <SidebarMenuButton
                   onClick={() => navigate('/app/subscription')}
                   tooltip={state === "collapsed" ? "Subscription" : undefined}
-                  className="h-10 px-3 justify-start gap-3"
+                  className={cn(
+                    touchFriendly.minTouch,
+                    "px-2 sm:px-3 justify-start gap-2 sm:gap-3"
+                  )}
                 >
-                  <CreditCard className="size-4 shrink-0" />
-                  <span className="truncate">Subscription</span>
+                  <CreditCard className={cn(responsiveIcon.sm, "shrink-0")} />
+                  <span className="truncate text-sm sm:text-base">Subscription</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -127,11 +143,14 @@ export function Sidebar({ activeView, onViewChange, collapsible = "icon" }: Side
       </SidebarContent>
 
       <SidebarFooter className="border-t border-border/40 bg-sidebar">
-        <div className="p-3 md:p-4 space-y-2 md:space-y-3">
-          {/* User Menu - Big and Prominent */}
+        <div className={cn(
+          responsiveSpacing.padding.sm,
+          touchFriendly.touchSpacing
+        )}>
+          {/* User Menu - Enhanced for touch */}
           <UserMenu onViewChange={onViewChange} />
 
-          {/* Store Selector - Full Width */}
+          {/* Store Selector - Full Width with responsive spacing */}
           <div className="w-full">
             <CompactStoreSelector />
           </div>

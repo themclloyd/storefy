@@ -35,6 +35,11 @@ import { ProductHistoryModal } from "./ProductHistoryModal";
 import { ProductPublicVisibilityDialog } from "./ProductPublicVisibilityDialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useTax } from "@/hooks/useTax";
+import { ResponsiveSearch } from "@/components/ui/responsive-search";
+import { ResponsiveFilters, QuickFilterButtons } from "@/components/ui/responsive-filters";
+import { useScreenSize } from "@/hooks/use-mobile";
+import { responsiveGrid, responsiveSpacing, touchFriendly } from "@/lib/responsive-utils";
+import { cn } from "@/lib/utils";
 
 interface Product {
   id: string;
@@ -391,8 +396,8 @@ export function InventoryView() {
         }
       />
 
-      {/* Stats Cards - Mobile Optimized */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+      {/* Stats Cards - Enhanced Responsive */}
+      <div className={cn(responsiveGrid.stats, responsiveSpacing.gap.sm)}>
         <Card className="card-professional">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
             <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
@@ -441,55 +446,60 @@ export function InventoryView() {
         </Card>
       </div>
 
-      {/* Desktop Search Bar */}
-      <div className="hidden sm:block">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-4">
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                <Input
-                  placeholder="Search products by name or SKU..."
-                  value={filters.search}
-                  onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-                  className="pl-10"
-                />
-              </div>
-              <select
-                value={filters.category}
-                onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-                className="px-3 py-2 border border-border rounded-md bg-background text-foreground min-w-[150px]"
+      {/* Enhanced Responsive Search and Filters */}
+      <Card>
+        <CardContent className={cn(responsiveSpacing.padding.sm)}>
+          <ResponsiveSearch
+            searchValue={filters.search}
+            onSearchChange={(value) => setFilters({ ...filters, search: value })}
+            placeholder="Search products by name or SKU..."
+            showFilters={true}
+            filterCount={Object.values(filters).filter(v => v && v !== 'all').length}
+            onFilterToggle={() => setShowMobileFilters(true)}
+            compactMode={false}
+          />
+
+          {/* Quick Filter Buttons for Desktop */}
+          <div className="hidden md:block mt-4">
+            <QuickFilterButtons
+              options={[
+                { label: "All Stock", value: "all" },
+                { label: "Low Stock", value: "low" },
+                { label: "Out of Stock", value: "out" },
+                { label: "In Stock", value: "in" }
+              ]}
+              activeValue={filters.stockLevel}
+              onChange={(value) => setFilters({ ...filters, stockLevel: value })}
+            />
+          </div>
+
+          {/* Category Filter for Desktop */}
+          <div className="hidden md:flex items-center gap-4 mt-4">
+            <select
+              value={filters.category}
+              onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+              className="px-3 py-2 border border-border rounded-md bg-background text-foreground min-w-[150px]"
+            >
+              <option value="all">All Categories</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+
+            {(filters.search || filters.category !== 'all' || filters.stockLevel !== 'all') && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={resetFilters}
               >
-                <option value="all">All Categories</option>
-                {categories.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={filters.stockLevel}
-                onChange={(e) => setFilters({ ...filters, stockLevel: e.target.value })}
-                className="px-3 py-2 border border-border rounded-md bg-background text-foreground min-w-[140px]"
-              >
-                <option value="all">All Stock</option>
-                <option value="low">Low Stock</option>
-                <option value="out">Out of Stock</option>
-                <option value="in">In Stock</option>
-              </select>
-              {(filters.search || filters.category !== 'all' || filters.stockLevel !== 'all') && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={resetFilters}
-                >
-                  Clear
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+                Clear Filters
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
 
 
@@ -843,72 +853,42 @@ export function InventoryView() {
         onBulkStockAdjustment={handleBulkStockAdjustment}
       />
 
-      {/* Mobile Filters Sheet */}
-      <Sheet open={showMobileFilters} onOpenChange={setShowMobileFilters}>
-        <SheetContent side="right" className="w-full sm:w-[400px]">
-          <SheetHeader>
-            <SheetTitle>Filters & Search</SheetTitle>
-          </SheetHeader>
-          <div className="mt-6 space-y-4">
-            {/* Search */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Search Products</label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                <Input
-                  placeholder="Search by name or SKU..."
-                  value={filters.search}
-                  onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-
-            {/* Category Filter */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Category</label>
-              <select
-                value={filters.category}
-                onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
-              >
-                <option value="all">All Categories</option>
-                {categories.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Stock Level Filter */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Stock Level</label>
-              <select
-                value={filters.stockLevel}
-                onChange={(e) => setFilters({ ...filters, stockLevel: e.target.value })}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
-              >
-                <option value="all">All Stock Levels</option>
-                <option value="low">Low Stock</option>
-                <option value="out">Out of Stock</option>
-                <option value="in">In Stock</option>
-              </select>
-            </div>
-
-            <Button
-              onClick={() => {
-                resetFilters();
-                setShowMobileFilters(false);
-              }}
-              variant="outline"
-              className="w-full"
-            >
-              Reset Filters
-            </Button>
-          </div>
-        </SheetContent>
-      </Sheet>
+      {/* Enhanced Mobile Filters using ResponsiveFilters */}
+      <ResponsiveFilters
+        filters={[
+          {
+            id: 'search',
+            label: 'Search Products',
+            type: 'input',
+            placeholder: 'Search by name or SKU...'
+          },
+          {
+            id: 'category',
+            label: 'Category',
+            type: 'select',
+            options: [
+              { value: 'all', label: 'All Categories' },
+              ...categories.map(cat => ({ value: cat, label: cat }))
+            ]
+          },
+          {
+            id: 'stockLevel',
+            label: 'Stock Level',
+            type: 'select',
+            options: [
+              { value: 'all', label: 'All Stock Levels' },
+              { value: 'low', label: 'Low Stock' },
+              { value: 'out', label: 'Out of Stock' },
+              { value: 'in', label: 'In Stock' }
+            ]
+          }
+        ]}
+        values={filters}
+        onChange={setFilters}
+        onReset={resetFilters}
+        title="Product Filters"
+        showTrigger={false}
+      />
 
       {/* Mobile Actions Sheet */}
       <Sheet open={showMobileActions} onOpenChange={setShowMobileActions}>

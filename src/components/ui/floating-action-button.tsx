@@ -37,7 +37,7 @@ export function FloatingActionButton({
         position === 'bottom-left' && "bottom-6 left-6",
         position === 'bottom-center' && "bottom-6 left-1/2 transform -translate-x-1/2",
         // Color variants
-        variant === 'default' && "bg-primary hover:bg-primary/90 text-primary-foreground",
+        variant === 'default' && "btn-gradient",
         variant === 'secondary' && "bg-secondary hover:bg-secondary/90 text-secondary-foreground",
         variant === 'destructive' && "bg-destructive hover:bg-destructive/90 text-destructive-foreground",
         className

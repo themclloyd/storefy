@@ -1,164 +1,335 @@
 script.js:1 Ignoring Event: localhost
 y @ script.js:1
-HiddenAdminAccess.tsx:148 🔧 Admin access helper available: window.adminAccess.showHelp()
-hook.js:608 No `HydrateFallback` element provided to render during initial hydration
-overrideMethod @ hook.js:608
-security.ts:100 🔒 CSP disabled in development for compatibility
-security.ts:52 🔒 Security measures initialized
-sessionTest.ts:234 🔧 Session testing utilities available at window.sessionTest
-sessionTest.ts:235    - runAll(): Run all tests
-sessionTest.ts:236    - info(): Show current session info
-sessionTest.ts:237    - expiry(): Test session expiry (1 minute)
-sessionTest.ts:238    - cleanup(): Clean up test sessions
-sessionTest.ts:239    - debugStore(): Debug store selection issues
-App.tsx:32 🔧 Session testing utilities loaded. Use window.sessionTest in console.
-authStore.ts:143 🔐 Setting up auth state change listener...
-authStore.ts:155 🔐 Auth state change listener set up successfully
-useStoreInitialization.ts:48 🔐 Initializing permissions after auth and store are ready
-useStoreInitialization.ts:49 🔐 Current store when initializing permissions: none
-permissionStore.ts:89 🔐 Loading permissions...
-permissionStore.ts:96 🔐 Loading permissions for user: themclloyd@gmail.com store: undefined
-permissionStore.ts:133 🔐 Fetching user effective role...
-script.debug.js:1 [Vercel Web Analytics] Debug mode is enabled by default in development. No requests will be sent to the server.
-script.debug.js:1 [Vercel Web Analytics] Running queued event event Object
-script.debug.js:1 [Vercel Web Analytics] Running queued event event Object
-script.debug.js:1 [Vercel Web Analytics] Running queued event event Object
-script.debug.js:1 [Vercel Web Analytics] [event] page_view Object
-script.debug.js:1 [Vercel Web Analytics] [event] performance_metric Object
-script.debug.js:1 [Vercel Web Analytics] [event] page_view Object
-script.debug.js:1 [Vercel Web Analytics] [pageview] http://localhost:8080/app/dashboard Object
-authStore.ts:146 🔐 Auth state changed: INITIAL_SESSION themclloyd@gmail.com
-script.debug.js:1 [Vercel Web Analytics] [event] page_view Object
-useRoleBasedAccess.ts?t=1752900078656:152 🔧 Navigation - User role: null Available pages: Array(0)
-Sidebar.tsx:43 🔧 Sidebar - User role: null Navigation items count: 0
-Sidebar.tsx:44 🔧 Sidebar - Navigation items: Array(0)
-useRoleBasedAccess.ts?t=1752900078656:152 🔧 Navigation - User role: null Available pages: Array(0)
-Sidebar.tsx:43 🔧 Sidebar - User role: null Navigation items count: 0
-Sidebar.tsx:44 🔧 Sidebar - Navigation items: Array(0)
-useRoleBasedAccess.ts?t=1752900078656:152 🔧 Navigation - User role: null Available pages: Array(0)
-Sidebar.tsx:43 🔧 Sidebar - User role: null Navigation items count: 0
-Sidebar.tsx:44 🔧 Sidebar - Navigation items: Array(0)
-script.debug.js:1 [Vercel Web Analytics] [event] performance_metric Object
-permissionStore.ts:155 🔐 RPC result - Role: owner Is owner: true
-permissionStore.ts:161 🔐 User role determined: owner (store owner)
-permissionStore.ts:207 🔐 Applied owner permissions. Pages: Array(13)
-permissionStore.ts:229 🔐 Updating store state with ownership info - isOwner: true userRole: owner
-storeStore.ts:79 🏪 Setting current store: undefined
-storeStore.ts:80 🏪 Store owner_id: fa42b752-76d8-43a8-bdcc-51df22809f24
-storeStore.ts:81 🏪 Current user: fa42b752-76d8-43a8-bdcc-51df22809f24
-storeStore.ts:83 🏪 Is owner calculated: true
-storeStore.ts:87 🏪 Setting hasValidStoreSelection: true
-useRoleBasedAccess.ts?t=1752900078656:152 🔧 Navigation - User role: owner Available pages: Array(9)
-Sidebar.tsx:43 🔧 Sidebar - User role: owner Navigation items count: 9
-Sidebar.tsx:44 🔧 Sidebar - Navigation items: Array(9)
-useStoreInitialization.ts:57 🔐 Store changed, refreshing permissions for: undefined
-permissionStore.ts:89 🔐 Loading permissions...
-permissionStore.ts:96 🔐 Loading permissions for user: themclloyd@gmail.com store: undefined
-permissionStore.ts:133 🔐 Fetching user effective role...
-useRoleBasedAccess.ts?t=1752900078656:152 🔧 Navigation - User role: owner Available pages: Array(9)
-Sidebar.tsx:43 🔧 Sidebar - User role: owner Navigation items count: 9
-Sidebar.tsx:44 🔧 Sidebar - Navigation items: Array(9)
-script.debug.js:1 [Vercel Web Analytics] [event] page_view Object
-permissionStore.ts:155 🔐 RPC result - Role: owner Is owner: true
-permissionStore.ts:161 🔐 User role determined: owner (store owner)
-permissionStore.ts:207 🔐 Applied owner permissions. Pages: Array(13)
-permissionStore.ts:229 🔐 Updating store state with ownership info - isOwner: true userRole: owner
-storeStore.ts:79 🏪 Setting current store: undefined
-storeStore.ts:80 🏪 Store owner_id: fa42b752-76d8-43a8-bdcc-51df22809f24
-storeStore.ts:81 🏪 Current user: fa42b752-76d8-43a8-bdcc-51df22809f24
-storeStore.ts:83 🏪 Is owner calculated: true
-storeStore.ts:87 🏪 Setting hasValidStoreSelection: true
-useRoleBasedAccess.ts?t=1752900078656:152 🔧 Navigation - User role: owner Available pages: Array(9)
-Sidebar.tsx:43 🔧 Sidebar - User role: owner Navigation items count: 9
-Sidebar.tsx:44 🔧 Sidebar - Navigation items: Array(9)
-script.debug.js:1 [Vercel Web Analytics] [event] page_view Object
-script.debug.js:1 [Vercel Web Analytics] [event] performance_metric Object
-useRoleBasedAccess.ts:169 🔧 Navigation - User role: owner Available pages: (13) ['dashboard', 'pos', 'inventory', 'categories', 'suppliers', 'customers', 'transactions', 'layby', 'reports', 'expenses', 'analytics', 'settings', 'showcase']
-Sidebar.tsx:43 🔧 Sidebar - User role: owner Navigation items count: 13
-Sidebar.tsx:44 🔧 Sidebar - Navigation items: (13) ['Overview', 'POS', 'Inventory', 'Categories', 'Suppliers', 'Customers', 'Transactions', 'Layby', 'Reports', 'Expenses', 'Analytics', 'Settings', 'Store Showcase']
-RouterAppLayout.tsx:39 🔄 View change requested: settings
-useRoleBasedAccess.ts:169 🔧 Navigation - User role: owner Available pages: (13) ['dashboard', 'pos', 'inventory', 'categories', 'suppliers', 'customers', 'transactions', 'layby', 'reports', 'expenses', 'analytics', 'settings', 'showcase']
-Sidebar.tsx:43 🔧 Sidebar - User role: owner Navigation items count: 13
-Sidebar.tsx:44 🔧 Sidebar - Navigation items: (13) ['Overview', 'POS', 'Inventory', 'Categories', 'Suppliers', 'Customers', 'Transactions', 'Layby', 'Reports', 'Expenses', 'Analytics', 'Settings', 'Store Showcase']
-script.js:1 Ignoring Event: localhost
-overrideMethod @ hook.js:608
-y @ script.js:1
 b @ script.js:1
 n @ script.js:1
-i @ script.js:1
-r.pushState @ script.js:1
-history.pushState @ extend-native-history-api.js:1
-history.pushState @ script.debug.js:1
-push @ react-router-dom.js?v=59e078a0:625
-completeNavigation @ react-router-dom.js?v=59e078a0:1568
-startNavigation @ react-router-dom.js?v=59e078a0:1843
-await in startNavigation
-navigate @ react-router-dom.js?v=59e078a0:1687
-(anonymous) @ react-router-dom.js?v=59e078a0:5814
-onClick @ Sidebar.tsx:104
-executeDispatch @ react-dom_client.js?v=59e078a0:11736
-runWithFiberInDEV @ react-dom_client.js?v=59e078a0:1485
-processDispatchQueue @ react-dom_client.js?v=59e078a0:11772
-(anonymous) @ react-dom_client.js?v=59e078a0:12182
-batchedUpdates$1 @ react-dom_client.js?v=59e078a0:2628
-dispatchEventForPluginEventSystem @ react-dom_client.js?v=59e078a0:11877
-dispatchEvent @ react-dom_client.js?v=59e078a0:14792
-dispatchDiscreteEvent @ react-dom_client.js?v=59e078a0:14773
-<button>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=59e078a0:250
-SidebarMenuButton @ sidebar.tsx:577
-react-stack-bottom-frame @ react-dom_client.js?v=59e078a0:17424
-renderWithHooks @ react-dom_client.js?v=59e078a0:4206
-updateForwardRef @ react-dom_client.js?v=59e078a0:6461
-beginWork @ react-dom_client.js?v=59e078a0:7864
-runWithFiberInDEV @ react-dom_client.js?v=59e078a0:1485
-performUnitOfWork @ react-dom_client.js?v=59e078a0:10868
-workLoopSync @ react-dom_client.js?v=59e078a0:10728
-renderRootSync @ react-dom_client.js?v=59e078a0:10711
-performWorkOnRoot @ react-dom_client.js?v=59e078a0:10330
-performSyncWorkOnRoot @ react-dom_client.js?v=59e078a0:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=59e078a0:11536
-flushSyncWork$1 @ react-dom_client.js?v=59e078a0:10567
-scheduleRefresh @ react-dom_client.js?v=59e078a0:372
-p.scheduleRefresh @ renderer.js:994
-(anonymous) @ @react-refresh:228
-performReactRefresh @ @react-refresh:217
-(anonymous) @ @react-refresh:608
-<SidebarMenuButton>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=59e078a0:250
-(anonymous) @ Sidebar.tsx:101
-Sidebar @ Sidebar.tsx:90
-react-stack-bottom-frame @ react-dom_client.js?v=59e078a0:17424
-renderWithHooks @ react-dom_client.js?v=59e078a0:4206
-updateFunctionComponent @ react-dom_client.js?v=59e078a0:6619
-beginWork @ react-dom_client.js?v=59e078a0:7654
-runWithFiberInDEV @ react-dom_client.js?v=59e078a0:1485
-performUnitOfWork @ react-dom_client.js?v=59e078a0:10868
-workLoopSync @ react-dom_client.js?v=59e078a0:10728
-renderRootSync @ react-dom_client.js?v=59e078a0:10711
-performWorkOnRoot @ react-dom_client.js?v=59e078a0:10330
-performSyncWorkOnRoot @ react-dom_client.js?v=59e078a0:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=59e078a0:11536
-flushSyncWork$1 @ react-dom_client.js?v=59e078a0:10567
-scheduleRefresh @ react-dom_client.js?v=59e078a0:372
-p.scheduleRefresh @ renderer.js:994
-(anonymous) @ @react-refresh:228
-performReactRefresh @ @react-refresh:217
-(anonymous) @ @react-refresh:608
-script.debug.js:1 [Vercel Web Analytics] [pageview] http://localhost:8080/app/settings {o: 'http://localhost:8080/app/settings', sv: '0.1.3', sdkn: '@vercel/analytics/react', sdkv: '1.5.0', ts: 1752900166638, …}
-useRoleBasedAccess.ts:169 🔧 Navigation - User role: owner Available pages: (13) ['dashboard', 'pos', 'inventory', 'categories', 'suppliers', 'customers', 'transactions', 'layby', 'reports', 'expenses', 'analytics', 'settings', 'showcase']
-Sidebar.tsx:43 🔧 Sidebar - User role: owner Navigation items count: 13
-Sidebar.tsx:44 🔧 Sidebar - Navigation items: (13) ['Overview', 'POS', 'Inventory', 'Categories', 'Suppliers', 'Customers', 'Transactions', 'Layby', 'Reports', 'Expenses', 'Analytics', 'Settings', 'Store Showcase']
-useRoleBasedAccess.ts:169 🔧 Navigation - User role: owner Available pages: (13) ['dashboard', 'pos', 'inventory', 'categories', 'suppliers', 'customers', 'transactions', 'layby', 'reports', 'expenses', 'analytics', 'settings', 'showcase']
-Sidebar.tsx:43 🔧 Sidebar - User role: owner Navigation items count: 13
-Sidebar.tsx:44 🔧 Sidebar - Navigation items: (13) ['Overview', 'POS', 'Inventory', 'Categories', 'Suppliers', 'Customers', 'Transactions', 'Layby', 'Reports', 'Expenses', 'Analytics', 'Settings', 'Store Showcase']
-SettingsView.tsx:50 🏪 Current store in settings: {id: '689af71b-a916-4c0a-8dc7-f5a7ff6f05a7', owner_id: 'fa42b752-76d8-43a8-bdcc-51df22809f24'}
-SettingsView.tsx:51 🏪 Settings - isOwner: true userRole: null
-SettingsView.tsx:52 🏪 Settings - user: fa42b752-76d8-43a8-bdcc-51df22809f24
-SecureAction.tsx:31 🔐 SecureAction check - Permission: manage_users Has permission: true Loading: false
-script.debug.js:1 [Vercel Web Analytics] [event] page_view {o: 'http://localhost:8080/app/settings', sv: '0.1.3', sdkn: '@vercel/analytics/react', sdkv: '1.5.0', ts: 1752900167626, …}
-script.debug.js:1 [Vercel Web Analytics] [event] performance_metric {o: 'http://localhost:8080/app/settings', sv: '0.1.3', sdkn: '@vercel/analytics/react', sdkv: '1.5.0', ts: 1752900167627, …}
-SettingsView.tsx:50 🏪 Current store in settings: {id: '689af71b-a916-4c0a-8dc7-f5a7ff6f05a7', owner_id: 'fa42b752-76d8-43a8-bdcc-51df22809f24'}
-SettingsView.tsx:51 🏪 Settings - isOwner: true userRole: null
-SettingsView.tsx:52 🏪 Settings - user: fa42b752-76d8-43a8-bdcc-51df22809f24
-SecureAction.tsx:31 🔐 SecureAction check - Permission: manage_users Has permission: true Loading: false
+(anonymous) @ script.js:1
+n @ script.js:1
+(anonymous) @ script.js:1
+(anonymous) @ script.js:1
+HiddenAdminAccess.tsx:148 🔧 Admin access helper available: window.adminAccess.showHelp()
+App.tsx:16 No `HydrateFallback` element provided to render during initial hydration
+overrideMethod @ hook.js:608
+warning @ react-router-dom.js?v=72597d2c:532
+warningOnce @ react-router-dom.js?v=72597d2c:5825
+(anonymous) @ react-router-dom.js?v=72597d2c:5576
+_renderMatches @ react-router-dom.js?v=72597d2c:5566
+useRoutesImpl @ react-router-dom.js?v=72597d2c:5403
+DataRoutes @ react-router-dom.js?v=72597d2c:6100
+react-stack-bottom-frame @ react-dom_client.js?v=72597d2c:17424
+renderWithHooks @ react-dom_client.js?v=72597d2c:4206
+updateFunctionComponent @ react-dom_client.js?v=72597d2c:6619
+updateSimpleMemoComponent @ react-dom_client.js?v=72597d2c:6528
+updateMemoComponent @ react-dom_client.js?v=72597d2c:6482
+beginWork @ react-dom_client.js?v=72597d2c:7915
+runWithFiberInDEV @ react-dom_client.js?v=72597d2c:1485
+performUnitOfWork @ react-dom_client.js?v=72597d2c:10868
+workLoopSync @ react-dom_client.js?v=72597d2c:10728
+renderRootSync @ react-dom_client.js?v=72597d2c:10711
+performWorkOnRoot @ react-dom_client.js?v=72597d2c:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=72597d2c:11623
+performWorkUntilDeadline @ react-dom_client.js?v=72597d2c:36
+<DataRoutes>
+exports.createElement @ chunk-H5FQS3OF.js?v=72597d2c:773
+RouterProvider @ react-router-dom.js?v=72597d2c:6084
+react-stack-bottom-frame @ react-dom_client.js?v=72597d2c:17424
+renderWithHooks @ react-dom_client.js?v=72597d2c:4206
+updateFunctionComponent @ react-dom_client.js?v=72597d2c:6619
+beginWork @ react-dom_client.js?v=72597d2c:7654
+runWithFiberInDEV @ react-dom_client.js?v=72597d2c:1485
+performUnitOfWork @ react-dom_client.js?v=72597d2c:10868
+workLoopSync @ react-dom_client.js?v=72597d2c:10728
+renderRootSync @ react-dom_client.js?v=72597d2c:10711
+performWorkOnRoot @ react-dom_client.js?v=72597d2c:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=72597d2c:11623
+performWorkUntilDeadline @ react-dom_client.js?v=72597d2c:36
+<RouterProvider>
+exports.createElement @ chunk-H5FQS3OF.js?v=72597d2c:773
+RouterProvider2 @ react-router-dom.js?v=72597d2c:12829
+react-stack-bottom-frame @ react-dom_client.js?v=72597d2c:17424
+renderWithHooks @ react-dom_client.js?v=72597d2c:4206
+updateFunctionComponent @ react-dom_client.js?v=72597d2c:6619
+beginWork @ react-dom_client.js?v=72597d2c:7654
+runWithFiberInDEV @ react-dom_client.js?v=72597d2c:1485
+performUnitOfWork @ react-dom_client.js?v=72597d2c:10868
+workLoopSync @ react-dom_client.js?v=72597d2c:10728
+renderRootSync @ react-dom_client.js?v=72597d2c:10711
+performWorkOnRoot @ react-dom_client.js?v=72597d2c:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=72597d2c:11623
+performWorkUntilDeadline @ react-dom_client.js?v=72597d2c:36
+<RouterProvider2>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=72597d2c:250
+AppContent @ App.tsx:16
+react-stack-bottom-frame @ react-dom_client.js?v=72597d2c:17424
+renderWithHooks @ react-dom_client.js?v=72597d2c:4206
+updateFunctionComponent @ react-dom_client.js?v=72597d2c:6619
+beginWork @ react-dom_client.js?v=72597d2c:7654
+runWithFiberInDEV @ react-dom_client.js?v=72597d2c:1485
+performUnitOfWork @ react-dom_client.js?v=72597d2c:10868
+workLoopSync @ react-dom_client.js?v=72597d2c:10728
+renderRootSync @ react-dom_client.js?v=72597d2c:10711
+performWorkOnRoot @ react-dom_client.js?v=72597d2c:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=72597d2c:11623
+performWorkUntilDeadline @ react-dom_client.js?v=72597d2c:36
+<AppContent>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=72597d2c:250
+App @ App.tsx:51
+react-stack-bottom-frame @ react-dom_client.js?v=72597d2c:17424
+renderWithHooks @ react-dom_client.js?v=72597d2c:4206
+updateFunctionComponent @ react-dom_client.js?v=72597d2c:6619
+beginWork @ react-dom_client.js?v=72597d2c:7654
+runWithFiberInDEV @ react-dom_client.js?v=72597d2c:1485
+performUnitOfWork @ react-dom_client.js?v=72597d2c:10868
+workLoopSync @ react-dom_client.js?v=72597d2c:10728
+renderRootSync @ react-dom_client.js?v=72597d2c:10711
+performWorkOnRoot @ react-dom_client.js?v=72597d2c:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=72597d2c:11623
+performWorkUntilDeadline @ react-dom_client.js?v=72597d2c:36
+<App>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=72597d2c:250
+(anonymous) @ main.tsx:8
+security.ts:100 🔒 CSP disabled in development for compatibility
+security.ts:52 🔒 Security measures initialized
+script.debug.js:1 [Vercel Web Analytics] Debug mode is enabled by default in development. No requests will be sent to the server.
+script.debug.js:1 [Vercel Web Analytics] Running queued event event {name: 'page_view', data: {…}, options: undefined}
+script.debug.js:1 [Vercel Web Analytics] [event] page_view {o: 'http://localhost:8080/app/dashboard', sv: '0.1.3', sdkn: '@vercel/analytics/react', sdkv: '1.5.0', ts: 1753067711020, …}
+script.debug.js:1 [Vercel Web Analytics] [pageview] http://localhost:8080/app/dashboard {o: 'http://localhost:8080/app/dashboard', sv: '0.1.3', sdkn: '@vercel/analytics/react', sdkv: '1.5.0', ts: 1753067711021, …}
+authStore.ts:143 🔐 Setting up auth state change listener...
+authStore.ts:155 🔐 Auth state change listener set up successfully
+useStoreInitialization.ts:89 🔐 Initializing permissions for user: themclloyd@gmail.com
+permissionStore.ts:89 🔐 Loading permissions...
+permissionStore.ts:96 🔐 Loading permissions for user: themclloyd@gmail.com store: undefined
+permissionStore.ts:133 🔐 Fetching user effective role...
+script.debug.js:1 [Vercel Web Analytics] [event] page_view {o: 'http://localhost:8080/app/dashboard', sv: '0.1.3', sdkn: '@vercel/analytics/react', sdkv: '1.5.0', ts: 1753067711052, …}
+authStore.ts:146 🔐 Auth state changed: INITIAL_SESSION themclloyd@gmail.com
+useStoreInitialization.ts:89 🔐 Initializing permissions for user: themclloyd@gmail.com
+script.debug.js:1 [Vercel Web Analytics] [event] page_view {o: 'http://localhost:8080/app/dashboard', sv: '0.1.3', sdkn: '@vercel/analytics/react', sdkv: '1.5.0', ts: 1753067711122, …}
+useRoleBasedAccess.ts:168 🔧 Navigation - User role: null Available pages: []
+useRoleBasedAccess.ts:168 🔧 Navigation - User role: null Available pages: []
+useRoleBasedAccess.ts:168 🔧 Navigation - User role: null Available pages: []
+useRoleBasedAccess.ts:168 🔧 Navigation - User role: null Available pages: []
+index.tsx:155 SyntaxError: Identifier 'ResponsiveTableCell' has already been declared (at responsive-table.tsx?t=1753067677974:237:8)
+
+The above error occurred in one of your React components.
+
+React will try to recreate this component tree from scratch using the error boundary you provided, RenderErrorBoundary.
+
+overrideMethod @ hook.js:608
+defaultOnCaughtError @ react-dom_client.js?v=72597d2c:6264
+logCaughtError @ react-dom_client.js?v=72597d2c:6296
+runWithFiberInDEV @ react-dom_client.js?v=72597d2c:1485
+inst.componentDidCatch.update.callback @ react-dom_client.js?v=72597d2c:6341
+callCallback @ react-dom_client.js?v=72597d2c:4097
+commitCallbacks @ react-dom_client.js?v=72597d2c:4109
+runWithFiberInDEV @ react-dom_client.js?v=72597d2c:1485
+commitClassCallbacks @ react-dom_client.js?v=72597d2c:8543
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:9011
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:8956
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:9096
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:9096
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:8956
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:9096
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:9096
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:9096
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:9096
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:8956
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:8956
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:8956
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:9096
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:8956
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:8956
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:9096
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:8956
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:8956
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:9096
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:8956
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:9016
+flushLayoutEffects @ react-dom_client.js?v=72597d2c:11174
+commitRoot @ react-dom_client.js?v=72597d2c:11080
+commitRootWhenReady @ react-dom_client.js?v=72597d2c:10512
+performWorkOnRoot @ react-dom_client.js?v=72597d2c:10457
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=72597d2c:11623
+performWorkUntilDeadline @ react-dom_client.js?v=72597d2c:36
+<...>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=72597d2c:250
+(anonymous) @ index.tsx:155
+App.tsx:16 React Router caught the following error during render SyntaxError: Identifier 'ResponsiveTableCell' has already been declared (at responsive-table.tsx?t=1753067677974:237:8) {componentStack: '\n    at Lazy (<anonymous>)\n    at RenderedRoute (h…calhost:8080/src/contexts/ThemeContext.tsx:24:33)'}
+overrideMethod @ hook.js:608
+componentDidCatch @ react-router-dom.js?v=72597d2c:5490
+react-stack-bottom-frame @ react-dom_client.js?v=72597d2c:17458
+inst.componentDidCatch.update.callback @ react-dom_client.js?v=72597d2c:6349
+callCallback @ react-dom_client.js?v=72597d2c:4097
+commitCallbacks @ react-dom_client.js?v=72597d2c:4109
+runWithFiberInDEV @ react-dom_client.js?v=72597d2c:1485
+commitClassCallbacks @ react-dom_client.js?v=72597d2c:8543
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:9011
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:8956
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:9096
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:9096
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:8956
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:9096
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:9096
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:9096
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:9096
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:8956
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:8956
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:8956
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:9096
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:8956
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:8956
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:9096
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:8956
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:8956
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:9096
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:8956
+recursivelyTraverseLayoutEffects @ react-dom_client.js?v=72597d2c:9682
+commitLayoutEffectOnFiber @ react-dom_client.js?v=72597d2c:9016
+flushLayoutEffects @ react-dom_client.js?v=72597d2c:11174
+commitRoot @ react-dom_client.js?v=72597d2c:11080
+commitRootWhenReady @ react-dom_client.js?v=72597d2c:10512
+performWorkOnRoot @ react-dom_client.js?v=72597d2c:10457
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=72597d2c:11623
+performWorkUntilDeadline @ react-dom_client.js?v=72597d2c:36
+<RenderErrorBoundary>
+exports.createElement @ chunk-H5FQS3OF.js?v=72597d2c:773
+(anonymous) @ react-router-dom.js?v=72597d2c:5616
+_renderMatches @ react-router-dom.js?v=72597d2c:5566
+useRoutesImpl @ react-router-dom.js?v=72597d2c:5403
+DataRoutes @ react-router-dom.js?v=72597d2c:6100
+react-stack-bottom-frame @ react-dom_client.js?v=72597d2c:17424
+renderWithHooks @ react-dom_client.js?v=72597d2c:4206
+updateFunctionComponent @ react-dom_client.js?v=72597d2c:6619
+updateSimpleMemoComponent @ react-dom_client.js?v=72597d2c:6528
+updateMemoComponent @ react-dom_client.js?v=72597d2c:6482
+beginWork @ react-dom_client.js?v=72597d2c:7915
+runWithFiberInDEV @ react-dom_client.js?v=72597d2c:1485
+performUnitOfWork @ react-dom_client.js?v=72597d2c:10868
+workLoopSync @ react-dom_client.js?v=72597d2c:10728
+renderRootSync @ react-dom_client.js?v=72597d2c:10711
+performWorkOnRoot @ react-dom_client.js?v=72597d2c:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=72597d2c:11623
+performWorkUntilDeadline @ react-dom_client.js?v=72597d2c:36
+<DataRoutes>
+exports.createElement @ chunk-H5FQS3OF.js?v=72597d2c:773
+RouterProvider @ react-router-dom.js?v=72597d2c:6084
+react-stack-bottom-frame @ react-dom_client.js?v=72597d2c:17424
+renderWithHooks @ react-dom_client.js?v=72597d2c:4206
+updateFunctionComponent @ react-dom_client.js?v=72597d2c:6619
+beginWork @ react-dom_client.js?v=72597d2c:7654
+runWithFiberInDEV @ react-dom_client.js?v=72597d2c:1485
+performUnitOfWork @ react-dom_client.js?v=72597d2c:10868
+workLoopSync @ react-dom_client.js?v=72597d2c:10728
+renderRootSync @ react-dom_client.js?v=72597d2c:10711
+performWorkOnRoot @ react-dom_client.js?v=72597d2c:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=72597d2c:11623
+performWorkUntilDeadline @ react-dom_client.js?v=72597d2c:36
+<RouterProvider>
+exports.createElement @ chunk-H5FQS3OF.js?v=72597d2c:773
+RouterProvider2 @ react-router-dom.js?v=72597d2c:12829
+react-stack-bottom-frame @ react-dom_client.js?v=72597d2c:17424
+renderWithHooks @ react-dom_client.js?v=72597d2c:4206
+updateFunctionComponent @ react-dom_client.js?v=72597d2c:6619
+beginWork @ react-dom_client.js?v=72597d2c:7654
+runWithFiberInDEV @ react-dom_client.js?v=72597d2c:1485
+performUnitOfWork @ react-dom_client.js?v=72597d2c:10868
+workLoopSync @ react-dom_client.js?v=72597d2c:10728
+renderRootSync @ react-dom_client.js?v=72597d2c:10711
+performWorkOnRoot @ react-dom_client.js?v=72597d2c:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=72597d2c:11623
+performWorkUntilDeadline @ react-dom_client.js?v=72597d2c:36
+<RouterProvider2>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=72597d2c:250
+AppContent @ App.tsx:16
+react-stack-bottom-frame @ react-dom_client.js?v=72597d2c:17424
+renderWithHooks @ react-dom_client.js?v=72597d2c:4206
+updateFunctionComponent @ react-dom_client.js?v=72597d2c:6619
+beginWork @ react-dom_client.js?v=72597d2c:7654
+runWithFiberInDEV @ react-dom_client.js?v=72597d2c:1485
+performUnitOfWork @ react-dom_client.js?v=72597d2c:10868
+workLoopSync @ react-dom_client.js?v=72597d2c:10728
+renderRootSync @ react-dom_client.js?v=72597d2c:10711
+performWorkOnRoot @ react-dom_client.js?v=72597d2c:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=72597d2c:11623
+performWorkUntilDeadline @ react-dom_client.js?v=72597d2c:36
+<AppContent>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=72597d2c:250
+App @ App.tsx:51
+react-stack-bottom-frame @ react-dom_client.js?v=72597d2c:17424
+renderWithHooks @ react-dom_client.js?v=72597d2c:4206
+updateFunctionComponent @ react-dom_client.js?v=72597d2c:6619
+beginWork @ react-dom_client.js?v=72597d2c:7654
+runWithFiberInDEV @ react-dom_client.js?v=72597d2c:1485
+performUnitOfWork @ react-dom_client.js?v=72597d2c:10868
+workLoopSync @ react-dom_client.js?v=72597d2c:10728
+renderRootSync @ react-dom_client.js?v=72597d2c:10711
+performWorkOnRoot @ react-dom_client.js?v=72597d2c:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=72597d2c:11623
+performWorkUntilDeadline @ react-dom_client.js?v=72597d2c:36
+<App>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=72597d2c:250
+(anonymous) @ main.tsx:8
+storeStore.ts:108 🏪 Selecting store from stores array: 1 stores
+storeStore.ts:110 🏪 Found store: {id: '689af71b-a916-4c0a-8dc7-f5a7ff6f05a7', owner_id: 'fa42b752-76d8-43a8-bdcc-51df22809f24', name: 'MACA', address: 'Pavilion, 4f, Blantyre', phone: '0993838160', …}
+storeStore.ts:80 🏪 Setting current store: MACA
+storeStore.ts:81 🏪 Store owner_id: fa42b752-76d8-43a8-bdcc-51df22809f24
+storeStore.ts:82 🏪 Current user: fa42b752-76d8-43a8-bdcc-51df22809f24
+storeStore.ts:84 🏪 Is owner calculated: true
+storeStore.ts:88 🏪 Setting hasValidStoreSelection: true
+storeStore.ts:123 💾 Store selection saved: {storeId: '689af71b-a916-4c0a-8dc7-f5a7ff6f05a7', userId: 'fa42b752-76d8-43a8-bdcc-51df22809f24', timestamp: 1753067711699}
+storeStore.ts:126 🏪 Store selected: MACA
+permissionStore.ts:155 🔐 RPC result - Role: owner Is owner: true
+permissionStore.ts:161 🔐 User role determined: owner (store owner)
+permissionStore.ts:207 🔐 Applied owner permissions. Pages: (13) ['dashboard', 'pos', 'inventory', 'categories', 'suppliers', 'customers', 'layby', 'transactions', 'reports', 'expenses', 'analytics', 'settings', 'showcase']
+permissionStore.ts:229 🔐 Updating store state with ownership info - isOwner: true userRole: owner
+storeStore.ts:80 🏪 Setting current store: MACA
+storeStore.ts:81 🏪 Store owner_id: fa42b752-76d8-43a8-bdcc-51df22809f24
+storeStore.ts:82 🏪 Current user: fa42b752-76d8-43a8-bdcc-51df22809f24
+storeStore.ts:84 🏪 Is owner calculated: true
+storeStore.ts:88 🏪 Setting hasValidStoreSelection: true
+storeStore.ts:108 🏪 Selecting store from stores array: 1 stores
+storeStore.ts:110 🏪 Found store: {id: '689af71b-a916-4c0a-8dc7-f5a7ff6f05a7', owner_id: 'fa42b752-76d8-43a8-bdcc-51df22809f24', name: 'MACA', address: 'Pavilion, 4f, Blantyre', phone: '0993838160', …}
+storeStore.ts:80 🏪 Setting current store: MACA
+storeStore.ts:81 🏪 Store owner_id: fa42b752-76d8-43a8-bdcc-51df22809f24
+storeStore.ts:82 🏪 Current user: fa42b752-76d8-43a8-bdcc-51df22809f24
+storeStore.ts:84 🏪 Is owner calculated: true
+storeStore.ts:88 🏪 Setting hasValidStoreSelection: true
+storeStore.ts:123 💾 Store selection saved: {storeId: '689af71b-a916-4c0a-8dc7-f5a7ff6f05a7', userId: 'fa42b752-76d8-43a8-bdcc-51df22809f24', timestamp: 1753067712099}
+storeStore.ts:126 🏪 Store selected: MACA

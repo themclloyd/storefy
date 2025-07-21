@@ -248,26 +248,12 @@ const Index = ({ activeView: propActiveView = 'dashboard' }: IndexProps) => {
       />
 
       <SidebarInset>
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="flex items-center gap-4 px-4">
-            <SidebarTrigger className="h-8 w-8" />
-            <div className="h-4 w-px bg-border" />
-            <Breadcrumbs activeView={activeView} />
-          </div>
-          <div className="ml-auto px-4">
-            <ThemeToggleButton />
-          </div>
-        </header>
-
         <div className="flex-1 overflow-auto">
           <div className="p-6">
             {viewComponent}
           </div>
         </div>
       </SidebarInset>
-
-      {/* Mobile Bottom Navigation */}
-      <MobileBottomNav activeView={activeView} onViewChange={handleViewChange} />
     </SidebarProvider>
   );
 };

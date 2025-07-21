@@ -136,7 +136,9 @@ export const shadows = {
 // Component variants - Neutral Theme
 export const componentVariants = {
   button: {
-    primary: 'bg-primary hover:bg-primary/90 text-primary-foreground rounded-md',
+    primary: 'btn-gradient rounded-md',
+    gradient: 'btn-gradient rounded-md',
+    solid: 'bg-primary hover:bg-primary/90 text-primary-foreground rounded-md',
     secondary: 'bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border rounded-md',
     destructive: 'bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-md',
     outline: 'border border-border bg-background hover:bg-accent text-foreground rounded-md',

@@ -286,6 +286,63 @@ BEGIN
 END;
 $$;
 
+-- Function to get all public stores for showcase directory
+CREATE OR REPLACE FUNCTION public.get_all_public_stores()
+RETURNS TABLE (
+  store_id UUID,
+  store_name TEXT,
+  store_address TEXT,
+  store_phone TEXT,
+  store_email TEXT,
+  store_code TEXT,
+  store_currency TEXT,
+  showcase_slug TEXT,
+  showcase_theme JSONB,
+  showcase_description TEXT,
+  showcase_logo_url TEXT,
+  showcase_banner_url TEXT,
+  showcase_contact_info JSONB,
+  showcase_seo_title TEXT,
+  showcase_seo_description TEXT,
+  product_count BIGINT,
+  category_count BIGINT,
+  created_at TIMESTAMP WITH TIME ZONE
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    s.id,
+    s.name,
+    s.address,
+    s.phone,
+    s.email,
+    s.store_code,
+    s.currency,
+    s.showcase_slug,
+    s.showcase_theme,
+    s.showcase_description,
+    s.showcase_logo_url,
+    s.showcase_banner_url,
+    s.showcase_contact_info,
+    s.showcase_seo_title,
+    s.showcase_seo_description,
+    COUNT(DISTINCT p.id) as product_count,
+    COUNT(DISTINCT p.category_id) as category_count,
+    s.created_at
+  FROM public.stores s
+  LEFT JOIN public.products p ON s.id = p.store_id AND p.is_public = true AND p.is_active = true
+  WHERE s.enable_public_showcase = true
+  GROUP BY s.id, s.name, s.address, s.phone, s.email, s.store_code, s.currency, s.showcase_slug,
+           s.showcase_theme, s.showcase_description, s.showcase_logo_url,
+           s.showcase_banner_url, s.showcase_contact_info, s.showcase_seo_title,
+           s.showcase_seo_description, s.created_at
+  ORDER BY s.created_at DESC;
+END;
+$$;
+
 -- Grant necessary permissions
 GRANT SELECT ON public.public_products TO anon, authenticated;
 GRANT SELECT ON public.public_stores TO anon, authenticated;
@@ -293,6 +350,7 @@ GRANT EXECUTE ON FUNCTION public.get_public_store_info(TEXT) TO anon, authentica
 GRANT EXECUTE ON FUNCTION public.get_public_products(TEXT, TEXT, TEXT) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.get_public_categories(TEXT) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.generate_showcase_slug(TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_all_public_stores() TO anon, authenticated;
 
 -- Add comments for documentation
 COMMENT ON COLUMN public.stores.enable_public_showcase IS 'Enable public showcase for this store';

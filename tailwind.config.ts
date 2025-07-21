@@ -12,14 +12,38 @@ export default {
 	theme: {
 		container: {
 			center: true,
-			padding: "2rem",
+			padding: {
+				DEFAULT: "1rem",
+				sm: "1.5rem",
+				lg: "2rem",
+				xl: "2.5rem",
+				"2xl": "3rem",
+			},
 			screens: {
+				sm: "640px",
+				md: "768px",
+				lg: "1024px",
+				xl: "1280px",
 				"2xl": "1400px",
 			},
+		},
+		screens: {
+			xs: "475px",
+			sm: "640px",
+			md: "768px",
+			lg: "1024px",
+			xl: "1280px",
+			"2xl": "1536px",
 		},
 		extend: {
 			fontFamily: {
 				'space-grotesk': ['Space Grotesk', 'sans-serif'],
+			},
+			spacing: {
+				'safe-top': 'env(safe-area-inset-top)',
+				'safe-bottom': 'env(safe-area-inset-bottom)',
+				'safe-left': 'env(safe-area-inset-left)',
+				'safe-right': 'env(safe-area-inset-right)',
 			},
 			colors: {
 				border: "hsl(var(--border))",

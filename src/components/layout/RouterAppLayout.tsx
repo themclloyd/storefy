@@ -1,13 +1,15 @@
 import { Suspense, useEffect } from 'react';
 import { Outlet, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import { Sidebar } from '@/components/layout/Sidebar';
-import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { CompactStoreSelector } from '@/components/stores/CompactStoreSelector';
 import { useCurrentStore, useStores } from '@/stores/storeStore';
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { ThemeToggleButton } from '@/components/ui/theme-toggle';
 import { InlineLoading } from '@/components/ui/modern-loading';
 import { usePageLoading } from '@/stores/loadingStore';
+import { useScreenSize } from '@/hooks/use-mobile';
+import { responsiveContainer, responsiveSpacing, touchFriendly } from '@/lib/responsive-utils';
+import { cn } from '@/lib/utils';
 
 interface AppLayoutData {
   user: any;
@@ -23,6 +25,7 @@ export default function RouterAppLayout() {
   const setPageLoading = usePageLoading();
   const currentStore = useCurrentStore();
   const stores = useStores();
+  const { isMobile, isTablet } = useScreenSize();
 
   // Clear loading when layout mounts
   useEffect(() => {
@@ -47,12 +50,12 @@ export default function RouterAppLayout() {
   if (!currentStore) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="max-w-md w-full mx-auto p-6">
-          <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold text-foreground mb-2">
+        <div className={cn(responsiveContainer.md, "text-center")}>
+          <div className={cn(responsiveSpacing.margin.md, "mb-6")}>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-3 sm:mb-4">
               {stores.length > 0 ? 'Select Your Store' : 'Welcome to Storefy'}
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-sm sm:text-base text-muted-foreground">
               {stores.length > 0
                 ? 'Choose a store to continue'
                 : 'Create your first store to get started'
@@ -66,54 +69,52 @@ export default function RouterAppLayout() {
   }
 
   return (
-    <SidebarProvider defaultOpen={true}>
-      {/* Desktop Sidebar - Hidden on mobile */}
-      <div className="hidden md:block">
-        <Sidebar
-          collapsible="icon"
-          activeView={currentView}
-          onViewChange={handleViewChange}
-        />
-      </div>
+    <SidebarProvider defaultOpen={!isMobile}>
+      {/* Sidebar - Now visible on all devices */}
+      <Sidebar
+        collapsible={isMobile ? "offcanvas" : "icon"}
+        activeView={currentView}
+        onViewChange={handleViewChange}
+      />
       <SidebarInset>
         <div className="flex-1 overflow-auto h-screen">
-          {/* Minimal Header */}
-          <div className="flex items-center justify-between px-4 py-2 border-b bg-background">
+          {/* Header with hamburger menu and theme toggle */}
+          <header className="flex items-center justify-between p-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 sticky top-0 z-40">
             <div className="flex items-center gap-3">
-              <SidebarTrigger />
-              <span className="text-sm font-medium text-muted-foreground">
-                {currentView === 'dashboard' ? 'Dashboard' :
-                 currentView === 'reports' ? 'Reports & Analytics' :
-                 currentView === 'pos' ? 'POS System' :
-                 currentView === 'inventory' ? 'Inventory' :
-                 currentView === 'customers' ? 'Customers' :
-                 currentView === 'transactions' ? 'Transactions' :
-                 currentView === 'expenses' ? 'Expenses' :
-                 currentView === 'layby' ? 'Layby' :
-                 currentView === 'subscription' ? 'Subscription' :
-                 'Dashboard'}
-              </span>
+              {/* Mobile Hamburger Menu */}
+              <SidebarTrigger className={cn(touchFriendly.minTouch, "md:hidden")} />
+
+              {/* Desktop: Show store name or app title */}
+              <div className="hidden md:flex items-center gap-2">
+                <div className="w-6 h-6 bg-primary rounded-md flex items-center justify-center">
+                  <div className="w-3 h-3 bg-primary-foreground rounded-sm" />
+                </div>
+                <span className="font-semibold text-foreground">
+                  {currentStore?.name || 'Storefy'}
+                </span>
+              </div>
             </div>
+
+            {/* Right side: Theme toggle and store selector */}
             <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">MACA</span>
+              {/* Store selector for mobile */}
+              {currentStore && (
+                <div className="md:hidden">
+                  <CompactStoreSelector />
+                </div>
+              )}
+
+              {/* Theme toggle */}
               <ThemeToggleButton />
             </div>
-          </div>
+          </header>
 
-          {/* Main content */}
-          <div className="p-4">
+          {/* Main content with responsive padding */}
+          <div className={cn(responsiveSpacing.padding.sm)}>
             <Outlet />
           </div>
         </div>
       </SidebarInset>
-
-      {/* Mobile bottom navigation */}
-      <div className="md:hidden">
-        <MobileBottomNav 
-          activeView={currentView}
-          onViewChange={handleViewChange}
-        />
-      </div>
     </SidebarProvider>
   );
 }
