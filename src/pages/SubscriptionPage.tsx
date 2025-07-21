@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useUser } from '@/stores/authStore';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useUser, useAuthLoading } from '@/stores/authStore';
 import { SubscriptionPlans } from '@/components/subscription/SubscriptionPlans';
 import { SubscriptionStatus } from '@/components/subscription/SubscriptionStatus';
 import { SubscriptionHistory } from '@/components/subscription/SubscriptionHistory';
@@ -9,15 +9,12 @@ import { CreditCard, Clock, CheckCircle, AlertTriangle, ArrowLeft, Settings } fr
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { PageLoading } from '@/components/ui/modern-loading';
-import { Sidebar } from '@/components/layout/Sidebar';
-import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
-import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
-import { ThemeToggleButton } from '@/components/ui/theme-toggle';
-
+import { PageHeader, PageLayout } from '@/components/common/PageHeader';
 import { toast } from 'sonner';
 
 export default function SubscriptionPage() {
-  const { user, loading: authLoading } = useAuth();
+  const user = useUser();
+  const authLoading = useAuthLoading();
   const {
     subscription,
     isTrialing,
@@ -81,8 +78,8 @@ export default function SubscriptionPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Card className="w-full max-w-md">
+      <PageLayout>
+        <Card className="w-full max-w-md mx-auto">
           <CardHeader className="text-center">
             <CardTitle className="text-foreground">Authentication Required</CardTitle>
             <CardDescription className="text-muted-foreground">
@@ -90,33 +87,12 @@ export default function SubscriptionPage() {
             </CardDescription>
           </CardHeader>
         </Card>
-      </div>
+      </PageLayout>
     );
   }
 
   return (
-    <SidebarProvider defaultOpen={true}>
-      <Sidebar
-        collapsible="icon"
-        activeView="subscription"
-        onViewChange={() => {}}
-      />
-
-      <SidebarInset>
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="flex items-center gap-4 px-4">
-            <SidebarTrigger className="h-8 w-8" />
-            <div className="h-4 w-px bg-border" />
-            <Breadcrumbs activeView="subscription" />
-          </div>
-          <div className="ml-auto px-4 flex items-center gap-2">
-            <ThemeToggleButton />
-          </div>
-        </header>
-
-        <div className="flex-1 overflow-auto">
-          <div className="p-6 max-w-4xl mx-auto">
-
+    <PageLayout>
             {/* Back Button for Plans/Manage Views */}
             {view !== 'overview' && (
               <Button
@@ -132,14 +108,12 @@ export default function SubscriptionPage() {
             {/* Overview - Simple Status Card */}
             {view === 'overview' && (
               <div className="space-y-6">
-                <div className="text-center mb-8">
-                  <h1 className="text-3xl font-bold text-foreground mb-2">
-                    Subscription Dashboard
-                  </h1>
-                  <p className="text-muted-foreground text-lg">
-                    Manage your Storefy subscription and track your usage
-                  </p>
-                </div>
+                <PageHeader
+                  title="Subscription Dashboard"
+                  description="Manage your Storefy subscription and track your usage"
+                  icon={<CreditCard className="w-8 h-8 text-primary" />}
+                  className="text-center"
+                />
 
                 <Card className="p-6">
                   <div className="flex items-center justify-between">
@@ -424,9 +398,6 @@ export default function SubscriptionPage() {
                 )}
               </div>
             )}
-          </div>
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+    </PageLayout>
   );
 }

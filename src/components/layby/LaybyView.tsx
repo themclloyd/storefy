@@ -21,6 +21,7 @@ import { AddLaybyDialog } from "./AddLaybyDialog";
 import { LaybyDetailsModal } from "./LaybyDetailsModal";
 import { LaybyPaymentDialog } from "./LaybyPaymentDialog";
 import { LaybySettingsDialog } from "./LaybySettingsDialog";
+import { PageHeader, PageLayout } from "@/components/common/PageHeader";
 
 
 
@@ -103,31 +104,29 @@ export function LaybyView() {
   }
 
   return (
-    <div className="space-y-4 md:space-y-6 p-4 md:p-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">Layby Management</h1>
-          <p className="text-muted-foreground mt-1 md:mt-2">
-            Manage customer layby orders and payment schedules
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setShowSettingsDialog(true)}
-          >
-            <Settings className="w-4 h-4 mr-2" />
-            Settings
-          </Button>
-          <Button
-            onClick={() => setShowAddDialog(true)}
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            New Layby Order
-          </Button>
-        </div>
-      </div>
+    <PageLayout>
+      <PageHeader
+        title="Layby Management"
+        description="Manage customer layby orders and payment schedules"
+        icon={<Clock className="w-8 h-8 text-primary" />}
+        actions={
+          <>
+            <Button
+              variant="outline"
+              onClick={() => setShowSettingsDialog(true)}
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              Settings
+            </Button>
+            <Button
+              onClick={() => setShowAddDialog(true)}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              New Layby Order
+            </Button>
+          </>
+        }
+      />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
@@ -306,6 +305,6 @@ export function LaybyView() {
         onOpenChange={setShowSettingsDialog}
         onSettingsUpdated={handleLaybyUpdated}
       />
-    </div>
+    </PageLayout>
   );
 }

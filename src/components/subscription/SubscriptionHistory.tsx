@@ -16,6 +16,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { subscriptionService, SubscriptionHistoryItem } from '@/services/subscription';
+import { formatCurrency } from '@/lib/taxUtils';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
@@ -109,10 +110,7 @@ export function SubscriptionHistory({ subscriptionId }: SubscriptionHistoryProps
 
   const formatAmount = (amount?: number) => {
     if (!amount) return '';
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
+    return formatCurrency(amount, 'USD');
   };
 
   if (loading) {

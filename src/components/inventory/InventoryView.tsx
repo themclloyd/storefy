@@ -26,6 +26,7 @@ import { StockAdjustmentDialog } from "./StockAdjustmentDialog";
 import { SuppliersView } from "./SuppliersView";
 import { CategoriesView } from "./CategoriesView";
 import { FilteredInventoryView } from "./FilteredInventoryView";
+import { PageHeader, PageLayout } from "@/components/common/PageHeader";
 import { BulkOperationsBar } from "./BulkOperationsBar";
 import { BulkStockAdjustmentDialog } from "./BulkStockAdjustmentDialog";
 import { FilterOptions } from "./AdvancedFilters";
@@ -301,19 +302,13 @@ export function InventoryView() {
   }
 
   return (
-    <div className="space-y-4 md:space-y-6 p-3 sm:p-4 md:p-6">
-      {/* Mobile Header */}
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">Inventory</h1>
-            <p className="text-sm sm:text-base text-muted-foreground mt-1">
-              {filteredInventory.length} products
-            </p>
-          </div>
-
-          {/* Mobile Action Buttons */}
-          <div className="flex items-center gap-2">
+    <PageLayout>
+      <PageHeader
+        title="Inventory"
+        description={`${filteredInventory.length} products`}
+        icon={<Package className="w-8 h-8 text-primary" />}
+        actions={
+          <>
             {/* View Mode Toggle */}
             <div className="hidden sm:flex items-center gap-1 bg-muted rounded-lg p-1">
               <Button
@@ -353,33 +348,34 @@ export function InventoryView() {
             </Sheet>
 
             {/* Desktop Actions */}
-            <div className="hidden sm:flex flex-wrap gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowExportDialog(true)}
-                disabled={filteredInventory.length === 0}
-              >
-                <Download className="w-4 h-4 mr-2" />
-                <span className="hidden md:inline">Export</span>
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowCategoriesView(true)}
-              >
-                <FolderOpen className="w-4 h-4 mr-2" />
-                <span className="hidden lg:inline">Categories</span>
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowSuppliersView(true)}
-              >
-                <Settings className="w-4 h-4 mr-2" />
-                <span className="hidden lg:inline">Suppliers</span>
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowExportDialog(true)}
+              disabled={filteredInventory.length === 0}
+              className="hidden sm:flex"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              <span className="hidden md:inline">Export</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowCategoriesView(true)}
+              className="hidden sm:flex"
+            >
+              <FolderOpen className="w-4 h-4 mr-2" />
+              <span className="hidden lg:inline">Categories</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowSuppliersView(true)}
+              className="hidden sm:flex"
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              <span className="hidden lg:inline">Suppliers</span>
+            </Button>
 
             {/* Add Product Button */}
             <SecureButton
@@ -391,9 +387,9 @@ export function InventoryView() {
               <Plus className="w-4 h-4 mr-2" />
               <span className="hidden md:inline">Add Product</span>
             </SecureButton>
-          </div>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       {/* Stats Cards - Mobile Optimized */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
@@ -1005,6 +1001,6 @@ export function InventoryView() {
           <Plus className="w-6 h-6" />
         </SecureButton>
       </div>
-    </div>
+    </PageLayout>
   );
 }

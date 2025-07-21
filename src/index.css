@@ -351,6 +351,19 @@
     background: linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--muted)/0.8) 100%);
   }
 
+  /* Standardized Card Styles */
+  .card-professional {
+    @apply bg-card border border-border rounded-lg shadow-sm;
+  }
+
+  .card-stats {
+    @apply bg-card border border-border rounded-lg shadow-sm p-4 sm:p-6;
+  }
+
+  .card-interactive {
+    @apply bg-card border border-border rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer;
+  }
+
   /* Enhanced Mobile Experience */
   @media (max-width: 768px) {
     body {

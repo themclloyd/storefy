@@ -17,6 +17,7 @@ import {
 import { useCurrentStore } from '@/stores/storeStore';
 import { useStoreData } from '@/hooks/useSupabaseClient';
 import { useTax } from '@/hooks/useTax';
+import { PageHeader, PageLayout } from '@/components/common/PageHeader';
 import { InlineLoading } from '@/components/ui/modern-loading';
 import {
   ResponsiveContainer,
@@ -197,25 +198,23 @@ export function SimpleDashboard({ onViewChange }: DashboardProps) {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Overview</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
-            Welcome back! Here's what's happening at your store today.
-          </p>
-        </div>
-        <Button
-          onClick={() => onViewChange('reports')}
-          variant="outline"
-          className="flex items-center gap-2 w-full sm:w-auto"
-          size="sm"
-        >
-          <BarChart3 className="w-4 h-4" />
-          Full Report
-        </Button>
-      </div>
+    <PageLayout>
+      <PageHeader
+        title="Overview"
+        description="Welcome back! Here's what's happening at your store today."
+        icon={<BarChart3 className="w-8 h-8 text-primary" />}
+        actions={
+          <Button
+            onClick={() => onViewChange('reports')}
+            variant="outline"
+            className="flex items-center gap-2 w-full sm:w-auto"
+            size="sm"
+          >
+            <BarChart3 className="w-4 h-4" />
+            Full Report
+          </Button>
+        }
+      />
 
       {/* Stats Cards - Mobile 2x2 Grid, Desktop 3 columns */}
       <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
@@ -502,6 +501,6 @@ export function SimpleDashboard({ onViewChange }: DashboardProps) {
           )}
         </CardContent>
       </Card>
-    </div>
+    </PageLayout>
   );
 }

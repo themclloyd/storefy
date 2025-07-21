@@ -6,6 +6,7 @@ import { Check, Star, Loader2, Calendar, Lock, Zap, Crown, Gift, CreditCard } fr
 import { useUser } from '@/stores/authStore';
 import { subscriptionService, SubscriptionPlan } from '@/services/subscription';
 import { useSubscription } from '@/hooks/useSubscription';
+import { formatCurrency } from '@/lib/taxUtils';
 import { toast } from 'sonner';
 
 interface SubscriptionPlansProps {
@@ -14,7 +15,7 @@ interface SubscriptionPlansProps {
 }
 
 export function SubscriptionPlans({ onPlanSelected, currentPlanId }: SubscriptionPlansProps) {
-  const { user } = useAuth();
+  const user = useUser();
   const { subscription, isTrialing, trialDaysRemaining } = useSubscription();
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [loading, setLoading] = useState(true);
@@ -96,10 +97,7 @@ export function SubscriptionPlans({ onPlanSelected, currentPlanId }: Subscriptio
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(price);
+    return formatCurrency(price, 'USD');
   };
 
   // Helper functions for smart upgrade logic

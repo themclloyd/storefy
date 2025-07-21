@@ -23,6 +23,7 @@ import { CustomerExportDialog } from "./CustomerExportDialog";
 import { CustomerStatusDialog } from "./CustomerStatusDialog";
 import { CustomerAnalytics } from "./CustomerAnalytics";
 import { CustomerFilters } from "./CustomerFilters";
+import { PageHeader, PageLayout } from "@/components/common/PageHeader";
 
 
 
@@ -111,19 +112,13 @@ export function CustomersView() {
   }
 
   return (
-    <div className="space-y-4 md:space-y-6 p-3 sm:p-4 md:p-6">
-      {/* Mobile Header */}
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">Customers</h1>
-            <p className="text-sm sm:text-base text-muted-foreground mt-1">
-              {filteredCustomers.length} customers
-            </p>
-          </div>
-
-          {/* Mobile Action Buttons */}
-          <div className="flex items-center gap-2">
+    <PageLayout>
+      <PageHeader
+        title="Customers"
+        description={`${filteredCustomers.length} customers`}
+        icon={<Users className="w-8 h-8 text-primary" />}
+        actions={
+          <>
             {/* View Mode Toggle */}
             <div className="hidden sm:flex items-center gap-1 bg-muted rounded-lg p-1">
               <Button
@@ -163,26 +158,26 @@ export function CustomersView() {
             </Sheet>
 
             {/* Desktop Actions */}
-            <div className="hidden sm:flex flex-wrap gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowAnalytics(!showAnalytics)}
-                disabled={customers.length === 0}
-              >
-                <BarChart3 className="w-4 h-4 mr-2" />
-                <span className="hidden md:inline">{showAnalytics ? 'Hide' : 'Show'} Analytics</span>
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowExportDialog(true)}
-                disabled={customers.length === 0}
-              >
-                <Download className="w-4 h-4 mr-2" />
-                <span className="hidden lg:inline">Export</span>
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowAnalytics(!showAnalytics)}
+              disabled={customers.length === 0}
+              className="hidden sm:flex"
+            >
+              <BarChart3 className="w-4 h-4 mr-2" />
+              <span className="hidden md:inline">{showAnalytics ? 'Hide' : 'Show'} Analytics</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowExportDialog(true)}
+              disabled={customers.length === 0}
+              className="hidden sm:flex"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              <span className="hidden lg:inline">Export</span>
+            </Button>
 
             {/* Add Customer Button */}
             <Button
@@ -193,9 +188,9 @@ export function CustomersView() {
               <Plus className="w-4 h-4 mr-2" />
               <span className="hidden md:inline">Add Customer</span>
             </Button>
-          </div>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       {/* Stats Cards - Mobile Optimized */}
       <div className="grid grid-cols-3 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
@@ -595,6 +590,6 @@ export function CustomersView() {
           <Plus className="w-6 h-6" />
         </Button>
       </div>
-    </div>
+    </PageLayout>
   );
 }

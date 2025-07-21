@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,6 @@ import {
   TrendingUp,
   Calendar as CalendarIcon,
   Download,
-  Filter,
   Eye,
   Edit,
   Trash2,
@@ -23,175 +22,68 @@ import {
   Receipt,
   CheckCircle,
   Clock,
-  XCircle,
   AlertCircle,
   Repeat
 } from "lucide-react";
 import { format } from "date-fns";
 import { useCurrentStore } from "@/stores/storeStore";
-import { useUser } from "@/stores/authStore";
-import { SecureAction, SecureButton } from "@/components/auth/SecureAction";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { SecureButton } from "@/components/auth/SecureAction";
 import { useTax } from "@/hooks/useTax";
+import {
+  useExpenseStore,
+  useFilteredExpenses,
+  useExpenseCategories,
+  useExpenseStats,
+  type Expense
+} from "@/stores/expenseStore";
 import { AddExpenseDialog } from "./AddExpenseDialog";
 import { EditExpenseDialog } from "./EditExpenseDialog";
 import { ExpenseCategoriesView } from "./ExpenseCategoriesView";
 import { ExpenseDetailsModal } from "./ExpenseDetailsModal";
 import { RecurringExpensesView } from "./RecurringExpensesView";
+import { PageHeader, PageLayout } from "@/components/common/PageHeader";
 
-interface Expense {
-  id: string;
-  expense_number: string;
-  title: string;
-  description: string;
-  amount: number;
-  expense_date: string;
-  payment_method: string;
-  vendor_name: string;
-  vendor_contact: string;
-  receipt_number: string;
-  tax_amount: number;
-  is_tax_deductible: boolean;
-  status: 'pending' | 'paid';
-  notes: string;
-  created_at: string;
-  expense_categories?: { name: string; color: string };
-  created_by_profile?: { display_name: string };
-}
 
-interface ExpenseCategory {
-  id: string;
-  name: string;
-  color: string;
-  description: string;
-  is_active: boolean;
-}
 
 export function ExpenseView() {
   const currentStore = useCurrentStore();
-  const user = useUser();
   const { formatCurrency } = useTax();
 
-  const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [categories, setCategories] = useState<ExpenseCategory[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
-  const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({
-    from: undefined,
-    to: undefined,
-  });
+  // Use Zustand store state
+  const filteredExpenses = useFilteredExpenses();
+  const categories = useExpenseCategories();
+  const stats = useExpenseStats();
+  const loading = useExpenseStore(state => state.loading);
+  const filters = useExpenseStore(state => state.filters);
+  const selectedExpense = useExpenseStore(state => state.selectedExpense);
+  const currentTab = useExpenseStore(state => state.currentTab);
 
-  // Dialog states
-  const [showAddExpenseDialog, setShowAddExpenseDialog] = useState(false);
-  const [showEditExpenseDialog, setShowEditExpenseDialog] = useState(false);
-  const [showCategoriesView, setShowCategoriesView] = useState(false);
-  const [showExpenseDetails, setShowExpenseDetails] = useState(false);
-  const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
-  const [activeTab, setActiveTab] = useState("expenses");
+  // Dialog states from Zustand
+  const showAddExpenseDialog = useExpenseStore(state => state.showAddExpenseDialog);
+  const showEditExpenseDialog = useExpenseStore(state => state.showEditExpenseDialog);
+  const showCategoriesView = useExpenseStore(state => state.showCategoriesView);
+  const showExpenseDetailsModal = useExpenseStore(state => state.showExpenseDetailsModal);
 
-  // Summary stats
-  const [totalExpenses, setTotalExpenses] = useState(0);
-  const [monthlyExpenses, setMonthlyExpenses] = useState(0);
-  const [unpaidExpenses, setUnpaidExpenses] = useState(0);
-  const [taxDeductibleAmount, setTaxDeductibleAmount] = useState(0);
+  // Actions from Zustand
+  const setFilters = useExpenseStore(state => state.setFilters);
+  const setSelectedExpense = useExpenseStore(state => state.setSelectedExpense);
+  const setShowAddExpenseDialog = useExpenseStore(state => state.setShowAddExpenseDialog);
+  const setShowEditExpenseDialog = useExpenseStore(state => state.setShowEditExpenseDialog);
+  const setShowCategoriesView = useExpenseStore(state => state.setShowCategoriesView);
+  const setShowExpenseDetailsModal = useExpenseStore(state => state.setShowExpenseDetailsModal);
+  const setCurrentTab = useExpenseStore(state => state.setCurrentTab);
+  const fetchExpenses = useExpenseStore(state => state.fetchExpenses);
+  const fetchCategories = useExpenseStore(state => state.fetchCategories);
+  const deleteExpense = useExpenseStore(state => state.deleteExpense);
+  const exportExpenses = useExpenseStore(state => state.exportExpenses);
 
   useEffect(() => {
-    if (currentStore) {
-      fetchExpenses();
-      fetchCategories();
+    if (currentStore?.id) {
+      fetchExpenses(currentStore.id);
+      fetchCategories(currentStore.id);
     }
-  }, [currentStore]);
+  }, [currentStore?.id, fetchExpenses, fetchCategories]);
 
-  const fetchExpenses = async () => {
-    if (!currentStore) return;
-
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('expenses')
-        .select(`
-          *,
-          expense_categories (name, color)
-        `)
-        .eq('store_id', currentStore.id)
-        .order('expense_date', { ascending: false });
-
-      if (error) throw error;
-
-      setExpenses(data || []);
-      calculateSummaryStats(data || []);
-    } catch (error) {
-      console.error('Error fetching expenses:', error);
-      toast.error('Failed to load expenses');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchCategories = async () => {
-    if (!currentStore) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('expense_categories')
-        .select('*')
-        .eq('store_id', currentStore.id)
-        .eq('is_active', true)
-        .order('name');
-
-      if (error) throw error;
-
-      setCategories(data || []);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    }
-  };
-
-  const calculateSummaryStats = (expenseData: Expense[]) => {
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-
-    const total = expenseData.reduce((sum, expense) => sum + expense.amount, 0);
-    const monthly = expenseData
-      .filter(expense => {
-        const expenseDate = new Date(expense.expense_date);
-        return expenseDate.getMonth() === currentMonth && expenseDate.getFullYear() === currentYear;
-      })
-      .reduce((sum, expense) => sum + expense.amount, 0);
-    const unpaid = expenseData
-      .filter(expense => expense.status === 'pending')
-      .reduce((sum, expense) => sum + expense.amount, 0);
-
-    const taxDeductible = expenseData
-      .filter(expense => expense.is_tax_deductible)
-      .reduce((sum, expense) => sum + expense.amount, 0);
-
-    setTotalExpenses(total);
-    setMonthlyExpenses(monthly);
-    setUnpaidExpenses(unpaid);
-    setTaxDeductibleAmount(taxDeductible);
-  };
-
-  const filteredExpenses = expenses.filter(expense => {
-    const matchesSearch = 
-      expense.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      expense.expense_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      expense.vendor_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      expense.description?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesCategory = !selectedCategory || expense.expense_categories?.name === selectedCategory;
-    const matchesStatus = !selectedStatus || expense.status === selectedStatus;
-
-    const matchesDateRange = 
-      (!dateRange.from || new Date(expense.expense_date) >= dateRange.from) &&
-      (!dateRange.to || new Date(expense.expense_date) <= dateRange.to);
-
-    return matchesSearch && matchesCategory && matchesStatus && matchesDateRange;
-  });
 
   const handleEditExpense = (expense: Expense) => {
     setSelectedExpense(expense);
@@ -200,26 +92,13 @@ export function ExpenseView() {
 
   const handleViewExpense = (expense: Expense) => {
     setSelectedExpense(expense);
-    setShowExpenseDetails(true);
+    setShowExpenseDetailsModal(true);
   };
 
   const handleDeleteExpense = async (expense: Expense) => {
     if (!confirm(`Are you sure you want to delete expense "${expense.title}"?`)) return;
 
-    try {
-      const { error } = await supabase
-        .from('expenses')
-        .delete()
-        .eq('id', expense.id);
-
-      if (error) throw error;
-
-      toast.success('Expense deleted successfully');
-      fetchExpenses();
-    } catch (error) {
-      console.error('Error deleting expense:', error);
-      toast.error('Failed to delete expense');
-    }
+    await deleteExpense(expense.id);
   };
 
   const getStatusBadge = (status: string) => {
@@ -239,29 +118,7 @@ export function ExpenseView() {
     );
   };
 
-  const exportExpenses = () => {
-    const csvContent = [
-      ['Expense Number', 'Title', 'Category', 'Amount', 'Date', 'Status', 'Vendor', 'Payment Method'].join(','),
-      ...filteredExpenses.map(expense => [
-        expense.expense_number,
-        expense.title,
-        expense.expense_categories?.name || 'Uncategorized',
-        expense.amount,
-        expense.expense_date,
-        expense.status,
-        expense.vendor_name || '',
-        expense.payment_method
-      ].join(','))
-    ].join('\n');
 
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `expenses-${format(new Date(), 'yyyy-MM-dd')}.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-  };
 
   if (loading) {
     return (
@@ -272,42 +129,41 @@ export function ExpenseView() {
   }
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Expense Management</h1>
-          <p className="text-muted-foreground mt-2">
-            Track and manage your business expenses
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setShowCategoriesView(true)}
-          >
-            <FolderOpen className="w-4 h-4 mr-2" />
-            Manage Categories
-          </Button>
-          <Button
-            variant="outline"
-            onClick={exportExpenses}
-            disabled={filteredExpenses.length === 0}
-          >
-            <Download className="w-4 h-4 mr-2" />
-            Export
-          </Button>
-          <SecureButton
-            permission="create_expense"
-            onClick={() => setShowAddExpenseDialog(true)}
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add Expense
-          </SecureButton>
-        </div>
-      </div>
+    <PageLayout>
+      <PageHeader
+        title="Expense Management"
+        description="Track and manage your business expenses"
+        icon={<DollarSign className="w-8 h-8 text-primary" />}
+        actions={
+          <>
+            <Button
+              variant="outline"
+              onClick={() => setShowCategoriesView(true)}
+            >
+              <FolderOpen className="w-4 h-4 mr-2" />
+              Manage Categories
+            </Button>
+            <Button
+              variant="outline"
+              onClick={exportExpenses}
+              disabled={filteredExpenses.length === 0}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export
+            </Button>
+            <SecureButton
+              permission="manage_expenses"
+              onClick={() => setShowAddExpenseDialog(true)}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Expense
+            </SecureButton>
+          </>
+        }
+      />
 
       {/* Tabs */}
-      <Tabs defaultValue="expenses" value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <Tabs defaultValue="expenses" value={currentTab} onValueChange={(value) => setCurrentTab(value as "expenses" | "recurring")} className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-6">
           <TabsTrigger value="expenses">
             <Receipt className="w-4 h-4 mr-2" />
@@ -328,7 +184,7 @@ export function ExpenseView() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(totalExpenses)}</div>
+            <div className="text-2xl font-bold">{formatCurrency(stats.totalAmount)}</div>
             <p className="text-xs text-muted-foreground">All time</p>
           </CardContent>
         </Card>
@@ -339,7 +195,7 @@ export function ExpenseView() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(monthlyExpenses)}</div>
+            <div className="text-2xl font-bold">{formatCurrency(stats.monthlyTotal)}</div>
             <p className="text-xs text-muted-foreground">Current month expenses</p>
           </CardContent>
         </Card>
@@ -350,7 +206,7 @@ export function ExpenseView() {
             <AlertCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(unpaidExpenses)}</div>
+            <div className="text-2xl font-bold">{formatCurrency(stats.pendingAmount)}</div>
             <p className="text-xs text-muted-foreground">Pending payment</p>
           </CardContent>
         </Card>
@@ -361,7 +217,7 @@ export function ExpenseView() {
             <Receipt className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(taxDeductibleAmount)}</div>
+            <div className="text-2xl font-bold">{formatCurrency(stats.taxDeductibleAmount)}</div>
             <p className="text-xs text-muted-foreground">Eligible for deduction</p>
           </CardContent>
         </Card>
@@ -376,15 +232,15 @@ export function ExpenseView() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
                   placeholder="Search expenses by title, number, vendor, or description..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  value={filters.searchTerm}
+                  onChange={(e) => setFilters({ searchTerm: e.target.value })}
                   className="pl-10"
                 />
               </div>
             </div>
             
             <div className="flex flex-wrap gap-2">
-              <Select value={selectedCategory || "all"} onValueChange={(value) => setSelectedCategory(value === "all" ? null : value)}>
+              <Select value={filters.selectedCategory || "all"} onValueChange={(value) => setFilters({ selectedCategory: value === "all" ? null : value })}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
@@ -404,7 +260,7 @@ export function ExpenseView() {
                 </SelectContent>
               </Select>
 
-              <Select value={selectedStatus || "all"} onValueChange={(value) => setSelectedStatus(value === "all" ? null : value)}>
+              <Select value={filters.selectedStatus || "all"} onValueChange={(value) => setFilters({ selectedStatus: value === "all" ? null : value })}>
                 <SelectTrigger className="w-[140px]">
                   <SelectValue placeholder="All Status" />
                 </SelectTrigger>
@@ -419,14 +275,14 @@ export function ExpenseView() {
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="w-[240px] justify-start text-left font-normal">
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {dateRange.from ? (
-                      dateRange.to ? (
+                    {filters.dateRange.from ? (
+                      filters.dateRange.to ? (
                         <>
-                          {format(dateRange.from, "LLL dd, y")} -{" "}
-                          {format(dateRange.to, "LLL dd, y")}
+                          {format(filters.dateRange.from, "LLL dd, y")} -{" "}
+                          {format(filters.dateRange.to, "LLL dd, y")}
                         </>
                       ) : (
-                        format(dateRange.from, "LLL dd, y")
+                        format(filters.dateRange.from, "LLL dd, y")
                       )
                     ) : (
                       <span>Pick a date range</span>
@@ -437,9 +293,9 @@ export function ExpenseView() {
                   <Calendar
                     initialFocus
                     mode="range"
-                    defaultMonth={dateRange.from}
-                    selected={dateRange}
-                    onSelect={setDateRange}
+                    defaultMonth={filters.dateRange.from}
+                    selected={filters.dateRange}
+                    onSelect={(range) => setFilters({ dateRange: { from: range?.from, to: range?.to } })}
                     numberOfMonths={2}
                   />
                 </PopoverContent>
@@ -460,13 +316,13 @@ export function ExpenseView() {
               <Receipt className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-medium text-muted-foreground mb-2">No expenses found</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                {searchTerm || selectedCategory || selectedStatus || dateRange.from
+                {filters.searchTerm || filters.selectedCategory || filters.selectedStatus || filters.dateRange.from
                   ? "Try adjusting your filters"
                   : "Get started by adding your first expense"}
               </p>
-              {!searchTerm && !selectedCategory && !selectedStatus && !dateRange.from && (
+              {!filters.searchTerm && !filters.selectedCategory && !filters.selectedStatus && !filters.dateRange.from && (
                 <SecureButton
-                  permission="create_expense"
+                  permission="manage_expenses"
                   onClick={() => setShowAddExpenseDialog(true)}
                 >
                   <Plus className="w-4 h-4 mr-2" />
@@ -560,8 +416,8 @@ export function ExpenseView() {
 
         <TabsContent value="recurring">
           <RecurringExpensesView
-            categories={categories}
-            onExpenseAdded={fetchExpenses}
+            categories={categories.map(cat => ({ ...cat, description: cat.description || undefined }))}
+            onExpenseAdded={() => currentStore?.id && fetchExpenses(currentStore.id)}
           />
         </TabsContent>
       </Tabs>
@@ -570,29 +426,46 @@ export function ExpenseView() {
       <AddExpenseDialog
         open={showAddExpenseDialog}
         onOpenChange={setShowAddExpenseDialog}
-        onExpenseAdded={fetchExpenses}
-        categories={categories}
+        onExpenseAdded={() => currentStore?.id && fetchExpenses(currentStore.id)}
+        categories={categories.map(cat => ({ ...cat, description: cat.description || '' }))}
       />
 
       <EditExpenseDialog
         open={showEditExpenseDialog}
         onOpenChange={setShowEditExpenseDialog}
-        expense={selectedExpense}
-        onExpenseUpdated={fetchExpenses}
-        categories={categories}
+        expense={selectedExpense ? {
+          ...selectedExpense,
+          description: selectedExpense.description || '',
+          vendor_name: selectedExpense.vendor_name || '',
+          vendor_contact: selectedExpense.vendor_contact || '',
+          receipt_number: selectedExpense.receipt_number || '',
+          notes: selectedExpense.notes || '',
+          category_id: selectedExpense.category_id || undefined,
+          expense_categories: selectedExpense.expense_categories || undefined
+        } : null}
+        onExpenseUpdated={() => currentStore?.id && fetchExpenses(currentStore.id)}
+        categories={categories.map(cat => ({ ...cat, description: cat.description || '' }))}
       />
 
       <ExpenseCategoriesView
         open={showCategoriesView}
         onOpenChange={setShowCategoriesView}
-        onCategoriesUpdated={fetchCategories}
+        onCategoriesUpdated={() => currentStore?.id && fetchCategories(currentStore.id)}
       />
 
       <ExpenseDetailsModal
-        open={showExpenseDetails}
-        onOpenChange={setShowExpenseDetails}
-        expense={selectedExpense}
+        open={showExpenseDetailsModal}
+        onOpenChange={setShowExpenseDetailsModal}
+        expense={selectedExpense ? {
+          ...selectedExpense,
+          description: selectedExpense.description || '',
+          vendor_name: selectedExpense.vendor_name || '',
+          vendor_contact: selectedExpense.vendor_contact || '',
+          receipt_number: selectedExpense.receipt_number || '',
+          notes: selectedExpense.notes || '',
+          expense_categories: selectedExpense.expense_categories || undefined
+        } : null}
       />
-    </div>
+    </PageLayout>
   );
 }

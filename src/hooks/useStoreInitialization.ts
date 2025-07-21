@@ -1,32 +1,35 @@
 import { useEffect } from 'react';
-import { useAuthStore, useAuthInitialized } from '@/stores/authStore';
-import { useStoreStore } from '@/stores/storeStore';
+import { useAuthStore, useAuthInitialized, useUser } from '@/stores/authStore';
+import { useStoreStore, useRefreshStores, useSelectStore } from '@/stores/storeStore';
 import { usePermissionStore } from '@/stores/permissionStore';
 
 /**
- * Hook to initialize all Zustand stores
- * This replaces the complex provider chain with simple store initialization
+ * Simplified store initialization - directly load stores when user is ready
  */
 export function useStoreInitialization() {
   const authInitialized = useAuthInitialized();
   const authInitialize = useAuthStore((state) => state.initialize);
-  const storeInitialize = useStoreStore((state) => state.initialize);
-  const storeInitialized = useStoreStore((state) => state.initialized);
+  const user = useUser();
+
+  const stores = useStoreStore((state) => state.stores);
   const currentStore = useStoreStore((state) => state.currentStore);
+  const storeInitialized = useStoreStore((state) => state.initialized);
+  const refreshStores = useRefreshStores();
+  const selectStore = useSelectStore();
+
   const permissionInitialize = usePermissionStore((state) => state.loadPermissions);
   const permissionInitialized = usePermissionStore((state) => state.initialized);
 
+  // Initialize auth first
   useEffect(() => {
-    // Initialize auth store first
     let authCleanup: (() => void) | undefined;
-    
+
     const initializeAuth = async () => {
       authCleanup = await authInitialize();
     };
-    
+
     initializeAuth();
 
-    // Cleanup auth listener on unmount
     return () => {
       if (authCleanup) {
         authCleanup();
@@ -34,30 +37,67 @@ export function useStoreInitialization() {
     };
   }, [authInitialize]);
 
+  // Load stores directly when user is ready
   useEffect(() => {
-    // Initialize store after auth is ready
-    if (authInitialized && !storeInitialized) {
-      storeInitialize();
-    }
-  }, [authInitialized, storeInitialized, storeInitialize]);
+    const loadStores = async () => {
+      if (authInitialized && user && stores.length === 0) {
+        await refreshStores();
 
+        // Try to restore last selected store
+        const storedSelection = localStorage.getItem('storefy_selected_store');
+        if (storedSelection) {
+          try {
+            let storeId: string;
+            if (storedSelection.startsWith('{')) {
+              const parsed = JSON.parse(storedSelection);
+              storeId = parsed.storeId;
+              if (parsed.userId !== user.id) {
+                console.log('❌ Stored selection belongs to different user, clearing');
+                localStorage.removeItem('storefy_selected_store');
+                return;
+              }
+            } else {
+              storeId = storedSelection;
+            }
+
+            const state = useStoreStore.getState();
+            const store = state.stores.find(s => s.id === storeId);
+            if (store) {
+              selectStore(store.id);
+              return;
+            }
+          } catch (error) {
+            console.error('Error restoring store selection:', error);
+            localStorage.removeItem('storefy_selected_store');
+          }
+        }
+
+        // Auto-select single store if no restoration
+        const state = useStoreStore.getState();
+        if (state.stores.length === 1 && !state.currentStore) {
+          selectStore(state.stores[0].id);
+        }
+      }
+    };
+
+    loadStores();
+  }, [authInitialized, user, stores.length, refreshStores, selectStore]);
+
+  // Initialize permissions when user is ready
   useEffect(() => {
-    // Initialize permissions after both auth and store are ready
-    // Wait for store initialization to complete (which includes store restoration)
-    if (authInitialized && storeInitialized && !permissionInitialized) {
-      console.log('🔐 Initializing permissions after auth and store are ready');
-      console.log('🔐 Current store when initializing permissions:', currentStore?.name || 'none');
+    if (authInitialized && user && !permissionInitialized) {
+      console.log('🔐 Initializing permissions for user:', user.email);
       permissionInitialize();
     }
-  }, [authInitialized, storeInitialized, permissionInitialized, permissionInitialize, currentStore]);
+  }, [authInitialized, user, permissionInitialized, permissionInitialize]);
 
-  // Refresh permissions when store changes (after initial load)
+  // Refresh permissions when store changes
   useEffect(() => {
-    if (authInitialized && storeInitialized && permissionInitialized && currentStore) {
-      console.log('🔐 Store changed, refreshing permissions for:', currentStore.name);
+    if (authInitialized && user && permissionInitialized) {
+      console.log('🔐 Store changed, refreshing permissions for:', currentStore?.name || 'no store');
       permissionInitialize();
     }
-  }, [currentStore?.id, authInitialized, storeInitialized, permissionInitialized, permissionInitialize]);
+  }, [currentStore?.id, authInitialized, user, permissionInitialized, permissionInitialize]);
 
   return {
     isReady: authInitialized && storeInitialized && permissionInitialized,

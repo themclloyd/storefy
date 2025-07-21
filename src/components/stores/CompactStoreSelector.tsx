@@ -45,8 +45,49 @@ export function CompactStoreSelector() {
     }
   };
 
+  // If no current store, show selection UI
   if (!currentStore) {
-    return null;
+    if (stores.length === 0) {
+      return (
+        <div className="text-center py-4 space-y-3">
+          <Building2 className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+          <p className="text-sm text-muted-foreground">No stores found</p>
+          <p className="text-xs text-muted-foreground">Create your first store to get started</p>
+          <Button
+            size="sm"
+            onClick={() => window.location.href = '/app/stores'}
+            className="w-full"
+          >
+            Create Store
+          </Button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-3">
+        <p className="text-sm font-medium text-foreground">Select a store:</p>
+        {stores.map((store) => (
+          <Button
+            key={store.id}
+            variant="outline"
+            className="w-full justify-start"
+            onClick={() => selectStore(store.id)}
+          >
+            <Building2 className="w-4 h-4 mr-2" />
+            <div className="flex-1 text-left">
+              <div className="font-medium">{store.name}</div>
+              {store.address && (
+                <div className="text-xs text-muted-foreground">{store.address}</div>
+              )}
+            </div>
+            <Badge variant="default">
+              Owner
+            </Badge>
+          </Button>
+        ))}
+      </div>
+    );
   }
 
   // If only one store, show as static button

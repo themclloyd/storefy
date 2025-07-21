@@ -19,8 +19,9 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Search, Receipt, DollarSign, TrendingUp, Calendar as CalendarIcon, Download, Filter, Eye } from "lucide-react";
 import { format } from "date-fns";
+import { toast } from "sonner";
 import { TransactionDetailsModal } from "./TransactionDetailsModal";
-
+import { PageHeader, PageLayout } from "@/components/common/PageHeader";
 import { ErrorBoundary } from "../ErrorBoundary";
 
 
@@ -146,23 +147,18 @@ export function TransactionView() {
 
   return (
     <ErrorBoundary>
-      <div className="space-y-6 p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Transactions</h1>
-            <p className="text-muted-foreground mt-2">
-              View and manage all store transactions
-            </p>
-          </div>
-        </div>
-
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div></div>
-          <Button variant="outline" onClick={exportTransactions} disabled={filteredTransactions.length === 0}>
-            <Download className="w-4 h-4 mr-2" />
-            Export CSV
-          </Button>
-        </div>
+      <PageLayout>
+        <PageHeader
+          title="Transactions"
+          description="View and manage all store transactions"
+          icon={<Receipt className="w-8 h-8 text-primary" />}
+          actions={
+            <Button variant="outline" onClick={exportTransactions} disabled={filteredTransactions.length === 0}>
+              <Download className="w-4 h-4 mr-2" />
+              Export CSV
+            </Button>
+          }
+        />
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -418,7 +414,7 @@ export function TransactionView() {
               />
             )}
 
-      </div>
+      </PageLayout>
     </ErrorBoundary>
   );
 }

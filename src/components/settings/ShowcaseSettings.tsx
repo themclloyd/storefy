@@ -15,6 +15,14 @@ import { useUser } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { generateShowcaseUrl, generateUniqueSlug, updateStoreSlug } from "@/lib/showcase-utils";
+import {
+  useSettingsStore,
+  useShowcaseSettings,
+  useShowcaseTheme,
+  useShowcaseAnalytics,
+  useShowcaseLoading,
+  useShowcaseSaving
+} from "@/stores/settingsStore";
 
 interface ShowcaseTheme {
   primaryColor: string;
@@ -36,141 +44,43 @@ export function ShowcaseSettings({ onShowcaseStatusChange }: ShowcaseSettingsPro
   const currentStore = useCurrentStore();
   const user = useUser();
   const { updateCurrentStore } = useStoreStore();
-  
-  // Showcase settings state
-  const [enableShowcase, setEnableShowcase] = useState(false);
-  const [showcaseSlug, setShowcaseSlug] = useState('');
-  const [showcaseDescription, setShowcaseDescription] = useState('');
-  const [showcaseLogoUrl, setShowcaseLogoUrl] = useState('');
-  const [showcaseBannerUrl, setShowcaseBannerUrl] = useState('');
-  const [seoTitle, setSeoTitle] = useState('');
-  const [seoDescription, setSeoDescription] = useState('');
-  
-  // Theme settings
-  const [theme, setTheme] = useState<ShowcaseTheme>({
-    primaryColor: '#3b82f6',
-    secondaryColor: '#1e40af',
-    layout: 'grid'
-  });
-  
-  // Contact info settings
-  const [contactInfo, setContactInfo] = useState<ContactInfo>({
-    showPhone: true,
-    showEmail: true,
-    showAddress: true
-  });
-  
-  const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
+
+  // Use Zustand store for showcase settings
+  const showcaseSettings = useShowcaseSettings();
+  const showcaseTheme = useShowcaseTheme();
+  const showcaseAnalytics = useShowcaseAnalytics();
+  const showcaseLoading = useShowcaseLoading();
+  const showcaseSaving = useShowcaseSaving();
+  const setShowcaseSettings = useSettingsStore(state => state.setShowcaseSettings);
+  const loadShowcaseSettings = useSettingsStore(state => state.loadShowcaseSettings);
+  const saveShowcaseSettings = useSettingsStore(state => state.saveShowcaseSettings);
+  const loadShowcaseAnalytics = useSettingsStore(state => state.loadShowcaseAnalytics);
+  const updateShowcaseTheme = useSettingsStore(state => state.updateShowcaseTheme);
+  const resetShowcaseSettings = useSettingsStore(state => state.resetShowcaseSettings);
+
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
 
   useEffect(() => {
-    if (currentStore) {
-      loadShowcaseSettings();
-    }
-  }, [currentStore]);
-
-  const loadShowcaseSettings = async () => {
-    if (!currentStore) return;
-
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('stores')
-        .select(`
-          enable_public_showcase,
-          showcase_slug,
-          showcase_theme,
-          showcase_description,
-          showcase_logo_url,
-          showcase_banner_url,
-          showcase_contact_info,
-          showcase_seo_title,
-          showcase_seo_description
-        `)
-        .eq('id', currentStore.id)
-        .single();
-
-      if (error) throw error;
-
-      if (data) {
-        setEnableShowcase(data.enable_public_showcase || false);
-        setShowcaseSlug(data.showcase_slug || '');
-        setShowcaseDescription(data.showcase_description || '');
-        setShowcaseLogoUrl(data.showcase_logo_url || '');
-        setShowcaseBannerUrl(data.showcase_banner_url || '');
-        setSeoTitle(data.showcase_seo_title || '');
-        setSeoDescription(data.showcase_seo_description || '');
-        
-        if (data.showcase_theme) {
-          setTheme({ ...theme, ...data.showcase_theme });
-        }
-        
-        if (data.showcase_contact_info) {
-          setContactInfo({ ...contactInfo, ...data.showcase_contact_info });
-        }
+    if (currentStore?.id) {
+      loadShowcaseSettings(currentStore.id);
+      if (showcaseSettings.enableShowcase) {
+        loadShowcaseAnalytics(currentStore.id);
       }
-    } catch (error) {
-      console.error('Error loading showcase settings:', error);
-      toast.error('Failed to load showcase settings');
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [currentStore?.id, loadShowcaseSettings, loadShowcaseAnalytics, showcaseSettings.enableShowcase]);
 
-  const saveShowcaseSettings = async () => {
-    if (!currentStore) return;
 
-    setSaving(true);
-    try {
-      const { error } = await supabase
-        .from('stores')
-        .update({
-          showcase_slug: showcaseSlug.trim() || null,
-          showcase_theme: theme,
-          showcase_description: showcaseDescription.trim() || null,
-          showcase_logo_url: showcaseLogoUrl.trim() || null,
-          showcase_banner_url: showcaseBannerUrl.trim() || null,
-          showcase_contact_info: contactInfo,
-          showcase_seo_title: seoTitle.trim() || null,
-          showcase_seo_description: seoDescription.trim() || null,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', currentStore.id);
 
-      if (error) throw error;
+  const handleSaveShowcaseSettings = async () => {
+    if (!currentStore?.id) return;
+    await saveShowcaseSettings(currentStore.id);
 
-      toast.success('Showcase settings saved successfully!');
-
-      // Update store context if needed
-      const updatedStore = {
-        ...currentStore,
-        enable_public_showcase: enableShowcase,
-        showcase_theme: theme,
-        showcase_description: showcaseDescription.trim() || null,
-        showcase_logo_url: showcaseLogoUrl.trim() || null,
-        showcase_banner_url: showcaseBannerUrl.trim() || null,
-        showcase_contact_info: contactInfo,
-        showcase_seo_title: seoTitle.trim() || null,
-        showcase_seo_description: seoDescription.trim() || null
-      };
-      updateCurrentStore(updatedStore);
-
-      // Notify parent component of status change
-      onShowcaseStatusChange?.(enableShowcase);
-
-    } catch (error: any) {
-      console.error('Error saving showcase settings:', error);
-      toast.error(error.message || 'Failed to save showcase settings');
-    } finally {
-      setSaving(false);
-    }
   };
 
   const getShowcaseUrl = () => {
     if (!currentStore) return '';
     return generateShowcaseUrl({
-      showcase_slug: showcaseSlug,
+      showcase_slug: showcaseSettings.showcaseSlug,
       store_code: currentStore.store_code,
       id: currentStore.id
     });
@@ -189,7 +99,7 @@ export function ShowcaseSettings({ onShowcaseStatusChange }: ShowcaseSettingsPro
       const success = await updateStoreSlug(currentStore.id, newSlug);
 
       if (success) {
-        setShowcaseSlug(newSlug);
+        setShowcaseSettings({ showcaseSlug: newSlug });
         toast.success('Showcase slug generated successfully!');
       } else {
         toast.error('Failed to generate slug');
@@ -207,14 +117,14 @@ export function ShowcaseSettings({ onShowcaseStatusChange }: ShowcaseSettingsPro
   };
 
   const openShowcasePreview = () => {
-    if (enableShowcase) {
+    if (showcaseSettings.enableShowcase) {
       window.open(getShowcaseUrl(), '_blank');
     } else {
       setPreviewDialogOpen(true);
     }
   };
 
-  if (loading) {
+  if (showcaseLoading) {
     return (
       <Card>
         <CardContent className="flex items-center justify-center py-8">
@@ -245,18 +155,18 @@ export function ShowcaseSettings({ onShowcaseStatusChange }: ShowcaseSettingsPro
                 <Label className="text-base font-medium">
                   Showcase Status
                 </Label>
-                <Badge variant={enableShowcase ? "default" : "secondary"}>
-                  {enableShowcase ? "Active" : "Disabled"}
+                <Badge variant={showcaseSettings.enableShowcase ? "default" : "secondary"}>
+                  {showcaseSettings.enableShowcase ? "Active" : "Disabled"}
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground">
-                {enableShowcase
+                {showcaseSettings.enableShowcase
                   ? "Your showcase is live and customers can view your products"
                   : "Enable showcase from the Showcase page to start sharing your products"
                 }
               </p>
             </div>
-            {!enableShowcase && (
+            {!showcaseSettings.enableShowcase && (
               <Button
                 variant="outline"
                 onClick={() => window.location.href = '/showcase'}
@@ -271,7 +181,7 @@ export function ShowcaseSettings({ onShowcaseStatusChange }: ShowcaseSettingsPro
 
 
           {/* URL Management */}
-          {enableShowcase && (
+          {showcaseSettings.enableShowcase && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Showcase URLs & Links</h3>
 
@@ -308,7 +218,7 @@ export function ShowcaseSettings({ onShowcaseStatusChange }: ShowcaseSettingsPro
                     <Button
                       onClick={() => window.open(getShowcaseUrl(), '_blank')}
                       className="flex items-center gap-2"
-                      style={{ backgroundColor: theme.primaryColor }}
+                      style={{ backgroundColor: showcaseSettings.theme.primaryColor }}
                     >
                       <ExternalLink className="w-4 h-4" />
                       Visit Your Store Catalog
@@ -341,8 +251,8 @@ export function ShowcaseSettings({ onShowcaseStatusChange }: ShowcaseSettingsPro
                           /shop/
                         </span>
                         <Input
-                          value={showcaseSlug}
-                          onChange={(e) => setShowcaseSlug(e.target.value)}
+                          value={showcaseSettings.showcaseSlug}
+                          onChange={(e) => setShowcaseSettings({ showcaseSlug: e.target.value })}
                           placeholder="your-store-name"
                           className="rounded-l-none"
                         />
@@ -405,11 +315,79 @@ export function ShowcaseSettings({ onShowcaseStatusChange }: ShowcaseSettingsPro
                   </div>
                 )}
               </div>
+
+              {/* Showcase Analytics */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Showcase Analytics</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2">
+                        <Eye className="w-5 h-5 text-primary" />
+                        <div>
+                          <p className="text-sm text-muted-foreground">Total Views</p>
+                          <p className="text-2xl font-bold">{showcaseAnalytics.totalViews}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2">
+                        <Globe className="w-5 h-5 text-primary" />
+                        <div>
+                          <p className="text-sm text-muted-foreground">Unique Visitors</p>
+                          <p className="text-2xl font-bold">{showcaseAnalytics.uniqueVisitors}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2">
+                        <Activity className="w-5 h-5 text-primary" />
+                        <div>
+                          <p className="text-sm text-muted-foreground">Last Visited</p>
+                          <p className="text-sm font-medium">
+                            {showcaseAnalytics.lastVisited
+                              ? new Date(showcaseAnalytics.lastVisited).toLocaleDateString()
+                              : 'Never'
+                            }
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {showcaseAnalytics.popularProducts.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">Popular Products</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        {showcaseAnalytics.popularProducts.map((product, index) => (
+                          <div key={product.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/30">
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline">{index + 1}</Badge>
+                              <span className="font-medium">{product.name}</span>
+                            </div>
+                            <span className="text-sm text-muted-foreground">{product.views} views</span>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
             </div>
           )}
 
           {/* Configuration Tabs */}
-          {enableShowcase && (
+          {showcaseSettings.enableShowcase && (
             <Tabs defaultValue="basic" className="space-y-4">
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="basic">Basic Info</TabsTrigger>
@@ -428,8 +406,8 @@ export function ShowcaseSettings({ onShowcaseStatusChange }: ShowcaseSettingsPro
                     <Textarea
                       id="showcase-description"
                       placeholder="Describe your store for customers..."
-                      value={showcaseDescription}
-                      onChange={(e) => setShowcaseDescription(e.target.value)}
+                      value={showcaseSettings.showcaseDescription}
+                      onChange={(e) => setShowcaseSettings({ showcaseDescription: e.target.value })}
                       rows={3}
                     />
                     <p className="text-xs text-muted-foreground">
@@ -442,8 +420,8 @@ export function ShowcaseSettings({ onShowcaseStatusChange }: ShowcaseSettingsPro
                     <Input
                       id="showcase-logo"
                       placeholder="https://example.com/logo.png"
-                      value={showcaseLogoUrl}
-                      onChange={(e) => setShowcaseLogoUrl(e.target.value)}
+                      value={showcaseSettings.showcaseLogoUrl}
+                      onChange={(e) => setShowcaseSettings({ showcaseLogoUrl: e.target.value })}
                     />
                   </div>
                   
@@ -452,8 +430,8 @@ export function ShowcaseSettings({ onShowcaseStatusChange }: ShowcaseSettingsPro
                     <Input
                       id="showcase-banner"
                       placeholder="https://example.com/banner.jpg"
-                      value={showcaseBannerUrl}
-                      onChange={(e) => setShowcaseBannerUrl(e.target.value)}
+                      value={showcaseSettings.showcaseBannerUrl}
+                      onChange={(e) => setShowcaseSettings({ showcaseBannerUrl: e.target.value })}
                     />
                   </div>
                 </div>
@@ -464,7 +442,7 @@ export function ShowcaseSettings({ onShowcaseStatusChange }: ShowcaseSettingsPro
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label>Layout Style</Label>
-                    <Select value={theme.layout} onValueChange={(value: 'grid' | 'list' | 'masonry') => setTheme({...theme, layout: value})}>
+                    <Select value={showcaseSettings.theme.layout} onValueChange={(value: 'grid' | 'list' | 'masonry') => updateShowcaseTheme({ layout: value })}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -483,13 +461,13 @@ export function ShowcaseSettings({ onShowcaseStatusChange }: ShowcaseSettingsPro
                         <Input
                           id="primary-color"
                           type="color"
-                          value={theme.primaryColor}
-                          onChange={(e) => setTheme({...theme, primaryColor: e.target.value})}
+                          value={showcaseSettings.theme.primaryColor}
+                          onChange={(e) => updateShowcaseTheme({ primaryColor: e.target.value })}
                           className="w-16 h-10 p-1"
                         />
                         <Input
-                          value={theme.primaryColor}
-                          onChange={(e) => setTheme({...theme, primaryColor: e.target.value})}
+                          value={showcaseSettings.theme.primaryColor}
+                          onChange={(e) => updateShowcaseTheme({ primaryColor: e.target.value })}
                           placeholder="#3b82f6"
                         />
                       </div>
@@ -501,13 +479,13 @@ export function ShowcaseSettings({ onShowcaseStatusChange }: ShowcaseSettingsPro
                         <Input
                           id="secondary-color"
                           type="color"
-                          value={theme.secondaryColor}
-                          onChange={(e) => setTheme({...theme, secondaryColor: e.target.value})}
+                          value={showcaseSettings.theme.secondaryColor}
+                          onChange={(e) => updateShowcaseTheme({ secondaryColor: e.target.value })}
                           className="w-16 h-10 p-1"
                         />
                         <Input
-                          value={theme.secondaryColor}
-                          onChange={(e) => setTheme({...theme, secondaryColor: e.target.value})}
+                          value={showcaseSettings.theme.secondaryColor}
+                          onChange={(e) => updateShowcaseTheme({ secondaryColor: e.target.value })}
                           placeholder="#1e40af"
                         />
                       </div>
@@ -530,8 +508,8 @@ export function ShowcaseSettings({ onShowcaseStatusChange }: ShowcaseSettingsPro
                         <Label>Show Phone Number</Label>
                       </div>
                       <Switch
-                        checked={contactInfo.showPhone}
-                        onCheckedChange={(checked) => setContactInfo({...contactInfo, showPhone: checked})}
+                        checked={showcaseSettings.contactInfo.showPhone}
+                        onCheckedChange={(checked) => setShowcaseSettings({ contactInfo: { ...showcaseSettings.contactInfo, showPhone: checked } })}
                       />
                     </div>
                     
@@ -541,8 +519,8 @@ export function ShowcaseSettings({ onShowcaseStatusChange }: ShowcaseSettingsPro
                         <Label>Show Email Address</Label>
                       </div>
                       <Switch
-                        checked={contactInfo.showEmail}
-                        onCheckedChange={(checked) => setContactInfo({...contactInfo, showEmail: checked})}
+                        checked={showcaseSettings.contactInfo.showEmail}
+                        onCheckedChange={(checked) => setShowcaseSettings({ contactInfo: { ...showcaseSettings.contactInfo, showEmail: checked } })}
                       />
                     </div>
                     
@@ -552,8 +530,8 @@ export function ShowcaseSettings({ onShowcaseStatusChange }: ShowcaseSettingsPro
                         <Label>Show Address</Label>
                       </div>
                       <Switch
-                        checked={contactInfo.showAddress}
-                        onCheckedChange={(checked) => setContactInfo({...contactInfo, showAddress: checked})}
+                        checked={showcaseSettings.contactInfo.showAddress}
+                        onCheckedChange={(checked) => setShowcaseSettings({ contactInfo: { ...showcaseSettings.contactInfo, showAddress: checked } })}
                       />
                     </div>
                   </div>
@@ -568,12 +546,12 @@ export function ShowcaseSettings({ onShowcaseStatusChange }: ShowcaseSettingsPro
                     <Input
                       id="seo-title"
                       placeholder="Your Store Name - Product Catalog"
-                      value={seoTitle}
-                      onChange={(e) => setSeoTitle(e.target.value)}
+                      value={showcaseSettings.seoTitle}
+                      onChange={(e) => setShowcaseSettings({ seoTitle: e.target.value })}
                       maxLength={60}
                     />
                     <p className="text-xs text-muted-foreground">
-                      {seoTitle.length}/60 characters (recommended)
+                      {showcaseSettings.seoTitle.length}/60 characters (recommended)
                     </p>
                   </div>
                   
@@ -582,13 +560,13 @@ export function ShowcaseSettings({ onShowcaseStatusChange }: ShowcaseSettingsPro
                     <Textarea
                       id="seo-description"
                       placeholder="Browse our collection of products..."
-                      value={seoDescription}
-                      onChange={(e) => setSeoDescription(e.target.value)}
+                      value={showcaseSettings.seoDescription}
+                      onChange={(e) => setShowcaseSettings({ seoDescription: e.target.value })}
                       maxLength={160}
                       rows={3}
                     />
                     <p className="text-xs text-muted-foreground">
-                      {seoDescription.length}/160 characters (recommended)
+                      {showcaseSettings.seoDescription.length}/160 characters (recommended)
                     </p>
                   </div>
                 </div>
@@ -596,14 +574,25 @@ export function ShowcaseSettings({ onShowcaseStatusChange }: ShowcaseSettingsPro
             </Tabs>
           )}
 
-          {/* Save Button */}
-          <div className="border-t pt-4">
+          {/* Save & Reset Buttons */}
+          <div className="border-t pt-4 flex flex-col md:flex-row gap-3">
             <Button
-              onClick={saveShowcaseSettings}
-              disabled={saving}
-              className="w-full md:w-auto"
+              onClick={handleSaveShowcaseSettings}
+              disabled={showcaseSaving}
+              className="flex-1 md:flex-none"
             >
-              {saving ? 'Saving...' : 'Save Showcase Settings'}
+              {showcaseSaving ? 'Saving...' : 'Save Showcase Settings'}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                resetShowcaseSettings();
+                toast.success('Showcase settings reset to defaults');
+              }}
+              disabled={showcaseSaving}
+              className="flex-1 md:flex-none"
+            >
+              Reset to Defaults
             </Button>
           </div>
         </CardContent>
@@ -621,7 +610,7 @@ export function ShowcaseSettings({ onShowcaseStatusChange }: ShowcaseSettingsPro
           <div className="flex gap-2">
             <Button
               onClick={() => {
-                setEnableShowcase(true);
+                setShowcaseSettings({ enableShowcase: true });
                 setPreviewDialogOpen(false);
               }}
               className="flex-1"

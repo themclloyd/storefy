@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Globe, Eye, EyeOff, DollarSign, Package } from "lucide-react";
+import { formatCurrency } from "@/lib/taxUtils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -88,12 +89,7 @@ export function ProductPublicVisibilityDialog({
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    }).format(price);
+    return formatCurrency(price, 'USD');
   };
 
   if (!product) return null;

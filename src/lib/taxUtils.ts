@@ -233,18 +233,27 @@ export const WORLD_CURRENCIES = {
 } as const;
 
 /**
- * Format currency based on currency code
+ * Format number with comma separators
+ */
+export const formatNumber = (num: number, decimals: number = 0): string => {
+  return num.toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
+/**
+ * Format currency based on currency code with comma separators
  */
 export const formatCurrency = (amount: number, currency: string = 'MWK'): string => {
   const currencyInfo = WORLD_CURRENCIES[currency as keyof typeof WORLD_CURRENCIES];
 
   if (!currencyInfo) {
-    // Fallback for unknown currencies
-    return `${currency} ${amount.toFixed(2)}`;
+    // Fallback for unknown currencies with comma formatting
+    const formattedAmount = formatNumber(amount, 2);
+    return `${currency} ${formattedAmount}`;
   }
 
   const { symbol, decimals } = currencyInfo;
-  return `${symbol}${amount.toFixed(decimals)}`;
+  const formattedAmount = formatNumber(amount, decimals);
+  return `${symbol}${formattedAmount}`;
 };
 
 /**

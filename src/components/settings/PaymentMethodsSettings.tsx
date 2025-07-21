@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useCurrentStore } from "@/stores/storeStore";
+import { useCurrentStore, useStoreStore } from "@/stores/storeStore";
 import { useUser } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -12,13 +12,11 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { 
-  CreditCard, 
-  Plus, 
-  Edit, 
-  Trash2, 
+  CreditCard,
+  Plus,
+  Edit,
+  Trash2,
   DollarSign,
-  Building,
-  Hash,
   Eye,
   EyeOff
 } from "lucide-react";
@@ -35,7 +33,10 @@ interface PaymentMethod {
 export function PaymentMethodsSettings() {
   const currentStore = useCurrentStore();
   const user = useUser();
-  // Note: isOwner and canManage can be derived from permission store if needed
+  const { isOwner, userRole } = useStoreStore();
+
+  // Derive permissions
+  const canManage = isOwner || userRole === 'manager';
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);

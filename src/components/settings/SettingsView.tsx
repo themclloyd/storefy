@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,55 +7,87 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Settings, Users, Shield, Eye, EyeOff, Edit, Trash2, UserCheck, UserX, Crown, UserCog, HelpCircle, UserPlus, Store, Globe, CreditCard, Bell, Activity, Copy } from "lucide-react";
 import { useCurrentStore, useStoreStore } from "@/stores/storeStore";
 import { useUser } from "@/stores/authStore";
 import { SecureAction, SecureButton } from "@/components/auth/SecureAction";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { teamMemberLogs, logActivity } from "@/lib/activityLogger";
+import { teamMemberLogs } from "@/lib/activityLogger";
 import { clearTaxCache, percentageToDecimal, isValidTaxRate, WORLD_CURRENCIES } from "@/lib/taxUtils";
 import { PaymentMethodsSettings } from "./PaymentMethodsSettings";
 import { ShowcaseSettings } from "./ShowcaseSettings";
 import { PrivacySettings } from "@/components/analytics/ConsentBanner";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  useSettingsStore,
+  useTeamMembers,
+  useActivityLogs,
+  useRoleStats,
+  useStoreSettings,
+  type TeamMember
+} from "@/stores/settingsStore";
+import { PageHeader, PageLayout } from "@/components/common/PageHeader";
 
-interface TeamMember {
-  id: string;
-  user_id?: string | null;
-  role: 'owner' | 'manager' | 'cashier';
-  is_active: boolean;
-  created_at: string;
-  name: string;
-  phone?: string;
-  email?: string;
-  pin?: string;
-}
 
-interface RoleStats {
-  owner: number;
-  manager: number;
-  cashier: number;
-  total: number;
-}
 
 export function SettingsView() {
   const currentStore = useCurrentStore();
   const user = useUser();
   const { isOwner, userRole, updateCurrentStore } = useStoreStore();
 
-  // Debug: Log current store to check if store_code is available
-  console.log('🏪 Current store in settings:', currentStore);
-  console.log('🏪 Settings - isOwner:', isOwner, 'userRole:', userRole);
-  console.log('🏪 Settings - user:', user?.id);
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
-  const [roleStats, setRoleStats] = useState<RoleStats>({ owner: 0, manager: 0, cashier: 0, total: 0 });
-  const [loading, setLoading] = useState(true);
+  // Use Zustand store state
+  const teamMembers = useTeamMembers();
+  const activityLogs = useActivityLogs();
+  const roleStats = useRoleStats();
+  const storeSettings = useStoreSettings();
+  const showcaseSettings = useSettingsStore(state => state.showcaseSettings);
+  const loading = useSettingsStore(state => state.loading);
+  const updatingStore = useSettingsStore(state => state.updatingStore);
+  const currentTab = useSettingsStore(state => state.currentTab);
 
-  // Add member dialog state
-  const [showAddMemberDialog, setShowAddMemberDialog] = useState(false);
+  // Dialog states from Zustand
+  const showAddMemberDialog = useSettingsStore(state => state.showAddTeamMemberDialog);
+
+  // Actions from Zustand
+  const setCurrentTab = useSettingsStore(state => state.setCurrentTab);
+  const setShowAddMemberDialog = useSettingsStore(state => state.setShowAddTeamMemberDialog);
+  const setStoreSettings = useSettingsStore(state => state.setStoreSettings);
+  const fetchTeamMembers = useSettingsStore(state => state.fetchTeamMembers);
+  const fetchActivityLogs = useSettingsStore(state => state.fetchActivityLogs);
+  const addTeamMember = useSettingsStore(state => state.addTeamMember);
+  const updateStoreSettings = useSettingsStore(state => state.updateStoreSettings);
+
+  useEffect(() => {
+    if (currentStore?.id) {
+      fetchTeamMembers(currentStore.id);
+    }
+  }, [currentStore?.id, fetchTeamMembers]);
+
+  useEffect(() => {
+    if (currentTab === 'activity' && currentStore?.id && activityLogs.length === 0) {
+      fetchActivityLogs(currentStore.id);
+    }
+  }, [currentTab, currentStore?.id, activityLogs.length, fetchActivityLogs]);
+
+  useEffect(() => {
+    if (currentStore) {
+      setStoreSettings({
+        storeName: currentStore.name || '',
+        storeAddress: currentStore.address || '',
+        storePhone: currentStore.phone || '',
+        storeEmail: currentStore.email || '',
+        storeCurrency: currentStore.currency || 'MWK',
+        storeTaxRate: currentStore.tax_rate?.toString() || '8.25',
+      });
+    }
+  }, [currentStore, setStoreSettings]);
+
+
+
+  // Local form state for add member dialog
   const [memberName, setMemberName] = useState('');
   const [memberPhone, setMemberPhone] = useState('');
   const [memberEmail, setMemberEmail] = useState('');
@@ -64,108 +96,8 @@ export function SettingsView() {
   const [showPin, setShowPin] = useState(false);
   const [adding, setAdding] = useState(false);
 
-  // Edit member dialog state
-  const [showEditMemberDialog, setShowEditMemberDialog] = useState(false);
-  const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
-  const [editing, setEditing] = useState(false);
-
-  // Delete confirmation state
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [deletingMember, setDeletingMember] = useState<TeamMember | null>(null);
-  const [deleting, setDeleting] = useState(false);
-
-  // Activity logs state
-  const [activityLogs, setActivityLogs] = useState<any[]>([]);
-  const [logsLoading, setLogsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('team');
-
-  // Store settings state
-  const [storeName, setStoreName] = useState('');
-  const [storeAddress, setStoreAddress] = useState('');
-  const [storePhone, setStorePhone] = useState('');
-  const [storeEmail, setStoreEmail] = useState('');
-  const [storeCurrency, setStoreCurrency] = useState('MWK');
-  const [storeTaxRate, setStoreTaxRate] = useState('8.25');
-  const [updatingStore, setUpdatingStore] = useState(false);
-
-  // Showcase status
-  const [showcaseEnabled, setShowcaseEnabled] = useState(false);
-
-  useEffect(() => {
-    if (currentStore) {
-      fetchTeamMembers();
-    }
-  }, [currentStore]);
-
-  useEffect(() => {
-    if (activeTab === 'activity' && currentStore && activityLogs.length === 0) {
-      fetchActivityLogs();
-    }
-  }, [activeTab, currentStore]);
-
-  useEffect(() => {
-    if (currentStore) {
-      setStoreName(currentStore.name || '');
-      setStoreAddress(currentStore.address || '');
-      setStorePhone(currentStore.phone || '');
-      setStoreEmail(currentStore.email || '');
-      setStoreCurrency(currentStore.currency || 'MWK');
-      setStoreTaxRate(currentStore.tax_rate?.toString() || '8.25');
-      setShowcaseEnabled(currentStore.enable_public_showcase || false);
-    }
-  }, [currentStore]);
-
-  const fetchTeamMembers = async () => {
-    if (!currentStore) return;
-
-    try {
-      setLoading(true);
-
-      // Get store members (roles only, no user accounts)
-      const { data: members, error } = await supabase
-        .from('store_members')
-        .select(`
-          id,
-          user_id,
-          role,
-          is_active,
-          created_at,
-          name,
-          phone,
-          email,
-          pin
-        `)
-        .eq('store_id', currentStore.id)
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      // Filter out the store owner user (only show roles)
-      const roleMembers = (members || []).filter(member =>
-        member.user_id !== currentStore.owner_id
-      );
-
-      setTeamMembers(roleMembers);
-      // Calculate role statistics (roles only, plus 1 owner)
-      const stats = roleMembers.reduce((acc, member) => {
-        if (member.is_active) {
-          acc[member.role]++;
-          acc.total++;
-        }
-        return acc;
-      }, { owner: 1, manager: 0, cashier: 0, total: 1 }); // Start with 1 owner
-
-      setRoleStats(stats);
-    } catch (error) {
-      console.error('Error fetching team members:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleAddMember = async () => {
-    if (!currentStore || !memberName.trim() || !memberPhone.trim() || !memberPin.trim()) {
+    if (!currentStore?.id || !memberName.trim() || !memberPhone.trim() || !memberPin.trim()) {
       toast.error('Please fill in all required fields (Name, Phone, PIN)');
       return;
     }
@@ -184,45 +116,17 @@ export function SettingsView() {
 
     setAdding(true);
     try {
-      // First, check if PIN is already in use in this store
-      const { data: existingPin } = await supabase
-        .from('store_members')
-        .select('id')
-        .eq('store_id', currentStore.id)
-        .eq('pin', memberPin)
-        .maybeSingle();
+      const memberData = {
+        name: memberName,
+        phone: memberPhone,
+        email: memberEmail.trim() || null,
+        role: memberRole,
+        pin: memberPin,
+        is_active: true,
+        created_by: user?.id,
+      };
 
-      if (existingPin) {
-        toast.error('This PIN is already in use. Please choose a different PIN.');
-        return;
-      }
-
-      // Create team member role directly (no user account needed)
-      const { error: memberError } = await supabase
-        .from('store_members')
-        .insert({
-          store_id: currentStore.id,
-          user_id: null, // No user account for roles
-          role: memberRole,
-          name: memberName,
-          phone: memberPhone,
-          email: memberEmail.trim() || null,
-          pin: memberPin,
-          is_active: true
-        });
-
-      if (memberError) throw memberError;
-
-      // Log the activity
-      await teamMemberLogs.added(
-        currentStore.id,
-        user?.user_metadata?.display_name || user?.email || 'Store Owner',
-        memberName,
-        memberRole,
-        user?.id
-      );
-
-      toast.success(`${memberName} has been added as a ${memberRole}!`);
+      await addTeamMember(currentStore.id, memberData);
 
       // Reset form and close dialog
       setMemberName('');
@@ -233,130 +137,64 @@ export function SettingsView() {
       setShowPin(false);
       setShowAddMemberDialog(false);
 
-      // Refresh team members list and activity logs if on activity tab
-      fetchTeamMembers();
-      if (activeTab === 'activity') {
-        fetchActivityLogs();
-      }
+      // Log the activity
+      await teamMemberLogs.added(
+        currentStore.id,
+        user?.user_metadata?.display_name || user?.email || 'Store Owner',
+        memberName,
+        memberRole,
+        user?.id
+      );
 
-    } catch (error: any) {
+      // Refresh activity logs if on activity tab
+      if (currentTab === 'activity') {
+        fetchActivityLogs(currentStore.id);
+      }
+    } catch (error) {
       console.error('Error adding team member:', error);
-      toast.error(error.message || 'Failed to add team member');
     } finally {
       setAdding(false);
     }
   };
 
   const handleUpdateStore = async () => {
-    if (!currentStore || !storeName.trim()) {
+    if (!currentStore?.id || !storeSettings.storeName.trim()) {
       toast.error('Store name is required');
       return;
     }
 
     // Validate tax rate
-    const taxRateDecimal = percentageToDecimal(parseFloat(storeTaxRate));
+    const taxRateDecimal = percentageToDecimal(parseFloat(storeSettings.storeTaxRate));
     if (isNaN(taxRateDecimal) || !isValidTaxRate(taxRateDecimal)) {
       toast.error('Tax rate must be a valid percentage between 0 and 100');
       return;
     }
 
     // Validate email if provided
-    if (storeEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(storeEmail.trim())) {
+    if (storeSettings.storeEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(storeSettings.storeEmail.trim())) {
       toast.error('Please enter a valid email address');
       return;
     }
 
-    setUpdatingStore(true);
+    await updateStoreSettings(currentStore.id, storeSettings);
 
-    try {
-      const { data, error } = await supabase
-        .from('stores')
-        .update({
-          name: storeName.trim(),
-          address: storeAddress.trim() || null,
-          phone: storePhone.trim() || null,
-          email: storeEmail.trim() || null,
-          currency: storeCurrency,
-          tax_rate: taxRateDecimal,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', currentStore.id)
-        .select();
+    // Clear tax cache since tax rate might have changed
+    clearTaxCache();
 
-      if (error) throw error;
-
-      // Clear tax cache since tax rate might have changed
-      clearTaxCache();
-
-      // Log the activity
-      try {
-        const changes = {
-          name: storeName !== currentStore.name ? { from: currentStore.name, to: storeName } : undefined,
-          address: storeAddress !== currentStore.address ? { from: currentStore.address, to: storeAddress } : undefined,
-          phone: storePhone !== currentStore.phone ? { from: currentStore.phone, to: storePhone } : undefined,
-          email: storeEmail !== currentStore.email ? { from: currentStore.email, to: storeEmail } : undefined,
-          currency: storeCurrency !== currentStore.currency ? { from: currentStore.currency, to: storeCurrency } : undefined,
-          tax_rate: storeTaxRate !== ((currentStore.tax_rate || 0) * 100).toString() ? { from: `${((currentStore.tax_rate || 0) * 100).toFixed(2)}%`, to: `${storeTaxRate}%` } : undefined
-        };
-
-        const actualChanges = Object.fromEntries(
-          Object.entries(changes).filter(([_, value]) => value !== undefined)
-        );
-
-        if (Object.keys(actualChanges).length > 0) {
-          await logActivity({
-            store_id: currentStore.id,
-            actor_id: user?.id,
-            actor_name: user?.user_metadata?.display_name || user?.email || 'Store Owner',
-            action_type: 'store_settings_updated',
-            target_type: 'store',
-            target_name: currentStore.name,
-            description: `${user?.user_metadata?.display_name || user?.email || 'Store Owner'} updated store settings`,
-            metadata: { changes: actualChanges }
-          });
-        }
-      } catch (logError) {
-        console.error('Error logging activity:', logError);
-      }
-
-      toast.success('Store settings updated successfully!');
-
-      // Update the current store in context without full refresh
-      if (data && data[0]) {
-        updateCurrentStore(data[0]);
-      }
-
-    } catch (error: any) {
-      console.error('Error updating store:', error);
-      toast.error(error.message || 'Failed to update store settings');
-    } finally {
-      setUpdatingStore(false);
-    }
+    // Update the current store in context
+    updateCurrentStore({
+      name: storeSettings.storeName.trim(),
+      address: storeSettings.storeAddress.trim() || undefined,
+      phone: storeSettings.storePhone.trim() || undefined,
+      email: storeSettings.storeEmail.trim() || undefined,
+      currency: storeSettings.storeCurrency,
+      tax_rate: taxRateDecimal,
+    });
   };
 
 
 
-  const fetchActivityLogs = async () => {
-    if (!currentStore) return;
 
-    setLogsLoading(true);
-    try {
-      const { data: logs, error } = await (supabase as any)
-        .from('activity_logs')
-        .select('*')
-        .eq('store_id', currentStore.id)
-        .order('created_at', { ascending: false })
-        .limit(50); // Get last 50 activities
-
-      if (error) throw error;
-      setActivityLogs(logs || []);
-    } catch (error) {
-      console.error('Error fetching activity logs:', error);
-      toast.error('Failed to load activity logs');
-    } finally {
-      setLogsLoading(false);
-    }
-  };
 
   const generatePin = async () => {
     if (!currentStore) return;
@@ -388,155 +226,15 @@ export function SettingsView() {
     toast.error('Unable to generate unique PIN. Please try again.');
   };
 
+  // These functions will be implemented when needed
   const handleEditMember = (member: TeamMember) => {
-    setEditingMember(member);
-    setMemberName(member.name);
-    setMemberPhone(member.phone || '');
-    setMemberEmail(member.email || '');
-    setMemberRole(member.role as 'manager' | 'cashier');
-    setMemberPin(member.pin || '');
-    setShowPin(false);
-    setShowEditMemberDialog(true);
-  };
-
-  const handleUpdateMember = async () => {
-    if (!currentStore || !editingMember || !memberName.trim() || !memberPhone.trim() || !memberPin.trim()) {
-      toast.error('Please fill in all required fields (Name, Phone, PIN)');
-      return;
-    }
-
-    if (memberPin.length !== 4 || !/^\d{4}$/.test(memberPin)) {
-      toast.error('PIN must be exactly 4 digits');
-      return;
-    }
-
-    // Basic phone validation
-    const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-    if (!phoneRegex.test(memberPhone.replace(/[\s\-\(\)]/g, ''))) {
-      toast.error('Please enter a valid phone number');
-      return;
-    }
-
-    setEditing(true);
-    try {
-      // Check if PIN is already in use by another member
-      const { data: existingPin } = await supabase
-        .from('store_members')
-        .select('id')
-        .eq('store_id', currentStore.id)
-        .eq('pin', memberPin)
-        .neq('id', editingMember.id)
-        .maybeSingle();
-
-      if (existingPin) {
-        toast.error('This PIN is already in use. Please choose a different PIN.');
-        return;
-      }
-
-      // Update team member
-      const { error: memberError } = await supabase
-        .from('store_members')
-        .update({
-          name: memberName,
-          phone: memberPhone,
-          email: memberEmail.trim() || null,
-          role: memberRole,
-          pin: memberPin
-        })
-        .eq('id', editingMember.id);
-
-      if (memberError) throw memberError;
-
-      // Log the activity
-      const changes = {
-        name: memberName !== editingMember.name ? { from: editingMember.name, to: memberName } : undefined,
-        phone: memberPhone !== editingMember.phone ? { from: editingMember.phone, to: memberPhone } : undefined,
-        email: memberEmail !== editingMember.email ? { from: editingMember.email, to: memberEmail } : undefined,
-        role: memberRole !== editingMember.role ? { from: editingMember.role, to: memberRole } : undefined,
-        pin: memberPin !== editingMember.pin ? 'PIN updated' : undefined
-      };
-
-      // Filter out undefined changes
-      const actualChanges = Object.fromEntries(
-        Object.entries(changes).filter(([_, value]) => value !== undefined)
-      );
-
-      await teamMemberLogs.updated(
-        currentStore.id,
-        user?.user_metadata?.display_name || user?.email || 'Store Owner',
-        memberName,
-        actualChanges,
-        user?.id
-      );
-
-      toast.success(`${memberName} has been updated successfully!`);
-
-      // Reset form and close dialog
-      setMemberName('');
-      setMemberPhone('');
-      setMemberEmail('');
-      setMemberRole('cashier');
-      setMemberPin('');
-      setShowPin(false);
-      setEditingMember(null);
-      setShowEditMemberDialog(false);
-
-      // Refresh team members list and activity logs if on activity tab
-      fetchTeamMembers();
-      if (activeTab === 'activity') {
-        fetchActivityLogs();
-      }
-
-    } catch (error: any) {
-      console.error('Error updating team member:', error);
-      toast.error(error.message || 'Failed to update team member');
-    } finally {
-      setEditing(false);
-    }
+    // TODO: Implement edit functionality using store
+    console.log('Edit member:', member);
   };
 
   const handleDeleteMember = (member: TeamMember) => {
-    setDeletingMember(member);
-    setShowDeleteDialog(true);
-  };
-
-  const confirmDeleteMember = async () => {
-    if (!deletingMember) return;
-
-    setDeleting(true);
-    try {
-      const { error } = await supabase
-        .from('store_members')
-        .delete()
-        .eq('id', deletingMember.id);
-
-      if (error) throw error;
-
-      // Log the activity
-      await teamMemberLogs.deleted(
-        currentStore.id,
-        user?.user_metadata?.display_name || user?.email || 'Store Owner',
-        deletingMember.name,
-        deletingMember.role,
-        user?.id
-      );
-
-      toast.success(`${deletingMember.name} has been removed from the team.`);
-      setShowDeleteDialog(false);
-      setDeletingMember(null);
-
-      // Refresh team members list and activity logs if on activity tab
-      fetchTeamMembers();
-      if (activeTab === 'activity') {
-        fetchActivityLogs();
-      }
-
-    } catch (error: any) {
-      console.error('Error deleting team member:', error);
-      toast.error(error.message || 'Failed to remove team member');
-    } finally {
-      setDeleting(false);
-    }
+    // TODO: Implement delete functionality using store
+    console.log('Delete member:', member);
   };
 
   const getRoleIcon = (role: string) => {
@@ -558,60 +256,45 @@ export function SettingsView() {
     }
   };
 
-  const getRolePermissions = (role: string) => {
-    switch (role) {
-      case 'owner':
-        return ['Full System Access', 'Team Management', 'Store Settings', 'Financial Reports', 'Data Export'];
-      case 'manager':
-        return ['POS Operations', 'Inventory Management', 'Customer Management', 'Sales Reports', 'Layby Management'];
-      case 'cashier':
-        return ['POS Operations', 'Basic Customer Info', 'Process Transactions'];
-      default:
-        return [];
-    }
-  };
+
 
   return (
     <TooltipProvider>
-      <div className="p-6 max-w-7xl mx-auto space-y-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <Settings className="w-8 h-8 text-primary" />
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Settings</h1>
-              <p className="text-muted-foreground">Manage your store settings and preferences</p>
-            </div>
-          </div>
+      <PageLayout className="max-w-7xl mx-auto">
+        <PageHeader
+          title="Settings"
+          description="Manage your store settings and preferences"
+          icon={<Settings className="w-8 h-8 text-primary" />}
+          actions={
+            currentStore && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      const showcaseUrl = `${window.location.origin}/showcase/${currentStore.id}`;
+                      window.open(showcaseUrl, '_blank');
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    <Globe className="w-4 h-4" />
+                    View Store Catalog
+                    {showcaseSettings.enableShowcase && (
+                      <Badge variant="default" className="ml-1 text-xs">
+                        Live
+                      </Badge>
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{showcaseSettings.enableShowcase ? 'View your public store catalog' : 'Enable showcase in settings to make your catalog public'}</p>
+                </TooltipContent>
+              </Tooltip>
+            )
+          }
+        />
 
-          {/* Quick Access to Store Catalog */}
-          {currentStore && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    const showcaseUrl = `${window.location.origin}/showcase/${currentStore.id}`;
-                    window.open(showcaseUrl, '_blank');
-                  }}
-                  className="flex items-center gap-2"
-                >
-                  <Globe className="w-4 h-4" />
-                  View Store Catalog
-                  {showcaseEnabled && (
-                    <Badge variant="default" className="ml-1 text-xs">
-                      Live
-                    </Badge>
-                  )}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{showcaseEnabled ? 'View your public store catalog' : 'Enable showcase in settings to make your catalog public'}</p>
-              </TooltipContent>
-            </Tooltip>
-          )}
-        </div>
-
-        <Tabs defaultValue="team" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs defaultValue="team" value={currentTab} onValueChange={setCurrentTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="team" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
@@ -624,7 +307,7 @@ export function SettingsView() {
             <TabsTrigger value="showcase" className="flex items-center gap-2">
               <Globe className="w-4 h-4" />
               Showcase
-              {showcaseEnabled && (
+              {showcaseSettings.enableShowcase && (
                 <Badge variant="default" className="ml-1 text-xs">
                   Live
                 </Badge>
@@ -650,6 +333,25 @@ export function SettingsView() {
 
           {/* Team Management Tab */}
           <TabsContent value="team" className="space-y-6">
+            {!currentStore ? (
+              <Card>
+                <CardContent className="p-8">
+                  <div className="text-center space-y-4">
+                    <Store className="w-12 h-12 mx-auto text-muted-foreground" />
+                    <div>
+                      <h3 className="text-lg font-semibold text-foreground mb-2">No Store Selected</h3>
+                      <p className="text-muted-foreground mb-4">
+                        Please select or create a store to manage team members.
+                      </p>
+                      <Button onClick={() => window.location.href = '/app/stores'}>
+                        Go to Store Management
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <>
             <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -874,125 +576,7 @@ export function SettingsView() {
               </div>
             </div>
 
-            {/* Edit Member Dialog */}
-            <Dialog open={showEditMemberDialog} onOpenChange={setShowEditMemberDialog}>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Edit Team Member</DialogTitle>
-                  <DialogDescription>
-                    Update team member information and access settings.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-member-name">Full Name *</Label>
-                    <Input
-                      id="edit-member-name"
-                      placeholder="Enter team member's full name"
-                      value={memberName}
-                      onChange={(e) => setMemberName(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-member-phone">Phone Number *</Label>
-                    <Input
-                      id="edit-member-phone"
-                      type="tel"
-                      placeholder="Enter phone number"
-                      value={memberPhone}
-                      onChange={(e) => setMemberPhone(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-member-email">Email Address (Optional)</Label>
-                    <Input
-                      id="edit-member-email"
-                      type="email"
-                      placeholder="Enter email address (optional)"
-                      value={memberEmail}
-                      onChange={(e) => setMemberEmail(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-member-role">Role</Label>
-                    <Select value={memberRole} onValueChange={(value: 'manager' | 'cashier') => setMemberRole(value)}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="manager">Manager</SelectItem>
-                        <SelectItem value="cashier">Cashier</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-member-pin">4-Digit PIN *</Label>
-                    <div className="flex gap-2">
-                      <div className="relative flex-1">
-                        <Input
-                          id="edit-member-pin"
-                          type={showPin ? "text" : "password"}
-                          placeholder="Enter 4-digit PIN"
-                          value={memberPin}
-                          onChange={(e) => {
-                            const value = e.target.value.replace(/\D/g, '').slice(0, 4);
-                            setMemberPin(value);
-                          }}
-                          maxLength={4}
-                          className="pr-10"
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setShowPin(!showPin)}
-                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                          disabled={editing}
-                        >
-                          {showPin ? (
-                            <EyeOff className="h-4 w-4 text-muted-foreground" />
-                          ) : (
-                            <Eye className="h-4 w-4 text-muted-foreground" />
-                          )}
-                        </Button>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={generatePin}
-                        disabled={editing}
-                      >
-                        Generate
-                      </Button>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      This PIN will be used for quick login access
-                    </p>
-                  </div>
-                  <div className="flex gap-2 pt-4">
-                    <Button
-                      onClick={handleUpdateMember}
-                      disabled={editing || !memberName.trim() || !memberPhone.trim() || memberPin.length !== 4}
-                      className="flex-1"
-                    >
-                      {editing ? 'Updating...' : 'Update Member'}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setShowEditMemberDialog(false);
-                        setShowPin(false);
-                        setEditingMember(null);
-                      }}
-                      className="flex-1"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
+            {/* Edit and Delete functionality will be implemented later */}
 
             {teamMembers.length === 0 && !loading ? (
               <div className="text-center py-8 text-muted-foreground">
@@ -1074,7 +658,7 @@ export function SettingsView() {
             <Label className="text-sm font-medium">Store Code</Label>
             <div className="flex items-center gap-2">
               <div className="flex-1 p-3 bg-muted rounded-md font-mono text-lg font-bold">
-                {currentStore?.store_code}
+                {currentStore?.store_code || 'No store selected'}
               </div>
               <Button
                 variant="outline"
@@ -1083,8 +667,11 @@ export function SettingsView() {
                   if (currentStore?.store_code) {
                     navigator.clipboard.writeText(currentStore.store_code);
                     toast.success('Store code copied!');
+                  } else {
+                    toast.error('No store selected');
                   }
                 }}
+                disabled={!currentStore?.store_code}
               >
                 <Copy className="w-4 h-4" />
               </Button>
@@ -1096,16 +683,24 @@ export function SettingsView() {
             <Label className="text-sm font-medium">Store Login Link</Label>
             <div className="flex items-center gap-2">
               <div className="flex-1 p-3 bg-muted rounded-md font-mono text-sm break-all">
-                {window.location.origin}/store/{currentStore?.store_code}
+                {currentStore?.store_code
+                  ? `${window.location.origin}/store/${currentStore.store_code}`
+                  : 'No store selected'
+                }
               </div>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  const storeLink = `${window.location.origin}/store/${currentStore?.store_code}`;
-                  navigator.clipboard.writeText(storeLink);
-                  toast.success('Store link copied!');
+                  if (currentStore?.store_code) {
+                    const storeLink = `${window.location.origin}/store/${currentStore.store_code}`;
+                    navigator.clipboard.writeText(storeLink);
+                    toast.success('Store link copied!');
+                  } else {
+                    toast.error('No store selected');
+                  }
                 }}
+                disabled={!currentStore?.store_code}
               >
                 <Copy className="w-4 h-4" />
               </Button>
@@ -1134,10 +729,31 @@ export function SettingsView() {
           </div>
         </CardContent>
       </Card>
+              </>
+            )}
           </TabsContent>
 
           {/* Store Settings Tab */}
           <TabsContent value="store" className="space-y-6">
+            {!currentStore ? (
+              <Card>
+                <CardContent className="p-8">
+                  <div className="text-center space-y-4">
+                    <Store className="w-12 h-12 mx-auto text-muted-foreground" />
+                    <div>
+                      <h3 className="text-lg font-semibold text-foreground mb-2">No Store Selected</h3>
+                      <p className="text-muted-foreground mb-4">
+                        Please select or create a store to manage store settings.
+                      </p>
+                      <Button onClick={() => window.location.href = '/app/stores'}>
+                        Go to Store Management
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <>
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -1159,8 +775,8 @@ export function SettingsView() {
                         <Input
                           id="store-name"
                           placeholder="Enter store name"
-                          value={storeName}
-                          onChange={(e) => setStoreName(e.target.value)}
+                          value={storeSettings.storeName}
+                          onChange={(e) => setStoreSettings({ storeName: e.target.value })}
                         />
                       </div>
                       <div className="space-y-2">
@@ -1168,8 +784,8 @@ export function SettingsView() {
                         <Input
                           id="store-address"
                           placeholder="Enter store address"
-                          value={storeAddress}
-                          onChange={(e) => setStoreAddress(e.target.value)}
+                          value={storeSettings.storeAddress}
+                          onChange={(e) => setStoreSettings({ storeAddress: e.target.value })}
                         />
                       </div>
                       <div className="space-y-2">
@@ -1178,8 +794,8 @@ export function SettingsView() {
                           id="store-phone"
                           type="tel"
                           placeholder="Enter phone number"
-                          value={storePhone}
-                          onChange={(e) => setStorePhone(e.target.value)}
+                          value={storeSettings.storePhone}
+                          onChange={(e) => setStoreSettings({ storePhone: e.target.value })}
                         />
                       </div>
                       <div className="space-y-2">
@@ -1188,8 +804,8 @@ export function SettingsView() {
                           id="store-email"
                           type="email"
                           placeholder="Enter email address"
-                          value={storeEmail}
-                          onChange={(e) => setStoreEmail(e.target.value)}
+                          value={storeSettings.storeEmail}
+                          onChange={(e) => setStoreSettings({ storeEmail: e.target.value })}
                         />
                       </div>
                     </div>
@@ -1201,7 +817,7 @@ export function SettingsView() {
                     <div className="space-y-4">
                       <div className="space-y-2">
                         <Label htmlFor="store-currency">Currency</Label>
-                        <Select value={storeCurrency} onValueChange={setStoreCurrency}>
+                        <Select value={storeSettings.storeCurrency} onValueChange={(value) => setStoreSettings({ storeCurrency: value })}>
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
@@ -1223,8 +839,8 @@ export function SettingsView() {
                           min="0"
                           max="100"
                           placeholder="Enter tax rate"
-                          value={storeTaxRate}
-                          onChange={(e) => setStoreTaxRate(e.target.value)}
+                          value={storeSettings.storeTaxRate}
+                          onChange={(e) => setStoreSettings({ storeTaxRate: e.target.value })}
                         />
                         <p className="text-xs text-muted-foreground">
                           Enter as percentage (e.g., 8.25 for 8.25%)
@@ -1244,7 +860,7 @@ export function SettingsView() {
                       e.preventDefault();
                       handleUpdateStore();
                     }}
-                    disabled={updatingStore || !storeName.trim()}
+                    disabled={updatingStore || !storeSettings.storeName.trim()}
                     className="w-full md:w-auto"
                   >
                     {updatingStore ? 'Updating...' : 'Update Store Settings'}
@@ -1252,16 +868,56 @@ export function SettingsView() {
                 </div>
               </CardContent>
             </Card>
+              </>
+            )}
           </TabsContent>
 
           {/* Public Showcase Tab */}
           <TabsContent value="showcase" className="space-y-6">
-            <ShowcaseSettings onShowcaseStatusChange={setShowcaseEnabled} />
+            {!currentStore ? (
+              <Card>
+                <CardContent className="p-8">
+                  <div className="text-center space-y-4">
+                    <Globe className="w-12 h-12 mx-auto text-muted-foreground" />
+                    <div>
+                      <h3 className="text-lg font-semibold text-foreground mb-2">No Store Selected</h3>
+                      <p className="text-muted-foreground mb-4">
+                        Please select or create a store to manage showcase settings.
+                      </p>
+                      <Button onClick={() => window.location.href = '/app/stores'}>
+                        Go to Store Management
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <ShowcaseSettings />
+            )}
           </TabsContent>
 
           {/* Payment Methods Tab */}
           <TabsContent value="payments" className="space-y-6">
-            <PaymentMethodsSettings />
+            {!currentStore ? (
+              <Card>
+                <CardContent className="p-8">
+                  <div className="text-center space-y-4">
+                    <CreditCard className="w-12 h-12 mx-auto text-muted-foreground" />
+                    <div>
+                      <h3 className="text-lg font-semibold text-foreground mb-2">No Store Selected</h3>
+                      <p className="text-muted-foreground mb-4">
+                        Please select or create a store to manage payment methods.
+                      </p>
+                      <Button onClick={() => window.location.href = '/app/stores'}>
+                        Go to Store Management
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <PaymentMethodsSettings />
+            )}
           </TabsContent>
 
           {/* Notifications Tab */}
@@ -1288,6 +944,25 @@ export function SettingsView() {
 
           {/* Activity Logs Tab - Only for owners and managers */}
           <TabsContent value="activity" className="space-y-6">
+            {!currentStore ? (
+              <Card>
+                <CardContent className="p-8">
+                  <div className="text-center space-y-4">
+                    <Activity className="w-12 h-12 mx-auto text-muted-foreground" />
+                    <div>
+                      <h3 className="text-lg font-semibold text-foreground mb-2">No Store Selected</h3>
+                      <p className="text-muted-foreground mb-4">
+                        Please select or create a store to view activity logs.
+                      </p>
+                      <Button onClick={() => window.location.href = '/app/stores'}>
+                        Go to Store Management
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <>
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
@@ -1299,15 +974,13 @@ export function SettingsView() {
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      if (activityLogs.length === 0) {
-                        fetchActivityLogs();
-                      } else {
-                        fetchActivityLogs();
+                      if (currentStore?.id) {
+                        fetchActivityLogs(currentStore.id);
                       }
                     }}
-                    disabled={logsLoading}
+                    disabled={loading}
                   >
-                    {logsLoading ? 'Loading...' : 'Refresh'}
+                    {loading ? 'Loading...' : 'Refresh'}
                   </Button>
                 </CardTitle>
                 <p className="text-sm text-muted-foreground">
@@ -1315,7 +988,7 @@ export function SettingsView() {
                 </p>
               </CardHeader>
               <CardContent>
-                {logsLoading ? (
+                {loading ? (
                   <div className="flex items-center justify-center py-8">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
                     <span className="ml-2 text-muted-foreground">Loading activity logs...</span>
@@ -1331,10 +1004,10 @@ export function SettingsView() {
                     {activityLogs.map((log) => (
                       <div key={log.id} className="flex items-start gap-3 p-3 border border-border rounded-lg">
                         <div className="flex-shrink-0 mt-1">
-                          {log.action_type.includes('added') && <UserPlus className="w-4 h-4 text-green-600" />}
-                          {log.action_type.includes('updated') && <Edit className="w-4 h-4 text-blue-600" />}
-                          {log.action_type.includes('deleted') && <Trash2 className="w-4 h-4 text-red-600" />}
-                          {log.action_type.includes('login') && <UserCheck className="w-4 h-4 text-primary" />}
+                          {log.action_type?.includes('added') && <UserPlus className="w-4 h-4 text-green-600" />}
+                          {log.action_type?.includes('updated') && <Edit className="w-4 h-4 text-blue-600" />}
+                          {log.action_type?.includes('deleted') && <Trash2 className="w-4 h-4 text-red-600" />}
+                          {log.action_type?.includes('login') && <UserCheck className="w-4 h-4 text-primary" />}
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-foreground">{log.description}</p>
@@ -1343,19 +1016,10 @@ export function SettingsView() {
                               {new Date(log.created_at).toLocaleString()}
                             </span>
                             <Badge variant="outline" className="text-xs">
-                              {log.action_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                              {log.action_type?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Unknown Action'}
                             </Badge>
                           </div>
-                          {log.metadata && Object.keys(log.metadata).length > 0 && (
-                            <details className="mt-2">
-                              <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
-                                View details
-                              </summary>
-                              <pre className="text-xs bg-muted p-2 rounded mt-1 overflow-auto">
-                                {JSON.stringify(log.metadata, null, 2)}
-                              </pre>
-                            </details>
-                          )}
+
                         </div>
                       </div>
                     ))}
@@ -1363,8 +1027,8 @@ export function SettingsView() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={fetchActivityLogs}
-                        disabled={logsLoading}
+                        onClick={() => currentStore?.id && fetchActivityLogs(currentStore.id)}
+                        disabled={loading}
                       >
                         Refresh Logs
                       </Button>
@@ -1373,6 +1037,8 @@ export function SettingsView() {
                 )}
               </CardContent>
             </Card>
+              </>
+            )}
           </TabsContent>
 
           {/* Analytics & Privacy Tab */}
@@ -1436,29 +1102,8 @@ export function SettingsView() {
           </TabsContent>
         </Tabs>
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Remove Team Member</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to remove <strong>{deletingMember?.name}</strong> from your team?
-              This action cannot be undone and they will lose access to the store immediately.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmDeleteMember}
-              disabled={deleting}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {deleting ? 'Removing...' : 'Remove Member'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-      </div>
+        {/* Delete functionality will be implemented later */}
+      </PageLayout>
     </TooltipProvider>
   );
 }

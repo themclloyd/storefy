@@ -144,7 +144,7 @@ export const useStoreStore = create<StoreStore>()(
         refreshStores: async () => {
           try {
             set({ loading: true }, false, 'refreshStores:start');
-            
+
             const user = useAuthStore.getState().user;
             if (!user) {
               set({ stores: [], loading: false }, false, 'refreshStores:noUser');
@@ -158,8 +158,6 @@ export const useStoreStore = create<StoreStore>()(
 
             if (error) throw error;
 
-            console.log('🏪 Fetched stores:', stores);
-            console.log('🏪 First store owner_id:', stores?.[0]?.owner_id);
             set({ stores: stores || [], loading: false }, false, 'refreshStores:success');
           } catch (error) {
             console.error('Error refreshing stores:', error);
@@ -179,14 +177,14 @@ export const useStoreStore = create<StoreStore>()(
         },
 
         initialize: async () => {
+          console.log('🏪 ===== SIMPLE STORE INITIALIZE =====');
           try {
             set({ loading: true, initialized: false }, false, 'initialize:start');
-            
-            const user = useAuthStore.getState().user;
+
             const pinData = sessionManager.getPinSession();
-            
-            // Handle PIN session
-            if (pinData && !user) {
+
+            // Handle PIN session only
+            if (pinData) {
               const store = pinData.store;
               if (store) {
                 set({
@@ -202,68 +200,10 @@ export const useStoreStore = create<StoreStore>()(
                 return;
               }
             }
-            
-            // Handle regular user session
-            if (user) {
-              await get().refreshStores();
-              
-              // Try to restore last selected store
-              const storedSelection = localStorage.getItem('storefy_selected_store');
-              if (storedSelection) {
-                try {
-                  // Handle both old string format and new JSON format
-                  let storeId: string;
-                  if (storedSelection.startsWith('{')) {
-                    const parsed = JSON.parse(storedSelection);
-                    storeId = parsed.storeId;
-                    // Validate user matches
-                    if (parsed.userId !== user.id) {
-                      console.log('❌ Stored selection belongs to different user, clearing');
-                      localStorage.removeItem('storefy_selected_store');
-                      return;
-                    }
-                  } else {
-                    storeId = storedSelection;
-                  }
 
-                  const state = get();
-                  const store = state.stores.find(s => s.id === storeId);
-                  console.log('🔄 Restoring store - Available stores:', state.stores.length);
-                  console.log('🔄 Looking for store ID:', storeId);
-                  console.log('🔄 Found store for restoration:', store);
-                  console.log('🔄 Store owner_id during restoration:', store?.owner_id);
-                  if (store) {
-                    get().setCurrentStore(store);
-                    console.log('🔄 Restored store selection:', store.name);
-                  }
-                } catch (parseError) {
-                  console.error('Failed to parse stored selection:', parseError);
-                  localStorage.removeItem('storefy_selected_store');
-                }
-              }
+            // For regular users, initialization is handled by the hook
+            console.log('🏪 Regular user initialization handled by hook');
 
-              // Check if user needs to select a store
-              const state = get();
-              if (!state.currentStore && state.stores.length > 0) {
-                console.log('🏪 No store selected. User has', state.stores.length, 'store(s) available');
-                // For single store users, auto-select. For multi-store users, they need to choose
-                if (state.stores.length === 1) {
-                  console.log('🏪 Single store user, auto-selecting:', state.stores[0].name);
-                  get().setCurrentStore(state.stores[0]);
-                  // Persist the selection
-                  const selectionData = {
-                    storeId: state.stores[0].id,
-                    userId: user.id,
-                    timestamp: Date.now()
-                  };
-                  localStorage.setItem('storefy_selected_store', JSON.stringify(selectionData));
-                } else {
-                  console.log('🏪 Multi-store user, requires manual selection');
-                  // Don't auto-select for multi-store users - they should choose
-                }
-              }
-            }
-            
             set({ initialized: true }, false, 'initialize:complete');
           } catch (error) {
             console.error('Store initialization failed:', error);

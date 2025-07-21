@@ -1,6 +1,6 @@
 import React from 'react';
 import { useUser, useAuthLoading } from '@/stores/authStore';
-import { useStores, useStoreLoading } from '@/stores/storeStore';
+import { useStores, useStoreLoading, useCurrentStore } from '@/stores/storeStore';
 import { Navigate } from 'react-router-dom';
 import { PremiumStoreSelector } from '@/components/stores/PremiumStoreSelector';
 import { Loader2 } from 'lucide-react';
@@ -9,6 +9,7 @@ export default function StoreSelectionPage() {
   const user = useUser();
   const authLoading = useAuthLoading();
   const storeLoading = useStoreLoading();
+  const currentStore = useCurrentStore();
 
   // Check for PIN session
   const pinSession = localStorage.getItem('pin_session');

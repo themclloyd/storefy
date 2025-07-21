@@ -12,6 +12,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/taxUtils";
 import { generateShowcaseUrl } from "@/lib/showcase-utils";
+import {
+  useSettingsStore,
+  useShowcaseSettings,
+  useShowcaseAnalytics,
+  useShowcaseLoading,
+  useShowcaseSaving
+} from "@/stores/settingsStore";
 
 interface Product {
   id: string;
@@ -40,8 +47,17 @@ interface AnalyticsData {
 
 export function ShowcaseManagementView() {
   const currentStore = useCurrentStore();
-  const [showcaseEnabled, setShowcaseEnabled] = useState(false);
-  const [showcaseSlug, setShowcaseSlug] = useState("");
+
+  // Use Zustand store for showcase settings
+  const showcaseSettings = useShowcaseSettings();
+  const showcaseAnalytics = useShowcaseAnalytics();
+  const showcaseLoading = useShowcaseLoading();
+  const showcaseSaving = useShowcaseSaving();
+  const loadShowcaseSettings = useSettingsStore(state => state.loadShowcaseSettings);
+  const loadShowcaseAnalytics = useSettingsStore(state => state.loadShowcaseAnalytics);
+  const toggleShowcase = useSettingsStore(state => state.toggleShowcase);
+
+  // Local state for products and analytics (not in settings store)
   const [products, setProducts] = useState<Product[]>([]);
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -50,30 +66,15 @@ export function ShowcaseManagementView() {
   const [filterPublic, setFilterPublic] = useState<'all' | 'public' | 'private'>('all');
 
   useEffect(() => {
-    if (currentStore) {
-      loadShowcaseData();
+    if (currentStore?.id) {
+      loadShowcaseSettings(currentStore.id);
+      loadShowcaseAnalytics(currentStore.id);
       loadProducts();
       loadAnalytics();
     }
-  }, [currentStore]);
+  }, [currentStore?.id, loadShowcaseSettings, loadShowcaseAnalytics]);
 
-  const loadShowcaseData = async () => {
-    if (!currentStore) return;
 
-    try {
-      const { data, error } = await supabase
-        .from('stores')
-        .select('enable_public_showcase, showcase_slug')
-        .eq('id', currentStore.id)
-        .single();
-
-      if (error) throw error;
-      setShowcaseEnabled(data?.enable_public_showcase || false);
-      setShowcaseSlug(data?.showcase_slug || "");
-    } catch (error) {
-      console.error('Error loading showcase data:', error);
-    }
-  };
 
   const loadProducts = async () => {
     if (!currentStore) return;
@@ -223,7 +224,7 @@ export function ShowcaseManagementView() {
   const getShowcaseUrl = () => {
     if (!currentStore) return '';
     return generateShowcaseUrl({
-      showcase_slug: showcaseSlug,
+      showcase_slug: showcaseSettings.showcaseSlug,
       store_code: currentStore.store_code,
       id: currentStore.id
     });
@@ -231,23 +232,9 @@ export function ShowcaseManagementView() {
 
 
 
-  const toggleShowcase = async (enabled: boolean) => {
-    if (!currentStore) return;
-
-    try {
-      const { error } = await supabase
-        .from('stores')
-        .update({ enable_public_showcase: enabled })
-        .eq('id', currentStore.id);
-
-      if (error) throw error;
-
-      setShowcaseEnabled(enabled);
-      toast.success(enabled ? 'Public showcase enabled!' : 'Public showcase disabled!');
-    } catch (error) {
-      console.error('Error updating showcase:', error);
-      toast.error('Failed to update showcase settings');
-    }
+  const handleToggleShowcase = async (enabled: boolean) => {
+    if (!currentStore?.id) return;
+    await toggleShowcase(currentStore.id, enabled);
   };
 
   const filteredProducts = products.filter(product => {
@@ -275,7 +262,7 @@ export function ShowcaseManagementView() {
         </div>
 
         <div className="flex gap-2">
-          {showcaseEnabled && (
+          {showcaseSettings.enableShowcase && (
             <Button
               variant="outline"
               onClick={() => window.open(getShowcaseUrl(), '_blank')}
@@ -345,8 +332,8 @@ export function ShowcaseManagementView() {
             <div className="text-center">
               <div className="text-2xl font-bold text-primary">{publicProductsCount}</div>
               <p className="text-sm text-muted-foreground">Public Products</p>
-              <Badge variant={showcaseEnabled ? "default" : "secondary"} className="text-xs mt-1">
-                {showcaseEnabled ? "Live" : "Disabled"}
+              <Badge variant={showcaseSettings.enableShowcase ? "default" : "secondary"} className="text-xs mt-1">
+                {showcaseSettings.enableShowcase ? "Live" : "Disabled"}
               </Badge>
             </div>
           </CardContent>
@@ -385,8 +372,8 @@ export function ShowcaseManagementView() {
             </div>
             <Switch
               id="showcase-enabled"
-              checked={showcaseEnabled}
-              onCheckedChange={toggleShowcase}
+              checked={showcaseSettings.enableShowcase}
+              onCheckedChange={handleToggleShowcase}
             />
           </div>
         </CardContent>

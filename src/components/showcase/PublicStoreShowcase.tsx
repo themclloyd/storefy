@@ -1,218 +1,80 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Card, CardContent } from "@/components/ui/card";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Phone, Mail, MapPin, Store, ArrowLeft, Grid, List, Filter, ExternalLink } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { Search, Phone, Mail, MapPin, Store, ArrowLeft, Grid, List, ExternalLink } from "lucide-react";
 import { PublicProductGrid } from "./PublicProductGrid";
 import { PublicProductModal } from "./PublicProductModal";
-import { trackShowcaseView, trackProductClick, trackContactClick } from "@/lib/analytics-tracker";
+import {
+  usePublicShowcaseStore,
+  usePublicStore,
+  usePublicProducts,
+  usePublicCategories,
+  usePublicShowcaseLoading,
+  usePublicShowcaseFilters,
+  usePublicProductModal
+} from "@/stores/publicShowcaseStore";
 
-interface PublicStore {
-  id: string;
-  name: string;
-  address?: string;
-  phone?: string;
-  email?: string;
-  store_code?: string;
-  currency?: string;
-  showcase_slug?: string;
-  showcase_theme?: any;
-  showcase_description?: string;
-  showcase_logo_url?: string;
-  showcase_banner_url?: string;
-  showcase_contact_info?: any;
-  showcase_seo_title?: string;
-  showcase_seo_description?: string;
-  product_count: number;
-  category_count: number;
-}
-
-interface PublicProduct {
-  product_id: string;
-  product_name: string;
-  product_description?: string;
-  public_description?: string;
-  price: number;
-  stock_quantity: number;
-  image_url?: string;
-  category_name?: string;
-  category_id?: string;
-  show_stock_publicly: boolean;
-  show_price_publicly: boolean;
-  created_at: string;
-}
-
-interface PublicCategory {
-  category_id: string;
-  category_name: string;
-  product_count: number;
-}
+// Interfaces are now imported from the store
 
 export function PublicStoreShowcase() {
   const { storeId, storeCode, storeSlug } = useParams<{ storeId?: string; storeCode?: string; storeSlug?: string }>();
   const navigate = useNavigate();
-  
-  const [store, setStore] = useState<PublicStore | null>(null);
-  const [products, setProducts] = useState<PublicProduct[]>([]);
-  const [categories, setCategories] = useState<PublicCategory[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [productsLoading, setProductsLoading] = useState(false);
-  
-  // Filters and search
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  
-  // Product modal
-  const [selectedProduct, setSelectedProduct] = useState<PublicProduct | null>(null);
-  const [showProductModal, setShowProductModal] = useState(false);
+
+  // Zustand store state
+  const store = usePublicStore();
+  const products = usePublicProducts();
+  const categories = usePublicCategories();
+  const { storeLoading, productsLoading } = usePublicShowcaseLoading();
+  const { searchQuery, selectedCategory, viewMode } = usePublicShowcaseFilters();
+  const { selectedProduct, showProductModal } = usePublicProductModal();
+
+  // Zustand store actions
+  const {
+    loadStore,
+    loadProducts,
+    loadCategories,
+    setSearchQuery,
+    setSelectedCategory,
+    setViewMode,
+    selectProduct,
+    closeProductModal,
+    trackView,
+    trackContactClick,
+    reset
+  } = usePublicShowcaseStore();
 
   const storeIdentifier = storeId || storeCode || storeSlug;
 
   useEffect(() => {
     if (storeIdentifier) {
-      fetchStoreInfo();
-
-      // Track showcase view
-      trackShowcaseView(storeIdentifier, document.referrer);
+      loadStore(storeIdentifier);
+      trackView(storeIdentifier, document.referrer);
     }
-  }, [storeIdentifier]);
+
+    // Reset store when component unmounts
+    return () => reset();
+  }, [storeIdentifier, loadStore, trackView, reset]);
 
   useEffect(() => {
-    if (store) {
-      fetchProducts();
-      fetchCategories();
-      updatePageMeta();
+    if (store && storeIdentifier) {
+      loadProducts(storeIdentifier);
+      loadCategories(storeIdentifier);
     }
-  }, [store, selectedCategory, searchQuery]);
+  }, [store, storeIdentifier, selectedCategory, searchQuery, loadProducts, loadCategories]);
 
-  const fetchStoreInfo = async () => {
-    if (!storeIdentifier) return;
+  // Store loading is now handled by Zustand
 
-    try {
-      setLoading(true);
-      
-      const { data, error } = await supabase
-        .rpc('get_public_store_info', { store_identifier: storeIdentifier });
+  // Product and category loading is now handled by Zustand
 
-      if (error) throw error;
+  // Page meta updates are now handled by Zustand
 
-      if (!data || data.length === 0) {
-        toast.error('Store not found or showcase is not enabled');
-        navigate('/');
-        return;
-      }
-
-      const storeData = data[0];
-      setStore({
-        id: storeData.store_id,
-        name: storeData.store_name,
-        address: storeData.store_address,
-        phone: storeData.store_phone,
-        email: storeData.store_email,
-        store_code: storeData.store_code,
-        currency: storeData.store_currency || 'USD',
-        showcase_slug: storeData.showcase_slug,
-        showcase_theme: storeData.showcase_theme,
-        showcase_description: storeData.showcase_description,
-        showcase_logo_url: storeData.showcase_logo_url,
-        showcase_banner_url: storeData.showcase_banner_url,
-        showcase_contact_info: storeData.showcase_contact_info,
-        showcase_seo_title: storeData.showcase_seo_title,
-        showcase_seo_description: storeData.showcase_seo_description,
-        product_count: storeData.product_count,
-        category_count: storeData.category_count
-      });
-
-      // Set view mode from theme
-      if (storeData.showcase_theme?.layout) {
-        setViewMode(storeData.showcase_theme.layout === 'list' ? 'list' : 'grid');
-      }
-
-    } catch (error) {
-      console.error('Error fetching store info:', error);
-      toast.error('Failed to load store information');
-      navigate('/');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchProducts = async () => {
-    if (!storeIdentifier) return;
-
-    try {
-      setProductsLoading(true);
-      
-      const categoryFilter = selectedCategory === 'all' ? null : selectedCategory;
-      const searchFilter = searchQuery.trim() || null;
-
-      const { data, error } = await supabase
-        .rpc('get_public_products', {
-          store_identifier: storeIdentifier,
-          category_filter: categoryFilter,
-          search_query: searchFilter
-        });
-
-      if (error) throw error;
-
-      setProducts(data || []);
-
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      toast.error('Failed to load products');
-    } finally {
-      setProductsLoading(false);
-    }
-  };
-
-  const fetchCategories = async () => {
-    if (!storeIdentifier) return;
-
-    try {
-      const { data, error } = await supabase
-        .rpc('get_public_categories', { store_identifier: storeIdentifier });
-
-      if (error) throw error;
-
-      setCategories(data || []);
-
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    }
-  };
-
-  const updatePageMeta = () => {
-    if (!store) return;
-
-    // Update page title
-    document.title = store.showcase_seo_title || `${store.name} - Product Catalog`;
-
-    // Update meta description
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-      metaDescription.setAttribute('content', 
-        store.showcase_seo_description || 
-        store.showcase_description || 
-        `Browse products from ${store.name}`
-      );
-    }
-  };
-
-  const handleProductClick = (product: PublicProduct) => {
-    setSelectedProduct(product);
-    setShowProductModal(true);
-
-    // Track product click
-    if (storeIdentifier) {
-      trackProductClick(storeIdentifier, product.product_id);
-    }
+  const handleProductClick = (product: any) => {
+    selectProduct(product);
   };
 
   const getThemeColors = () => {
@@ -235,7 +97,7 @@ export function PublicStoreShowcase() {
     }
   };
 
-  if (loading) {
+  if (storeLoading) {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
@@ -306,7 +168,7 @@ export function PublicStoreShowcase() {
                   <a
                     href={`tel:${store.phone}`}
                     className="flex items-center gap-2 hover:opacity-80 transition-opacity justify-center md:justify-start"
-                    onClick={() => storeIdentifier && trackContactClick(storeIdentifier)}
+                    onClick={() => trackContactClick('phone')}
                   >
                     <Phone className="w-4 h-4" />
                     {store.phone}
@@ -316,7 +178,7 @@ export function PublicStoreShowcase() {
                   <a
                     href={`mailto:${store.email}`}
                     className="flex items-center gap-2 hover:opacity-80 transition-opacity justify-center md:justify-start"
-                    onClick={() => storeIdentifier && trackContactClick(storeIdentifier)}
+                    onClick={() => trackContactClick('email')}
                   >
                     <Mail className="w-4 h-4" />
                     {store.email}
@@ -430,7 +292,7 @@ export function PublicStoreShowcase() {
         <PublicProductModal
           product={selectedProduct}
           open={showProductModal}
-          onOpenChange={setShowProductModal}
+          onOpenChange={closeProductModal}
           storeInfo={store}
           themeColors={colors}
           storeCurrency={store.currency}

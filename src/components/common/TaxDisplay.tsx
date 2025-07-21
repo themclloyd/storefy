@@ -1,5 +1,5 @@
 import React from 'react';
-import { TaxCalculation } from '@/lib/taxUtils';
+import { TaxCalculation, formatNumber } from '@/lib/taxUtils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -106,8 +106,8 @@ export function TaxSummary({ calculations, title = "Tax Summary", className = ''
   
   // Get currency from first calculation (assuming all use same currency)
   const currency = calculations[0]?.formattedTotal.match(/^[^\d]+/)?.[0] || '$';
-  
-  const formatAmount = (amount: number) => `${currency}${amount.toFixed(2)}`;
+
+  const formatAmount = (amount: number) => `${currency}${formatNumber(amount, 2)}`;
 
   return (
     <Card className={className}>

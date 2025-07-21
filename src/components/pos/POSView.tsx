@@ -29,6 +29,7 @@ import { ReceiptDialog } from "./ReceiptDialog";
 import { OrderHistoryDialog } from "./OrderHistoryDialog";
 import { AddCustomerDialog } from "./AddCustomerDialog";
 import { useAnalytics } from "@/hooks/useAnalyticsTracking";
+import { PageHeader, PageLayout } from "@/components/common/PageHeader";
 
 // Interfaces are now imported from the POS store
 
@@ -490,15 +491,16 @@ export function POSView() {
 
   return (
     <>
-      <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 md:gap-6 h-full">
+      <PageLayout>
+        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 md:gap-6 h-full">
       {/* Products Section */}
       <div className="lg:col-span-2 space-y-4 md:space-y-6 flex-1">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">POS System</h1>
-            <p className="text-sm md:text-base text-muted-foreground mt-1 md:mt-2">Select products to add to cart</p>
-          </div>
-          <div className="flex items-center gap-2">
+        <PageHeader
+          title="POS System"
+          description="Select products to add to cart"
+          icon={<ShoppingCart className="w-8 h-8 text-primary" />}
+          actions={
+            <div className="flex items-center gap-2">
             {/* Mobile Cart Button */}
             <Sheet open={showMobileCart} onOpenChange={setShowMobileCart}>
               <SheetTrigger asChild>
@@ -520,18 +522,19 @@ export function POSView() {
               </SheetTrigger>
             </Sheet>
 
-            <Button
-              variant="outline"
-              onClick={() => setShowOrderHistory(true)}
-              className="flex items-center gap-2 w-full sm:w-auto"
-              size="sm"
-            >
-              <History className="w-4 h-4" />
-              <span className="hidden sm:inline">Order History</span>
-              <span className="sm:hidden">History</span>
-            </Button>
-          </div>
-        </div>
+              <Button
+                variant="outline"
+                onClick={() => setShowOrderHistory(true)}
+                className="flex items-center gap-2 w-full sm:w-auto"
+                size="sm"
+              >
+                <History className="w-4 h-4" />
+                <span className="hidden sm:inline">Order History</span>
+                <span className="sm:hidden">History</span>
+              </Button>
+            </div>
+          }
+        />
 
 
 
@@ -1190,9 +1193,10 @@ export function POSView() {
           </CardContent>
         </Card>
       </div>
-    </div>
+        </div>
+      </PageLayout>
 
-    {/* Receipt Dialog */}
+      {/* Receipt Dialog */}
     {lastOrder && (
       <ReceiptDialog
         open={showReceipt}

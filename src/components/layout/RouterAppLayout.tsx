@@ -3,6 +3,7 @@ import { Outlet, useLoaderData, useLocation, useNavigate } from 'react-router-do
 import { Sidebar } from '@/components/layout/Sidebar';
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { CompactStoreSelector } from '@/components/stores/CompactStoreSelector';
+import { useCurrentStore, useStores } from '@/stores/storeStore';
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { ThemeToggleButton } from '@/components/ui/theme-toggle';
 import { InlineLoading } from '@/components/ui/modern-loading';
@@ -20,6 +21,8 @@ export default function RouterAppLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const setPageLoading = usePageLoading();
+  const currentStore = useCurrentStore();
+  const stores = useStores();
 
   // Clear loading when layout mounts
   useEffect(() => {
@@ -39,6 +42,28 @@ export default function RouterAppLayout() {
     console.log('🔄 View change requested:', view);
     navigate(`/app/${view}`);
   };
+
+  // If no store is selected, show store selector or creation prompt
+  if (!currentStore) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="max-w-md w-full mx-auto p-6">
+          <div className="text-center mb-6">
+            <h1 className="text-2xl font-bold text-foreground mb-2">
+              {stores.length > 0 ? 'Select Your Store' : 'Welcome to Storefy'}
+            </h1>
+            <p className="text-muted-foreground">
+              {stores.length > 0
+                ? 'Choose a store to continue'
+                : 'Create your first store to get started'
+              }
+            </p>
+          </div>
+          <CompactStoreSelector />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <SidebarProvider defaultOpen={true}>

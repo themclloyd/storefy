@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
+import { PageLayout } from '@/components/common/PageHeader';
 import { subscriptionService } from '@/services/subscription';
 import { paychanguService } from '@/services/paychangu';
 
@@ -135,9 +136,10 @@ export default function PaymentResultPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-8">
-      <div className="max-w-md w-full px-4">
-        <Card>
+    <PageLayout>
+      <div className="flex items-center justify-center py-8">
+        <div className="max-w-md w-full px-4">
+          <Card>
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
               {getIcon()}
@@ -192,7 +194,8 @@ export default function PaymentResultPage() {
             </CardContent>
           </Card>
         )}
+        </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }

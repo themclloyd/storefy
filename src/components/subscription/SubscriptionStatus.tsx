@@ -3,11 +3,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { 
-  Calendar, 
-  CreditCard, 
-  AlertTriangle, 
-  CheckCircle, 
+import {
+  Calendar,
+  CreditCard,
+  AlertTriangle,
+  CheckCircle,
   XCircle,
   Users,
   Store,
@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useUser } from '@/stores/authStore';
 import { subscriptionService, UserSubscription, SubscriptionUsage } from '@/services/subscription';
+import { formatCurrency } from '@/lib/taxUtils';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
@@ -94,13 +95,6 @@ export function SubscriptionStatus() {
     return Math.min((current / max) * 100, 100);
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
-  };
-
   const handleTestPaymentConfirmation = async () => {
     if (!subscription) return;
 
@@ -170,7 +164,7 @@ export function SubscriptionStatus() {
               <CardDescription>{plan.description}</CardDescription>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold">{formatCurrency(plan.price_monthly)}</div>
+              <div className="text-2xl font-bold">{formatCurrency(plan.price_monthly, 'USD')}</div>
               <div className="text-sm text-muted-foreground">per month</div>
             </div>
           </div>
@@ -209,7 +203,7 @@ export function SubscriptionStatus() {
               <div>
                 <div className="text-sm font-medium">Last Payment</div>
                 <div className="text-sm text-muted-foreground">
-                  {formatCurrency(subscription.last_payment_amount || 0)} on {format(new Date(subscription.last_payment_date), 'MMM d, yyyy')}
+                  {formatCurrency(subscription.last_payment_amount || 0, 'USD')} on {format(new Date(subscription.last_payment_date), 'MMM d, yyyy')}
                 </div>
               </div>
             </div>
