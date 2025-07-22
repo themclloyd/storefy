@@ -25,10 +25,10 @@ export function PageHeader({
   return (
     <div className={cn(
       "flex flex-col sm:flex-row sm:items-center justify-between",
-      responsiveSpacing.gap.md,
+      responsiveSpacing.gap.sm,
       className
     )}>
-      <div className={cn("flex items-center", responsiveSpacing.gap.sm)}>
+      <div className={cn("flex items-center", responsiveSpacing.gap.xs)}>
         {icon && (
           <div className="flex-shrink-0">
             {icon}
@@ -40,7 +40,7 @@ export function PageHeader({
           </ResponsiveH1>
           {description && (
             <ResponsiveBodyText
-              className="text-muted-foreground mt-1"
+              className="text-muted-foreground mt-0.5"
               as="p"
             >
               {description}
@@ -68,7 +68,7 @@ interface PageLayoutProps {
 
 export function PageLayout({ children, className = "" }: PageLayoutProps) {
   return (
-    <div className={`space-y-4 sm:space-y-6 ${className}`}>
+    <div className={`h-full ${className}`}>
       {children}
     </div>
   );

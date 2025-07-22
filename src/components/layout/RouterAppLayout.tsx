@@ -77,9 +77,9 @@ export default function RouterAppLayout() {
         onViewChange={handleViewChange}
       />
       <SidebarInset>
-        <div className="flex-1 overflow-auto h-screen">
+        <div className="flex flex-col h-screen">
           {/* Header with hamburger menu and theme toggle */}
-          <header className="flex items-center justify-between p-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 sticky top-0 z-40">
+          <header className="flex items-center justify-between p-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 sticky top-0 z-40 flex-shrink-0">
             <div className="flex items-center gap-3">
               {/* Mobile Hamburger Menu */}
               <SidebarTrigger className={cn(touchFriendly.minTouch, "md:hidden")} />
@@ -109,9 +109,15 @@ export default function RouterAppLayout() {
             </div>
           </header>
 
-          {/* Main content with responsive padding */}
-          <div className={cn(responsiveSpacing.padding.sm)}>
-            <Outlet />
+          {/* Main content area - Full height with left spacing for box illusion */}
+          <div className="flex-1 overflow-hidden bg-muted/20">
+            <div className="h-full pl-4 md:pl-6 lg:pl-8 py-2">
+              <div className="h-full bg-background border-l border-border/40 rounded-tl-lg shadow-sm border-t border-border/20">
+                <div className="h-full p-3 md:p-4 lg:p-6">
+                  <Outlet />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </SidebarInset>
