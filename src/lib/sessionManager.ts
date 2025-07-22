@@ -320,20 +320,7 @@ class SessionManager {
     return info;
   }
 
-  /**
-   * Cleanup timers
-   */
-  public cleanup(): void {
-    if (this.activityTimer) {
-      clearInterval(this.activityTimer);
-      this.activityTimer = null;
-    }
-    
-    if (this.warningTimer) {
-      clearTimeout(this.warningTimer);
-      this.warningTimer = null;
-    }
-  }
+
 }
 
 export const sessionManager = SessionManager.getInstance();

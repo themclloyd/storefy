@@ -78,7 +78,7 @@ export const responsiveGrid = {
 export const responsiveContainer = {
   // Max widths
   sm: "max-w-sm mx-auto px-4 sm:px-6",
-  md: "max-w-md mx-auto px-4 sm:px-6", 
+  md: "max-w-md mx-auto px-4 sm:px-6",
   lg: "max-w-lg mx-auto px-4 sm:px-6",
   xl: "max-w-xl mx-auto px-4 sm:px-6",
   "2xl": "max-w-2xl mx-auto px-4 sm:px-6",
@@ -88,6 +88,48 @@ export const responsiveContainer = {
   "6xl": "max-w-6xl mx-auto px-4 sm:px-6",
   "7xl": "max-w-7xl mx-auto px-4 sm:px-6",
   full: "w-full px-4 sm:px-6 lg:px-8"
+}
+
+// Compact layout utilities - constrained widths for better readability
+export const compactContainer = {
+  // Compact max widths - prevents content from being too wide
+  sm: "max-w-sm mx-auto px-3 sm:px-4",
+  md: "max-w-md mx-auto px-3 sm:px-4",
+  lg: "max-w-2xl mx-auto px-3 sm:px-4",
+  xl: "max-w-4xl mx-auto px-3 sm:px-4",
+  "2xl": "max-w-5xl mx-auto px-3 sm:px-4",
+  "3xl": "max-w-6xl mx-3 sm:px-4",
+  content: "max-w-4xl mx-auto px-3 sm:px-4", // Default content width
+  wide: "max-w-6xl mx-auto px-3 sm:px-4", // For wider content like tables
+  narrow: "max-w-2xl mx-auto px-3 sm:px-4" // For forms and narrow content
+}
+
+// Compact spacing - balanced spacing for compact mode
+export const compactSpacing = {
+  // Padding classes - balanced reduction
+  padding: {
+    xs: "p-2 sm:p-3",
+    sm: "p-3 sm:p-4",
+    md: "p-4 sm:p-5",
+    lg: "p-5 sm:p-6",
+    xl: "p-6 sm:p-7"
+  },
+  // Margin classes - balanced reduction
+  margin: {
+    xs: "m-2 sm:m-3",
+    sm: "m-3 sm:m-4",
+    md: "m-4 sm:m-5",
+    lg: "m-5 sm:m-6",
+    xl: "m-6 sm:m-7"
+  },
+  // Gap classes for flex/grid - balanced reduction
+  gap: {
+    xs: "gap-2 sm:gap-3",
+    sm: "gap-3 sm:gap-4",
+    md: "gap-4 sm:gap-5",
+    lg: "gap-5 sm:gap-6",
+    xl: "gap-6 sm:gap-7"
+  }
 }
 
 // Responsive button utilities

@@ -3,9 +3,16 @@ import { useCurrentStore } from '@/stores/storeStore';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  BarChart3, ShoppingCart, Package, Users,
-  Receipt, Clock, CreditCard, Settings, Globe
-} from 'lucide-react';
+  ChartBarIcon,
+  ShoppingCartIcon,
+  CubeIcon,
+  UsersIcon,
+  ReceiptPercentIcon,
+  ClockIcon,
+  CreditCardIcon,
+  CogIcon,
+  GlobeAltIcon
+} from '@heroicons/react/24/solid';
 
 /**
  * Hook for checking if user has specific permission
@@ -168,15 +175,15 @@ export function useRoleBasedNavigation() {
     console.log('🔧 Navigation - User role:', userRole, 'Available pages:', availablePages);
 
     const navigationMap = {
-      dashboard: { label: 'Overview', icon: BarChart3 },
-      pos: { label: 'POS', icon: ShoppingCart },
-      inventory: { label: 'Inventory', icon: Package },
-      customers: { label: 'Customers', icon: Users },
-      layby: { label: 'Layby', icon: Clock },
-      transactions: { label: 'Transactions', icon: Receipt },
-      expenses: { label: 'Expenses', icon: CreditCard },
-      settings: { label: 'Settings', icon: Settings },
-      showcase: { label: 'Store Showcase', icon: Globe }
+      dashboard: { label: 'Overview', icon: ChartBarIcon },
+      pos: { label: 'POS', icon: ShoppingCartIcon },
+      inventory: { label: 'Inventory', icon: CubeIcon },
+      customers: { label: 'Customers', icon: UsersIcon },
+      layby: { label: 'Layby', icon: ClockIcon },
+      transactions: { label: 'Transactions', icon: ReceiptPercentIcon },
+      expenses: { label: 'Expenses', icon: CreditCardIcon },
+      settings: { label: 'Settings', icon: CogIcon },
+      showcase: { label: 'Store Showcase', icon: GlobeAltIcon }
     };
     
     return availablePages.map(page => ({
@@ -184,7 +191,7 @@ export function useRoleBasedNavigation() {
       ...navigationMap[page],
       // Fallback for unmapped pages
       label: navigationMap[page]?.label || page.charAt(0).toUpperCase() + page.slice(1),
-      icon: navigationMap[page]?.icon || Settings
+      icon: navigationMap[page]?.icon || CogIcon
     })).filter(item => item.icon); // Filter out items without icons
   };
   
