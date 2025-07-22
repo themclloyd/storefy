@@ -29,8 +29,7 @@ const StoreSelectionPage = lazy(() => import('@/pages/StoreSelectionPage'));
 const StoreShortLinkPage = lazy(() => import('@/pages/StoreShortLinkPage'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
-// Demo System - Completely separate from main app
-const DemoSystem = lazy(() => import('@/demo').then(m => ({ default: m.DemoSystem })));
+
 
 // Authentication loader
 async function authLoader(): Promise<{ user: any; session: any } | Response> {
@@ -369,11 +368,7 @@ export const router = createBrowserRouter([
     path: '/stores',
     loader: () => redirect('/app/stores'),
   },
-  // Completely separate demo system
-  {
-    path: '/demo/*',
-    element: <DemoSystem />,
-  },
+
   // 404 catch-all
   {
     path: '*',
