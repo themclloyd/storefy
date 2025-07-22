@@ -31,21 +31,7 @@ const NotFound = lazy(() => import('@/pages/NotFound'));
 
 
 
-// Authentication loader
-async function authLoader(): Promise<{ user: any; session: any } | Response> {
-  try {
-    const { data: { session }, error } = await supabase.auth.getSession();
-    if (error) throw error;
-    
-    return {
-      user: session?.user || null,
-      session: session || null
-    };
-  } catch (error) {
-    console.error('Auth loader error:', error);
-    return redirect('/auth');
-  }
-}
+
 
 // Protected route loader
 async function protectedLoader({ request }: LoaderFunctionArgs) {
