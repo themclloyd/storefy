@@ -18,6 +18,7 @@ const SuppliersView = lazy(() => import('@/components/inventory/SuppliersView').
 const CustomersView = lazy(() => import('@/components/customers/CustomersView').then(m => ({ default: m.CustomersView })));
 const LaybyView = lazy(() => import('@/components/layby/LaybyView').then(m => ({ default: m.LaybyView })));
 const TransactionView = lazy(() => import('@/components/transactions/TransactionView').then(m => ({ default: m.TransactionView })));
+const PublicOrdersView = lazy(() => import('@/components/orders/PublicOrdersView').then(m => ({ default: m.PublicOrdersView })));
 
 const ExpenseView = lazy(() => import('@/components/expenses/ExpenseView').then(m => ({ default: m.ExpenseView })));
 const ShowcaseView = lazy(() => import('@/components/showcase/ShowcaseManagementView').then(m => ({ default: m.ShowcaseManagementView })));
@@ -28,6 +29,9 @@ const PaymentResultPage = lazy(() => import('@/pages/PaymentResultPage'));
 const StoreSelectionPage = lazy(() => import('@/pages/StoreSelectionPage'));
 const StoreShortLinkPage = lazy(() => import('@/pages/StoreShortLinkPage'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
+
+// Design System Demo (Development)
+const DesignSystemDemo = lazy(() => import('@/components/test/DesignSystemDemo').then(m => ({ default: m.DesignSystemDemo })));
 
 
 
@@ -97,6 +101,10 @@ export const router = createBrowserRouter([
     path: '/pin-login',
     element: <PinLoginPage />,
   },
+  {
+    path: '/design-system',
+    element: <DesignSystemDemo />,
+  },
   // Public store showcase routes (no authentication required)
   {
     path: '/showcase/:storeId',
@@ -104,10 +112,6 @@ export const router = createBrowserRouter([
   },
   {
     path: '/store/:storeCode/catalog',
-    element: <PublicStoreShowcase />,
-  },
-  {
-    path: '/shop',
     element: <PublicStoreShowcase />,
   },
   {
@@ -242,6 +246,18 @@ export const router = createBrowserRouter([
       },
 
       {
+        path: 'orders',
+        element: <RouterAppLayout />,
+        loader: protectedLoader,
+        children: [
+          {
+            index: true,
+            element: <PublicOrdersView />,
+          },
+        ],
+      },
+
+      {
         path: 'expenses',
         element: <RouterAppLayout />,
         loader: protectedLoader,
@@ -332,6 +348,10 @@ export const router = createBrowserRouter([
   {
     path: '/transactions',
     loader: () => redirect('/app/transactions'),
+  },
+  {
+    path: '/orders',
+    loader: () => redirect('/app/orders'),
   },
   {
     path: '/reports',

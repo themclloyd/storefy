@@ -33,13 +33,14 @@ export type Permission =
   | 'manage_store'
   | 'system_admin';
 
-export type ProtectedPage = 
+export type ProtectedPage =
   | 'dashboard'
   | 'pos'
   | 'inventory'
   | 'categories'
   | 'suppliers'
   | 'customers'
+  | 'orders'
   | 'layby'
   | 'transactions'
   | 'reports'
@@ -187,17 +188,17 @@ export const usePermissionStore = create<PermissionStore>()(
 
           // Define page access based on role
           const ownerPages: ProtectedPage[] = [
-            'dashboard', 'pos', 'inventory', 'categories', 'suppliers', 'customers', 'layby', 
+            'dashboard', 'pos', 'inventory', 'categories', 'suppliers', 'customers', 'orders', 'layby',
             'transactions', 'reports', 'expenses', 'analytics', 'settings', 'showcase'
           ];
 
           const managerPages: ProtectedPage[] = [
-            'dashboard', 'pos', 'inventory', 'categories', 'suppliers', 'customers', 'layby', 
+            'dashboard', 'pos', 'inventory', 'categories', 'suppliers', 'customers', 'orders', 'layby',
             'transactions', 'reports', 'expenses', 'analytics'
           ];
 
           const cashierPages: ProtectedPage[] = [
-            'dashboard', 'pos', 'customers', 'layby', 'transactions'
+            'dashboard', 'pos', 'customers', 'orders', 'layby', 'transactions'
           ];
 
           // Apply permissions based on role

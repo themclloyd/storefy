@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,31 +12,28 @@ import {
   ArrowUpRight,
   Eye,
   BarChart3,
-  PieChart
+  PieChart,
+  RefreshCw
 } from 'lucide-react';
 import { useCurrentStore } from '@/stores/storeStore';
 import { useStoreData } from '@/hooks/useSupabaseClient';
 import { useTax } from '@/hooks/useTax';
-import { PageHeader, PageLayout } from '@/components/common/PageHeader';
 import { InlineLoading } from '@/components/ui/modern-loading';
-import { ResponsiveCardGrid } from '@/components/ui/responsive-table';
 import { useScreenSize } from '@/hooks/use-mobile';
-import { responsiveGrid, responsiveSpacing, responsiveText, touchFriendly } from '@/lib/responsive-utils';
+import { dashboardDesign, responsiveSpacing } from '@/lib/responsive-utils';
 import { cn } from '@/lib/utils';
-import {
-  ResponsiveContainer,
-  PieChart as RechartsPieChart,
-  Pie,
-  Cell,
-  BarChart,
-  Bar,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip
-} from 'recharts';
+
+// Import new modern components
+import { DashboardHeader } from './DashboardHeader';
+import { MetricCard, MetricCardsGrid, RevenueCard, OrdersCard, CustomersCard } from './MetricCard';
+import { ModernAreaChart, ModernBarChart, ModernPieChart } from './ChartComponents';
+import { DashboardGrid, GridItem, DashboardSection, TwoColumnLayout } from './DashboardGrid';
+import { QuickActionsPanel } from './QuickActionsPanel';
+import { MobileDashboard } from './MobileDashboard';
+import { DashboardInsights } from './DashboardInsights';
+import { DashboardCustomization } from './DashboardCustomization';
+import { useDashboardLayout } from '@/hooks/useDashboardLayout';
+import { DashboardWidgetRenderer, getWidgetGridClasses } from './DashboardWidgetRenderer';
 
 interface DashboardProps {
   onViewChange: (view: string) => void;
@@ -75,6 +72,8 @@ export function SimpleDashboard({ onViewChange }: DashboardProps) {
   const { formatCurrency } = useTax();
   const { isMobile, isTablet } = useScreenSize();
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<string>('');
   const [stats, setStats] = useState<DashboardStats>({
     totalRevenue: 0,
     totalOrders: 0,
@@ -88,18 +87,51 @@ export function SimpleDashboard({ onViewChange }: DashboardProps) {
     weeklyRevenue: []
   });
 
+  // Dashboard layout management
+  const {
+    currentLayout,
+    saveLayout,
+    setCurrentLayout
+  } = useDashboardLayout();
+
   useEffect(() => {
     if ((currentStore && !isPinSession) || (currentStoreId && isPinSession)) {
       fetchDashboardData();
     }
   }, [currentStore, currentStoreId, isPinSession]);
 
-  const fetchDashboardData = async () => {
+  // Auto-refresh based on layout settings
+  useEffect(() => {
+    if (currentLayout.refreshInterval === 0) return; // No auto-refresh
+
+    const interval = setInterval(() => {
+      if ((currentStore && !isPinSession) || (currentStoreId && isPinSession)) {
+        fetchDashboardData(true);
+      }
+    }, currentLayout.refreshInterval * 1000);
+
+    return () => clearInterval(interval);
+  }, [currentStore, currentStoreId, isPinSession, currentLayout.refreshInterval]);
+
+  const handleRefresh = useCallback(() => {
+    fetchDashboardData(true);
+  }, []);
+
+  const handleExport = useCallback(() => {
+    // Export dashboard data as CSV or PDF
+    console.log('Exporting dashboard data...');
+  }, []);
+
+  const fetchDashboardData = async (isRefresh = false) => {
     const storeId = currentStoreId || currentStore?.id;
     if (!storeId) return;
 
     try {
-      setLoading(true);
+      if (isRefresh) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
       
       const today = new Date().toISOString().split('T')[0];
 
@@ -193,227 +225,148 @@ export function SimpleDashboard({ onViewChange }: DashboardProps) {
         salesByCategory,
         weeklyRevenue
       });
+
+      // Update last updated timestamp
+      setLastUpdated(new Date().toLocaleTimeString());
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
   if (loading) {
-    return <InlineLoading text="Loading dashboard..." size="lg" />;
+    return (
+      <div className="h-full flex items-center justify-center">
+        <InlineLoading text="Loading dashboard..." size="lg" />
+      </div>
+    );
+  }
+
+  // Prepare chart data
+  const revenueChartData = stats.weeklyRevenue.map(item => ({
+    name: item.day,
+    revenue: item.revenue,
+    orders: item.orders
+  }));
+
+  const categoryChartData = stats.salesByCategory.map(item => ({
+    name: item.name,
+    value: item.value,
+    color: item.color
+  }));
+
+  // Mobile-first approach
+  if (isMobile) {
+    return (
+      <div className="h-full w-full overflow-auto">
+        <DashboardHeader
+          title="Dashboard"
+          onRefresh={handleRefresh}
+          onExport={handleExport}
+          isLoading={refreshing}
+          lastUpdated={lastUpdated}
+        />
+        <div className="w-full px-4 py-4">
+          <MobileDashboard
+            stats={stats}
+            formatCurrency={formatCurrency}
+            onViewChange={onViewChange}
+          />
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="h-full p-6 bg-background">
-      {/* Header Section */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground mb-1">
-              Hi, here's what's happening in your store
-            </h1>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="text-xs">Today</Button>
-            <Button variant="outline" size="sm" className="text-xs">This Week</Button>
-            <Button variant="outline" size="sm" className="text-xs">This Month</Button>
-            <Button
-              onClick={() => onViewChange('reports')}
-              variant="outline"
-              size="sm"
-              className="text-xs"
-            >
-              All Reports
-            </Button>
-          </div>
-        </div>
-      </div>
+    <div className="h-full w-full overflow-auto">
+      {/* Modern Dashboard Header */}
+      <DashboardHeader
+        title="Dashboard"
+        onRefresh={handleRefresh}
+        onExport={handleExport}
+        isLoading={refreshing}
+        lastUpdated={lastUpdated}
+        customizationComponent={
+          <DashboardCustomization
+            currentLayout={currentLayout}
+            onLayoutChange={setCurrentLayout}
+            onSaveLayout={saveLayout}
+          />
+        }
+      />
 
-      {/* Main Content Grid */}
-      <div className="h-[calc(100%-120px)] grid grid-cols-12 gap-6">
-        {/* Left Column - Main Metrics */}
-        <div className="col-span-8 space-y-6">
-          {/* Hero Metrics */}
-          <div className="grid grid-cols-3 gap-6">
-            {/* Primary Revenue Metric */}
-            <Card className="p-6">
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">This month your store has sold</p>
-                <p className="text-3xl font-bold">{formatCurrency(stats.totalRevenue)}</p>
-                <p className="text-sm text-muted-foreground">
-                  That's {formatCurrency(stats.todayRevenue)} more than this time last month!
-                </p>
+      {/* Main Dashboard Content */}
+      <div className="flex-1 w-full px-6 py-6">
+        {/* Dynamic Widget Grid based on Layout */}
+        <div className={cn(
+          'grid gap-6',
+          currentLayout.compactMode ? 'gap-4' : 'gap-6',
+          'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+        )}>
+          {currentLayout.widgets
+            .filter(widget => widget.enabled)
+            .sort((a, b) => {
+              // Sort by row first, then by column
+              if (a.position.row !== b.position.row) {
+                return a.position.row - b.position.row;
+              }
+              return a.position.col - b.position.col;
+            })
+            .map((widget) => (
+              <div
+                key={widget.id}
+                className={getWidgetGridClasses(widget)}
+              >
+                <DashboardWidgetRenderer
+                  widget={widget}
+                  stats={stats}
+                  formatCurrency={formatCurrency}
+                  onViewChange={onViewChange}
+                  onRefresh={handleRefresh}
+                  onExport={handleExport}
+                />
               </div>
-            </Card>
-
-            {/* All Orders Chart */}
-            <Card className="p-6">
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">All Orders</p>
-                  <div className="h-16 mt-2">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={stats.weeklyRevenue.slice(0, 7)} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-                        <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[2, 2, 0, 0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-            {/* Average Sale Value */}
-            <Card className="p-6">
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">Average Sale Value</p>
-                <p className="text-3xl font-bold">
-                  {stats.totalOrders > 0 ? formatCurrency(stats.totalRevenue / stats.totalOrders) : formatCurrency(0)}
-                </p>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Average Items per Sale</p>
-                  <p className="text-xl font-semibold">{stats.totalOrders > 0 ? Math.round(stats.totalProducts / Math.max(stats.totalOrders, 1)) : 0}</p>
-                  <p className="text-xs text-muted-foreground">0.95 items than last month</p>
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          {/* Main Chart Section */}
-          <Card className="p-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Your Sales this Month</h3>
-                <Button variant="ghost" size="sm" className="text-xs text-muted-foreground">
-                  SHOW MORE RETAIL METRICS
-                </Button>
-              </div>
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={stats.weeklyRevenue} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1}/>
-                      </linearGradient>
-                    </defs>
-                    <XAxis
-                      dataKey="day"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
-                    />
-                    <YAxis hide />
-                    <Tooltip
-                      content={({ active, payload, label }) => {
-                        if (active && payload && payload.length) {
-                          return (
-                            <div className="bg-background border rounded-lg p-3 shadow-lg">
-                              <p className="text-sm font-medium">{label}</p>
-                              <p className="text-sm text-primary">
-                                Revenue: {formatCurrency(payload[0].value as number)}
-                              </p>
-                            </div>
-                          );
-                        }
-                        return null;
-                      }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="revenue"
-                      stroke="hsl(var(--primary))"
-                      strokeWidth={2}
-                      fillOpacity={1}
-                      fill="url(#colorRevenue)"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </Card>
-
-          {/* Bottom Metrics Row */}
-          <div className="grid grid-cols-3 gap-6">
-            <Card className="p-6">
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">Your Sales Targets</p>
-                <p className="text-3xl font-bold">{formatCurrency(800.80)}</p>
-                <Button variant="link" className="p-0 h-auto text-xs text-primary">
-                  Set a sales target
-                </Button>
-              </div>
-            </Card>
-
-            <Card className="p-6">
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">Average Sales Targets</p>
-                <p className="text-3xl font-bold">{formatCurrency(stats.totalRevenue / Math.max(stats.totalOrders, 1))}</p>
-                <p className="text-xs text-muted-foreground">
-                  {formatCurrency(20.95)} less than last month
-                </p>
-              </div>
-            </Card>
-
-            <Card className="p-6">
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">Average Items per Sale</p>
-                <p className="text-3xl font-bold">{Math.round(stats.totalProducts / Math.max(stats.totalOrders, 1))}</p>
-                <p className="text-xs text-muted-foreground">
-                  0.08 more than last month
-                </p>
-              </div>
-            </Card>
-          </div>
+            ))}
         </div>
 
-        {/* Right Sidebar */}
-        <div className="col-span-4 space-y-6">
-          {/* Transfer Section */}
-          <Card className="p-6">
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Transfer</h3>
-              <p className="text-sm text-muted-foreground">
-                You have 1 transfer waiting to be received
-              </p>
-              <div className="flex items-center space-x-3 p-3 bg-muted/50 rounded-lg">
-                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                  <Package className="w-4 h-4 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Beats Studio Pro</p>
-                  <p className="text-xs text-muted-foreground">20 pcs</p>
-                  <p className="text-xs text-muted-foreground">Texas warehouse → IT Dept.</p>
-                </div>
-              </div>
-              <Button variant="outline" size="sm" className="w-full text-xs">
-                VIEW TRANSFER
-              </Button>
+        {/* Additional Sections for non-mobile */}
+        {!isMobile && (
+          <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Quick Actions */}
+            <div>
+              <QuickActionsPanel onViewChange={onViewChange} />
             </div>
-          </Card>
 
-          {/* Purchase Orders Section */}
-          <Card className="p-6">
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Purchase Orders</h3>
-              <p className="text-sm text-muted-foreground">
-                You have 6 dispatched orders waiting to be received
-              </p>
-              <div className="grid grid-cols-3 gap-2">
-                {[1, 2, 3, 4, 5, 6].map((item) => (
-                  <div key={item} className="aspect-square bg-muted/50 rounded-lg flex items-center justify-center">
-                    <Package className="w-6 h-6 text-muted-foreground" />
-                  </div>
-                ))}
-              </div>
-              <Button variant="outline" size="sm" className="w-full text-xs">
-                VIEW DISPATCHED ORDERS
-              </Button>
+            {/* AI Insights */}
+            <div>
+              <DashboardInsights
+                stats={stats}
+                formatCurrency={formatCurrency}
+                onViewChange={onViewChange}
+              />
             </div>
-          </Card>
-        </div>
+
+            {/* Additional Metrics or Charts */}
+            <div className="space-y-6">
+              <MetricCard
+                title="Average Order Value"
+                value={stats.totalOrders > 0 ? formatCurrency(stats.totalRevenue / stats.totalOrders) : formatCurrency(0)}
+                change={{
+                  value: 5.2,
+                  period: 'last month',
+                  trend: 'up'
+                }}
+                icon={DollarSign}
+                color="success"
+                description="Per transaction average"
+              />
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
-
   );
 }

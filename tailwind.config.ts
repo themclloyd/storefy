@@ -37,7 +37,7 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				'space-grotesk': ['Space Grotesk', 'sans-serif'],
+				'lexend-deca': ['Lexend Deca', 'sans-serif'],
 			},
 			spacing: {
 				'safe-top': 'env(safe-area-inset-top)',
@@ -94,6 +94,9 @@ export default {
 				lg: "var(--radius)",
 				md: "calc(var(--radius) - 2px)",
 				sm: "calc(var(--radius) - 4px)",
+				// Button and badge specific rounded corners
+				'button': '9999px',
+				'badge': '9999px',
 			},
 			keyframes: {
 				"accordion-down": {

@@ -60,7 +60,7 @@ export const themeColors = {
 // Typography system
 export const typography = {
   fontFamily: {
-    sans: ['Space Grotesk', 'system-ui', 'sans-serif'],
+    sans: ['Lexend Deca', 'system-ui', 'sans-serif'],
     mono: ['JetBrains Mono', 'Consolas', 'monospace'],
   },
   
@@ -107,18 +107,20 @@ export const spacing = {
   32: '8rem',     // 128px
 } as const;
 
-// Border radius system - Neutral Theme
+// Border radius system - Square Design (No radius except buttons and badges)
 export const borderRadius = {
   none: '0',
-  sm: '0.25rem',    // 4px
-  DEFAULT: '0.5rem', // 8px - Neutral theme standard
-  md: '0.5rem',     // 8px
-  lg: '0.75rem',    // 12px
-  xl: '1rem',       // 16px
-  '2xl': '1.5rem',  // 24px
-  '3xl': '2rem',    // 32px
-  '4xl': '2.5rem',  // 40px
-  full: '9999px',   // Fully rounded
+  DEFAULT: '0',     // Square by default
+  sm: '0',          // Square
+  md: '0',          // Square
+  lg: '0',          // Square
+  xl: '0',          // Square
+  '2xl': '0',       // Square
+  '3xl': '0',       // Square
+  '4xl': '0',       // Square
+  button: '9999px', // Fully rounded buttons
+  badge: '9999px',  // Fully rounded badges
+  full: '9999px',   // Fully rounded when explicitly needed
 } as const;
 
 // Shadow system

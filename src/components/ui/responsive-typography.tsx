@@ -218,9 +218,9 @@ export function ResponsiveCard({
   };
 
   return (
-    <div 
+    <div
       className={cn(
-        'bg-card border rounded-lg shadow-sm',
+        'bg-card border shadow-sm',
         paddingClasses[padding],
         hover && 'transition-shadow hover:shadow-md',
         clickable && 'cursor-pointer transition-colors hover:bg-muted/50',

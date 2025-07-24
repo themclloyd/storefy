@@ -45,28 +45,102 @@ export function ShowcaseThemeSettings() {
           </div>
         ) : (
           <>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="layout-style">Layout Style</Label>
-                <Select 
-                  value={showcaseSettings.theme.layout} 
-                  onValueChange={(value: 'grid' | 'list' | 'masonry') => 
-                    setShowcaseSettings({ 
-                      theme: { ...showcaseSettings.theme, layout: value } 
+            <div className="space-y-6">
+              {/* Layout Style */}
+              <div className="space-y-3">
+                <Label htmlFor="layout-style" className="text-sm font-semibold">Layout Style</Label>
+                <Select
+                  value={showcaseSettings.theme.layout}
+                  onValueChange={(value: 'grid' | 'list' | 'masonry') =>
+                    setShowcaseSettings({
+                      theme: { ...showcaseSettings.theme, layout: value }
                     })
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-11">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="grid">Grid Layout</SelectItem>
-                    <SelectItem value="list">List Layout</SelectItem>
-                    <SelectItem value="masonry">Masonry Layout</SelectItem>
+                    <SelectItem value="grid">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 grid grid-cols-2 gap-0.5">
+                          <div className="bg-blue-500 rounded-sm"></div>
+                          <div className="bg-blue-500 rounded-sm"></div>
+                          <div className="bg-blue-500 rounded-sm"></div>
+                          <div className="bg-blue-500 rounded-sm"></div>
+                        </div>
+                        Grid Layout
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="list">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 flex flex-col gap-0.5">
+                          <div className="bg-green-500 rounded-sm h-1"></div>
+                          <div className="bg-green-500 rounded-sm h-1"></div>
+                          <div className="bg-green-500 rounded-sm h-1"></div>
+                        </div>
+                        List Layout
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="masonry">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 grid grid-cols-2 gap-0.5">
+                          <div className="bg-purple-500 rounded-sm h-2"></div>
+                          <div className="bg-purple-500 rounded-sm h-3"></div>
+                          <div className="bg-purple-500 rounded-sm h-3"></div>
+                          <div className="bg-purple-500 rounded-sm h-2"></div>
+                        </div>
+                        Masonry Layout
+                      </div>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground">
                   Choose how your products will be displayed on the showcase
+                </p>
+              </div>
+
+              {/* Theme Presets */}
+              <div className="space-y-3">
+                <Label className="text-sm font-semibold">Theme Presets</Label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {[
+                    { name: 'Modern Blue', primary: '#3b82f6', secondary: '#1e40af', bg: 'bg-gradient-to-br from-blue-50 to-blue-100' },
+                    { name: 'Elegant Purple', primary: '#8b5cf6', secondary: '#7c3aed', bg: 'bg-gradient-to-br from-purple-50 to-purple-100' },
+                    { name: 'Fresh Green', primary: '#10b981', secondary: '#059669', bg: 'bg-gradient-to-br from-green-50 to-green-100' },
+                    { name: 'Warm Orange', primary: '#f59e0b', secondary: '#d97706', bg: 'bg-gradient-to-br from-orange-50 to-orange-100' }
+                  ].map((preset) => (
+                    <button
+                      key={preset.name}
+                      onClick={() => setShowcaseSettings({
+                        theme: {
+                          ...showcaseSettings.theme,
+                          primaryColor: preset.primary,
+                          secondaryColor: preset.secondary
+                        }
+                      })}
+                      className={`p-3 rounded-lg border-2 transition-all duration-200 ${preset.bg} ${
+                        showcaseSettings.theme.primaryColor === preset.primary
+                          ? 'border-gray-900 shadow-md'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <div
+                          className="w-4 h-4 rounded-full border-2 border-white shadow-sm"
+                          style={{ backgroundColor: preset.primary }}
+                        ></div>
+                        <div
+                          className="w-4 h-4 rounded-full border-2 border-white shadow-sm"
+                          style={{ backgroundColor: preset.secondary }}
+                        ></div>
+                      </div>
+                      <p className="text-xs font-medium text-gray-700">{preset.name}</p>
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Quick preset themes to get started, or customize colors below
                 </p>
               </div>
 

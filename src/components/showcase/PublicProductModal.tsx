@@ -1,10 +1,16 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useState, useEffect } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Package, Phone, Mail, MapPin, ExternalLink, Share2, MessageCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Package, Phone, Mail, MapPin, ExternalLink, Share2, MessageCircle, ShoppingCart, Plus, Minus } from "lucide-react";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/taxUtils";
+import { useShowcaseCartStore } from "@/stores/showcaseCartStore";
+import { ProductVariantSelector, ProductVariant } from "./cart/ProductVariantSelector";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PublicProduct {
   product_id: string;
@@ -19,6 +25,7 @@ interface PublicProduct {
   show_stock_publicly: boolean;
   show_price_publicly: boolean;
   created_at: string;
+  sku?: string;
 }
 
 interface PublicStore {
@@ -59,6 +66,98 @@ export function PublicProductModal({
   themeColors,
   storeCurrency = 'USD'
 }: PublicProductModalProps) {
+  const [variants, setVariants] = useState<ProductVariant[]>([]);
+  const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
+  const [variantAdjustments, setVariantAdjustments] = useState(0);
+  const [quantity, setQuantity] = useState(1);
+  const [isLoadingVariants, setIsLoadingVariants] = useState(false);
+
+  const { addToCart, setStoreInfo } = useShowcaseCartStore();
+
+  // Set store info when component mounts
+  useEffect(() => {
+    if (storeInfo) {
+      const taxRate = 0; // You might want to get this from store settings
+      setStoreInfo(storeInfo.id, storeCurrency, taxRate);
+    }
+  }, [storeInfo, storeCurrency, setStoreInfo]);
+
+  // Load product variants when modal opens
+  useEffect(() => {
+    if (open && product.product_id) {
+      loadProductVariants();
+    }
+  }, [open, product.product_id]);
+
+  // Reset state when product changes
+  useEffect(() => {
+    setSelectedVariants({});
+    setVariantAdjustments(0);
+    setQuantity(1);
+  }, [product.product_id]);
+
+  const loadProductVariants = async () => {
+    try {
+      setIsLoadingVariants(true);
+      const { data, error } = await supabase
+        .from('product_variants')
+        .select('*')
+        .eq('product_id', product.product_id)
+        .eq('is_active', true);
+
+      if (error) throw error;
+
+      const formattedVariants: ProductVariant[] = (data || []).map(variant => ({
+        id: variant.id,
+        type: variant.variant_type as 'color' | 'size' | 'style',
+        name: variant.variant_name,
+        value: variant.variant_value,
+        priceAdjustment: variant.price_adjustment || 0,
+        stockQuantity: variant.stock_quantity || 0,
+        isActive: variant.is_active
+      }));
+
+      setVariants(formattedVariants);
+    } catch (error) {
+      console.error('Error loading variants:', error);
+    } finally {
+      setIsLoadingVariants(false);
+    }
+  };
+
+  const handleVariantChange = (type: string, value: string, priceAdjustment: number) => {
+    setSelectedVariants(prev => ({
+      ...prev,
+      [type]: value
+    }));
+
+    // Recalculate total variant adjustments
+    const newVariants = { ...selectedVariants, [type]: value };
+    let totalAdjustment = 0;
+    Object.entries(newVariants).forEach(([variantType, variantValue]) => {
+      const variant = variants.find(v => v.type === variantType && v.value === variantValue);
+      if (variant) {
+        totalAdjustment += variant.priceAdjustment;
+      }
+    });
+    setVariantAdjustments(totalAdjustment);
+  };
+
+  const handleAddToCart = () => {
+    addToCart(
+      product.product_id,
+      product.product_name,
+      product.price,
+      product.stock_quantity,
+      selectedVariants,
+      variantAdjustments,
+      product.image_url,
+      quantity
+    );
+
+    // Close modal after adding to cart
+    onOpenChange(false);
+  };
 
   const formatPrice = (price: number) => {
     return formatCurrency(price, storeCurrency);
@@ -125,12 +224,15 @@ export function PublicProductModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl">{product.product_name}</DialogTitle>
+      <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader className="pb-3">
+          <DialogTitle className="text-xl">{product.product_name}</DialogTitle>
+          <DialogDescription className="text-sm">
+            {product.public_description || product.product_description || "View product details and add to cart"}
+          </DialogDescription>
         </DialogHeader>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Product Image */}
           <div className="space-y-4">
             <div className="relative aspect-square rounded-lg overflow-hidden bg-muted">
@@ -163,87 +265,160 @@ export function PublicProductModal({
           </div>
           
           {/* Product Details */}
-          <div className="space-y-6">
-            {/* Category and Stock */}
-            <div className="flex flex-wrap gap-2">
-              {product.category_name && (
-                <Badge variant="outline">
-                  {product.category_name}
-                </Badge>
+          <div className="space-y-4">
+            {/* SKU and Category */}
+            <div className="space-y-2">
+              {product.sku && (
+                <div className="text-xs text-muted-foreground">
+                  SKU: <span className="font-mono">{product.sku}</span>
+                </div>
               )}
-              {product.show_stock_publicly && (
-                <Badge variant={stockStatus.variant}>
-                  {stockStatus.label}
-                </Badge>
-              )}
+              <div className="flex flex-wrap gap-2">
+                {product.category_name && (
+                  <Badge variant="outline" className="text-xs">
+                    {product.category_name}
+                  </Badge>
+                )}
+                {product.show_stock_publicly && (
+                  <Badge variant={stockStatus.variant} className="text-xs">
+                    {stockStatus.label}
+                  </Badge>
+                )}
+              </div>
             </div>
             
             {/* Price */}
             {product.show_price_publicly && (
-              <div className="text-3xl font-bold" style={{ color: themeColors.primary }}>
-                {formatPrice(product.price)}
+              <div className="flex items-baseline gap-2">
+                <div className="text-2xl font-bold" style={{ color: themeColors.primary }}>
+                  {formatPrice(product.price + variantAdjustments)}
+                </div>
+                {variantAdjustments !== 0 && (
+                  <div className="text-xs text-muted-foreground">
+                    Base: {formatPrice(product.price)}
+                  </div>
+                )}
               </div>
             )}
-            
+
             {/* Description */}
             {(product.public_description || product.product_description) && (
-              <div className="space-y-2">
-                <h3 className="font-semibold text-lg">Description</h3>
-                <p className="text-muted-foreground leading-relaxed">
+              <div className="space-y-1">
+                <h3 className="font-medium text-sm">Description</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
                   {product.public_description || product.product_description}
                 </p>
               </div>
             )}
-            
-            {/* Stock Information */}
-            {product.show_stock_publicly && (
+
+            {/* Variants */}
+            {variants.length > 0 && (
+              <div className="space-y-3">
+                <h3 className="font-semibold text-lg">Options</h3>
+                <ProductVariantSelector
+                  variants={variants}
+                  selectedVariants={selectedVariants}
+                  onVariantChange={handleVariantChange}
+                  basePrice={product.price}
+                  storeCurrency={storeCurrency}
+                  themeColors={themeColors}
+                />
+              </div>
+            )}
+
+            {/* Quantity Selector */}
+            {product.stock_quantity > 0 && (
               <div className="space-y-2">
-                <h3 className="font-semibold text-lg">Availability</h3>
-                <div className="flex items-center gap-2">
-                  <Badge variant={stockStatus.variant}>
-                    {stockStatus.label}
-                  </Badge>
-                  {product.stock_quantity > 0 && (
-                    <span className="text-sm text-muted-foreground">
-                      {product.stock_quantity} units available
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="quantity" className="font-medium text-sm">Quantity</Label>
+                  {product.show_stock_publicly && (
+                    <span className="text-xs text-muted-foreground">
+                      {product.stock_quantity} available
                     </span>
                   )}
                 </div>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    disabled={quantity <= 1}
+                  >
+                    <Minus className="h-3 w-3" />
+                  </Button>
+
+                  <Input
+                    id="quantity"
+                    type="number"
+                    min="1"
+                    max={product.stock_quantity}
+                    value={quantity}
+                    onChange={(e) => setQuantity(Math.min(product.stock_quantity, Math.max(1, parseInt(e.target.value) || 1)))}
+                    className="w-14 text-center text-sm h-8"
+                  />
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setQuantity(Math.min(product.stock_quantity, quantity + 1))}
+                    disabled={quantity >= product.stock_quantity}
+                    style={
+                      quantity < product.stock_quantity
+                        ? { borderColor: themeColors.primary, color: themeColors.primary }
+                        : {}
+                    }
+                  >
+                    <Plus className="h-3 w-3" />
+                  </Button>
+                </div>
               </div>
             )}
-            
+
+            {/* Add to Cart Button */}
+            {product.stock_quantity > 0 && (
+              <Button
+                className="w-full"
+                onClick={handleAddToCart}
+                style={{ backgroundColor: themeColors.primary }}
+              >
+                <ShoppingCart className="mr-2 h-4 w-4" />
+                Add to Cart
+              </Button>
+            )}
+
             <Separator />
-            
+
             {/* Store Contact Information */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-lg">Contact Store</h3>
+            <div className="space-y-3">
+              <h3 className="font-medium text-sm">Contact Store</h3>
               <div className="space-y-3">
                 {shouldShowContactInfo('phone') && storeInfo.phone && (
                   <>
                     <a
                       href={`tel:${storeInfo.phone}`}
-                      className="flex items-center gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors"
+                      className="flex items-center gap-2 p-2 rounded-lg border hover:bg-muted/50 transition-colors"
                     >
-                      <Phone className="w-5 h-5" style={{ color: themeColors.primary }} />
-                      <div>
-                        <div className="font-medium">Call Store</div>
-                        <div className="text-sm text-muted-foreground">{storeInfo.phone}</div>
+                      <Phone className="w-4 h-4" style={{ color: themeColors.primary }} />
+                      <div className="flex-1">
+                        <div className="font-medium text-sm">Call Store</div>
+                        <div className="text-xs text-muted-foreground">{storeInfo.phone}</div>
                       </div>
-                      <ExternalLink className="w-4 h-4 ml-auto text-muted-foreground" />
+                      <ExternalLink className="w-3 h-3 text-muted-foreground" />
                     </a>
 
                     <a
                       href={getWhatsAppLink(storeInfo.phone, getWhatsAppMessage())}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors bg-green-50 border-green-200 hover:bg-green-100"
+                      className="flex items-center gap-2 p-2 rounded-lg border hover:bg-muted/50 transition-colors bg-green-50 border-green-200 hover:bg-green-100"
                     >
-                      <MessageCircle className="w-5 h-5 text-green-600" />
-                      <div>
-                        <div className="font-medium text-green-800">WhatsApp Store</div>
-                        <div className="text-sm text-green-600">Send instant message about this product</div>
+                      <MessageCircle className="w-4 h-4 text-green-600" />
+                      <div className="flex-1">
+                        <div className="font-medium text-sm text-green-800">WhatsApp Store</div>
+                        <div className="text-xs text-green-600">Ask about this product</div>
                       </div>
-                      <ExternalLink className="w-4 h-4 ml-auto text-green-600" />
+                      <ExternalLink className="w-3 h-3 text-green-600" />
                     </a>
                   </>
                 )}

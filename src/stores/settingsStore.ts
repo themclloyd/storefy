@@ -224,8 +224,8 @@ const initialShowcaseSettings: ShowcaseSettings = {
   seoTitle: '',
   seoDescription: '',
   theme: {
-    primaryColor: '#3b82f6',
-    secondaryColor: '#1e40af',
+    primaryColor: '#1f2937',
+    secondaryColor: '#374151',
     layout: 'grid'
   },
   contactInfo: {

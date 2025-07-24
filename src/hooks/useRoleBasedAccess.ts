@@ -13,6 +13,7 @@ import {
   CogIcon,
   GlobeAltIcon
 } from '@heroicons/react/24/solid';
+import { Package as PackageIcon } from 'lucide-react';
 
 /**
  * Hook for checking if user has specific permission
@@ -163,7 +164,7 @@ export function useRoleBasedNavigation() {
   
   const getAvailablePages = (): ProtectedPage[] => {
     const allPages: ProtectedPage[] = [
-      'dashboard', 'pos', 'inventory', 'customers', 'transactions', 'layby', 'expenses', 'settings', 'showcase'
+      'dashboard', 'pos', 'inventory', 'customers', 'orders', 'transactions', 'layby', 'expenses', 'settings', 'showcase'
     ];
 
     return allPages.filter(page => canAccessPage(page));
@@ -179,6 +180,7 @@ export function useRoleBasedNavigation() {
       pos: { label: 'POS', icon: ShoppingCartIcon },
       inventory: { label: 'Inventory', icon: CubeIcon },
       customers: { label: 'Customers', icon: UsersIcon },
+      orders: { label: 'Orders', icon: PackageIcon },
       layby: { label: 'Layby', icon: ClockIcon },
       transactions: { label: 'Transactions', icon: ReceiptPercentIcon },
       expenses: { label: 'Expenses', icon: CreditCardIcon },

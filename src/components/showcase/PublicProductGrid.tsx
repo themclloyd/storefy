@@ -1,9 +1,10 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Eye, Package, DollarSign } from "lucide-react";
+import { Package, ShoppingCart, Plus, Heart, Star, Eye } from "lucide-react";
 import { formatCurrency } from "@/lib/taxUtils";
+import { useShowcaseCartStore } from "@/stores/showcaseCartStore";
+import { useState } from "react";
 
 interface PublicProduct {
   product_id: string;
@@ -40,9 +41,30 @@ export function PublicProductGrid({
   themeColors,
   storeCurrency = 'USD'
 }: PublicProductGridProps) {
+  const { addToCart } = useShowcaseCartStore();
+  const [wishlistItems, setWishlistItems] = useState<Set<string>>(new Set());
 
   const formatPrice = (price: number) => {
     return formatCurrency(price, storeCurrency);
+  };
+
+  const handleQuickAddToCart = (e: React.MouseEvent, product: PublicProduct) => {
+    e.stopPropagation(); // Prevent opening the product modal
+
+    if (product.stock_quantity <= 0) {
+      return;
+    }
+
+    addToCart(
+      product.product_id,
+      product.product_name,
+      product.price,
+      product.stock_quantity,
+      {}, // No variants for quick add
+      0,  // No variant adjustments
+      product.image_url,
+      1   // Default quantity of 1
+    );
   };
 
   const getStockStatus = (quantity: number) => {
@@ -51,130 +73,60 @@ export function PublicProductGrid({
     return { label: 'In Stock', variant: 'default' as const };
   };
 
+  const toggleWishlist = (productId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setWishlistItems(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(productId)) {
+        newSet.delete(productId);
+      } else {
+        newSet.add(productId);
+      }
+      return newSet;
+    });
+  };
+
   if (loading) {
     return (
-      <div className={`grid gap-6 ${
-        viewMode === 'grid' 
-          ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
+      <div className={`grid gap-4 ${
+        viewMode === 'grid'
+          ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
           : 'grid-cols-1'
       }`}>
         {Array.from({ length: 8 }).map((_, index) => (
-          <Card key={index} className="overflow-hidden">
+          <div key={index} className="bg-white rounded-lg border border-gray-100 overflow-hidden">
             <Skeleton className={viewMode === 'grid' ? "h-48" : "h-32"} />
-            <CardContent className="p-4">
+            <div className="p-4">
               <Skeleton className="h-4 w-3/4 mb-2" />
               <Skeleton className="h-3 w-1/2 mb-2" />
-              <Skeleton className="h-6 w-1/4" />
-            </CardContent>
-          </Card>
+              <Skeleton className="h-5 w-1/4" />
+            </div>
+          </div>
         ))}
       </div>
     );
   }
 
-  if (viewMode === 'list') {
-    return (
-      <div className="space-y-4">
-        {products.map((product) => {
-          const stockStatus = getStockStatus(product.stock_quantity);
-          
-          return (
-            <Card 
-              key={product.product_id} 
-              className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => onProductClick(product)}
-            >
-              <CardContent className="p-0">
-                <div className="flex">
-                  {/* Product Image */}
-                  <div className="w-32 h-32 flex-shrink-0">
-                    {product.image_url ? (
-                      <img
-                        src={product.image_url}
-                        alt={product.product_name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          target.nextElementSibling?.classList.remove('hidden');
-                        }}
-                      />
-                    ) : null}
-                    <div className={`w-full h-full bg-muted flex items-center justify-center ${product.image_url ? 'hidden' : ''}`}>
-                      <Package className="w-8 h-8 text-muted-foreground" />
-                    </div>
-                  </div>
-                  
-                  {/* Product Info */}
-                  <div className="flex-1 p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg mb-1">{product.product_name}</h3>
-                        {product.category_name && (
-                          <Badge variant="outline" className="text-xs mb-2">
-                            {product.category_name}
-                          </Badge>
-                        )}
-                      </div>
-                      
-                      <div className="text-right ml-4">
-                        {product.show_price_publicly && (
-                          <div className="text-xl font-bold" style={{ color: themeColors.primary }}>
-                            {formatPrice(product.price)}
-                          </div>
-                        )}
-                        {product.show_stock_publicly && (
-                          <Badge variant={stockStatus.variant} className="text-xs mt-1">
-                            {stockStatus.label}
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {(product.public_description || product.product_description) && (
-                      <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                        {product.public_description || product.product_description}
-                      </p>
-                    )}
-                    
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      className="mt-2"
-                      style={{ borderColor: themeColors.primary, color: themeColors.primary }}
-                    >
-                      <Eye className="w-4 h-4 mr-2" />
-                      View Details
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-    );
-  }
-
-  // Grid view
+  // Always use grid view for the template
   return (
-    <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {products.map((product) => {
         const stockStatus = getStockStatus(product.stock_quantity);
-        
+        const isWishlisted = wishlistItems.has(product.product_id);
+
         return (
-          <Card 
-            key={product.product_id} 
-            className="overflow-hidden hover:shadow-lg transition-all duration-200 cursor-pointer group"
+          <div
+            key={product.product_id}
+            className="group bg-white rounded-lg border border-gray-100 hover:shadow-md transition-all duration-200 cursor-pointer overflow-hidden"
             onClick={() => onProductClick(product)}
           >
             {/* Product Image */}
-            <div className="relative h-48 overflow-hidden">
+            <div className="relative aspect-square bg-gray-50 p-4">
               {product.image_url ? (
                 <img
                   src={product.image_url}
                   alt={product.product_name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                  className="w-full h-full object-contain"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
@@ -182,65 +134,60 @@ export function PublicProductGrid({
                   }}
                 />
               ) : null}
-              <div className={`absolute inset-0 bg-muted flex items-center justify-center ${product.image_url ? 'hidden' : ''}`}>
-                <Package className="w-12 h-12 text-muted-foreground" />
+              <div className={`w-full h-full flex items-center justify-center ${product.image_url ? 'hidden' : ''}`}>
+                <Package className="w-16 h-16 text-gray-400" />
               </div>
-              
-              {/* Stock Badge */}
-              {product.show_stock_publicly && (
-                <div className="absolute top-2 right-2">
-                  <Badge variant={stockStatus.variant} className="text-xs">
-                    {stockStatus.label}
-                  </Badge>
-                </div>
-              )}
-              
-              {/* Category Badge */}
-              {product.category_name && (
-                <div className="absolute top-2 left-2">
-                  <Badge variant="outline" className="text-xs bg-white/90 backdrop-blur-sm">
-                    {product.category_name}
-                  </Badge>
-                </div>
-              )}
+
+              {/* Wishlist Button */}
+              <button
+                onClick={(e) => toggleWishlist(product.product_id, e)}
+                className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200"
+              >
+                <Heart
+                  className={`w-4 h-4 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-400'}`}
+                />
+              </button>
             </div>
-            
+
             {/* Product Info */}
-            <CardContent className="p-4">
-              <h3 className="font-semibold text-base mb-2 line-clamp-1">
+            <div className="p-4">
+              <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">
                 {product.product_name}
               </h3>
-              
-              {(product.public_description || product.product_description) && (
-                <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                  {product.public_description || product.product_description}
-                </p>
-              )}
-              
-              <div className="flex justify-between items-center">
-                {product.show_price_publicly ? (
-                  <div className="text-lg font-bold" style={{ color: themeColors.primary }}>
-                    {formatPrice(product.price)}
-                  </div>
-                ) : (
-                  <div className="text-sm text-muted-foreground">
-                    Contact for price
-                  </div>
-                )}
-                
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className="opacity-0 group-hover:opacity-100 transition-opacity"
-                  style={{ borderColor: themeColors.primary, color: themeColors.primary }}
-                >
-                  <Eye className="w-4 h-4" />
-                </Button>
+
+              {/* Rating Stars */}
+              <div className="flex items-center gap-1 mb-2">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                ))}
+                <span className="text-sm text-gray-500 ml-1">(121)</span>
               </div>
-            </CardContent>
-          </Card>
+
+              {/* Price */}
+              {product.show_price_publicly && (
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-lg font-bold text-gray-900">
+                    {formatPrice(product.price)}
+                  </span>
+                  <span className="text-sm text-gray-500 line-through">
+                    {formatPrice(product.price * 1.2)}
+                  </span>
+                </div>
+              )}
+
+              {/* Add to Cart Button */}
+              <Button
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 rounded-md transition-colors duration-200"
+                onClick={(e) => handleQuickAddToCart(e, product)}
+                disabled={product.stock_quantity <= 0}
+              >
+                {product.stock_quantity <= 0 ? 'Out of Stock' : 'Add to Cart'}
+              </Button>
+            </div>
+          </div>
         );
       })}
     </div>
   );
+
 }

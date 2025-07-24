@@ -26,7 +26,7 @@ export function FloatingActionButton({
     <Button
       onClick={onClick}
       className={cn(
-        "fixed z-50 rounded-full shadow-lg hover:shadow-xl transition-all duration-200",
+        "fixed z-50 rounded-badge shadow-lg hover:shadow-xl transition-all duration-200",
         "app-button active:scale-95",
         // Size variants
         size === 'sm' && "w-12 h-12 p-0",

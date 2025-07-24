@@ -39,13 +39,13 @@ export const responsiveSpacing = {
 
 // Responsive typography utilities
 export const responsiveText = {
-  // Heading sizes
-  h1: "text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold",
-  h2: "text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold",
-  h3: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold",
-  h4: "text-base sm:text-lg md:text-xl lg:text-2xl font-semibold",
-  h5: "text-sm sm:text-base md:text-lg lg:text-xl font-medium",
-  h6: "text-xs sm:text-sm md:text-base lg:text-lg font-medium",
+  // Heading sizes - Made lighter
+  h1: "text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light",
+  h2: "text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light",
+  h3: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-normal",
+  h4: "text-base sm:text-lg md:text-xl lg:text-2xl font-normal",
+  h5: "text-sm sm:text-base md:text-lg lg:text-xl font-normal",
+  h6: "text-xs sm:text-sm md:text-base lg:text-lg font-normal",
   
   // Body text sizes
   body: "text-sm sm:text-base",
@@ -239,13 +239,108 @@ export const touchFriendly = {
   // Minimum touch target sizes
   minTouch: "min-h-[44px] min-w-[44px]", // iOS guidelines
   touchTarget: "h-11 w-11 sm:h-10 sm:w-10", // Larger on mobile
-  
+
   // Touch-friendly spacing
   touchSpacing: "space-y-3 sm:space-y-2",
   touchGap: "gap-3 sm:gap-2",
-  
+
   // Touch-friendly padding
   touchPadding: "p-3 sm:p-2",
   touchPaddingX: "px-4 sm:px-3",
   touchPaddingY: "py-3 sm:py-2"
+}
+
+// Modern Dashboard Design System (2025)
+export const dashboardDesign = {
+  // Visual hierarchy levels
+  hierarchy: {
+    primary: "text-2xl sm:text-3xl font-bold text-foreground",
+    secondary: "text-lg sm:text-xl font-semibold text-foreground",
+    tertiary: "text-base sm:text-lg font-medium text-foreground",
+    body: "text-sm sm:text-base text-muted-foreground",
+    caption: "text-xs sm:text-sm text-muted-foreground"
+  },
+
+  // Modern card designs
+  cards: {
+    // Elevated cards with subtle shadows
+    elevated: "bg-card border border-border/50 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200",
+    // Flat cards with borders
+    flat: "bg-card border border-border rounded-lg",
+    // Glass morphism effect
+    glass: "bg-card/80 backdrop-blur-sm border border-border/30 rounded-xl",
+    // Metric cards with emphasis
+    metric: "bg-gradient-to-br from-card to-card/80 border border-border/50 rounded-xl shadow-sm hover:shadow-md transition-all duration-200",
+    // Interactive cards
+    interactive: "bg-card border border-border/50 rounded-xl shadow-sm hover:shadow-md hover:border-border transition-all duration-200 cursor-pointer"
+  },
+
+  // Color system for data visualization
+  colors: {
+    // Primary data colors
+    primary: "hsl(var(--primary))",
+    success: "hsl(142 76% 36%)",
+    warning: "hsl(38 92% 50%)",
+    danger: "hsl(0 84% 60%)",
+    info: "hsl(217 91% 60%)",
+
+    // Chart color palette
+    chart: [
+      "hsl(var(--primary))",
+      "hsl(142 76% 36%)",
+      "hsl(38 92% 50%)",
+      "hsl(217 91% 60%)",
+      "hsl(280 100% 70%)",
+      "hsl(16 100% 66%)"
+    ],
+
+    // Gradient backgrounds
+    gradients: {
+      primary: "bg-gradient-to-br from-primary/10 to-primary/5",
+      success: "bg-gradient-to-br from-green-500/10 to-green-500/5",
+      warning: "bg-gradient-to-br from-yellow-500/10 to-yellow-500/5",
+      danger: "bg-gradient-to-br from-red-500/10 to-red-500/5"
+    }
+  },
+
+  // Animation and transitions
+  animations: {
+    // Smooth transitions
+    smooth: "transition-all duration-200 ease-in-out",
+    fast: "transition-all duration-150 ease-in-out",
+    slow: "transition-all duration-300 ease-in-out",
+
+    // Hover effects
+    hover: "hover:scale-[1.02] transition-transform duration-200",
+    hoverSoft: "hover:bg-muted/50 transition-colors duration-200",
+
+    // Loading states
+    pulse: "animate-pulse",
+    bounce: "animate-bounce",
+    spin: "animate-spin"
+  },
+
+  // Layout patterns for dashboard
+  layouts: {
+    // Main dashboard grid
+    main: "grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6",
+    // Metrics grid
+    metrics: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6",
+    // Chart section
+    charts: "grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6",
+    // Sidebar layout
+    sidebar: "grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-4 sm:gap-6",
+    // Full width sections
+    fullWidth: "col-span-full"
+  },
+
+  // Interactive elements
+  interactive: {
+    // Buttons with modern styling
+    button: "inline-flex items-center justify-center rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+    // Icon buttons
+    iconButton: "inline-flex items-center justify-center rounded-lg transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+    // Links
+    link: "text-primary hover:text-primary/80 transition-colors underline-offset-4 hover:underline"
+  }
 }

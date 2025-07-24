@@ -37,6 +37,7 @@ export interface PublicProduct {
   show_stock_publicly: boolean;
   show_price_publicly: boolean;
   created_at: string;
+  sku?: string;
 }
 
 export interface PublicCategory {
