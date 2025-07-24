@@ -99,15 +99,16 @@ export function PublicProductModal({
   const loadProductVariants = async () => {
     try {
       setIsLoadingVariants(true);
+      // Type assertion to work around outdated Supabase types
       const { data, error } = await supabase
-        .from('product_variants')
+        .from('product_variants' as any)
         .select('*')
         .eq('product_id', product.product_id)
         .eq('is_active', true);
 
       if (error) throw error;
 
-      const formattedVariants: ProductVariant[] = (data || []).map(variant => ({
+      const formattedVariants: ProductVariant[] = (data || []).map((variant: any) => ({
         id: variant.id,
         type: variant.variant_type as 'color' | 'size' | 'style',
         name: variant.variant_name,
@@ -125,7 +126,7 @@ export function PublicProductModal({
     }
   };
 
-  const handleVariantChange = (type: string, value: string, priceAdjustment: number) => {
+  const handleVariantChange = (type: string, value: string, _priceAdjustment: number) => {
     setSelectedVariants(prev => ({
       ...prev,
       [type]: value
