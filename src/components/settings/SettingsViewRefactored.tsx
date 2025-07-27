@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { TabsContent } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useCurrentStore } from "@/stores/storeStore";
@@ -11,20 +12,30 @@ import { StoreSettings } from "./components/StoreSettings";
 import { ActivityLogs } from "./components/ActivityLogs";
 import { PaymentMethodsSettings } from "./PaymentMethodsSettingsRefactored";
 import { ShowcaseSettings } from "./ShowcaseSettingsRefactored";
+import { SubscriptionSettings } from "./components/SubscriptionSettings";
 import { PrivacySettings } from "@/components/analytics/ConsentBanner";
 
 export function SettingsView() {
   const currentStore = useCurrentStore();
-  
+  const [searchParams] = useSearchParams();
+
   // Use Zustand store state
   const currentTab = useSettingsStore(state => state.currentTab);
   const loading = useSettingsStore(state => state.loading);
-  
+
   // Actions from Zustand
   const setCurrentTab = useSettingsStore(state => state.setCurrentTab);
   const setStoreSettings = useSettingsStore(state => state.setStoreSettings);
   const fetchTeamMembers = useSettingsStore(state => state.fetchTeamMembers);
   const fetchActivityLogs = useSettingsStore(state => state.fetchActivityLogs);
+
+  // Handle URL parameters for direct tab navigation
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab && ['team', 'store', 'showcase', 'payments', 'subscription', 'notifications', 'activity'].includes(tab)) {
+      setCurrentTab(tab);
+    }
+  }, [searchParams, setCurrentTab]);
 
   useEffect(() => {
     if (currentStore?.id) {
@@ -91,6 +102,10 @@ export function SettingsView() {
 
         <TabsContent value="payments" className="space-y-6">
           <PaymentMethodsSettings />
+        </TabsContent>
+
+        <TabsContent value="subscription" className="space-y-6">
+          <SubscriptionSettings />
         </TabsContent>
 
         <TabsContent value="notifications" className="space-y-6">

@@ -72,7 +72,7 @@ export function POSCartSection({
   const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <div className={cn("flex flex-col h-full bg-background border rounded-lg", className)}>
+    <div className={cn("flex flex-col h-full bg-background border rounded-lg overflow-hidden", className)}>
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b">
         <div className="flex items-center gap-2">
@@ -215,15 +215,19 @@ export function POSCartSection({
             </div>
 
             {/* Cart Items - Scrollable */}
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 overflow-hidden min-h-0">
               <ScrollArea className="h-full">
-                <div className="space-y-2 p-4">
-                  {cart.map((item) => (
-                    <POSCartItem
-                      key={item.id}
-                      item={item}
-                      onUpdateQuantity={onUpdateQuantity}
-                    />
+                <div className="p-4">
+                  {cart.map((item, index) => (
+                    <div key={item.id}>
+                      <POSCartItem
+                        item={item}
+                        onUpdateQuantity={onUpdateQuantity}
+                      />
+                      {index < cart.length - 1 && (
+                        <div className="border-b border-border/30 my-2" />
+                      )}
+                    </div>
                   ))}
                 </div>
               </ScrollArea>
@@ -257,14 +261,14 @@ export function POSCartSection({
               </div>
 
               {/* Process Order Button */}
-              <div className="p-4 pt-0">
+              <div className="p-4 pt-0 bg-background">
                 <Button
                   onClick={onProcessOrder}
                   disabled={!isOrderValid() || isProcessingOrder}
-                  className="w-full h-12 text-base font-semibold"
+                  className="w-full h-12 text-base font-semibold shadow-lg"
                   size="lg"
                 >
-                  {isProcessingOrder ? 'Processing...' : `Complete Order`}
+                  {isProcessingOrder ? 'Processing...' : `Complete Order • ${formatCurrency(total)}`}
                 </Button>
               </div>
             </div>

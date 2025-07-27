@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Globe, Store, Palette, Eye, ExternalLink, Copy, Settings, Image, Phone, Mail, MapPin } from "lucide-react";
+import { Globe, Store, Palette, Eye, ExternalLink, Copy, Settings, Image, Phone, Mail, MapPin, Activity } from "lucide-react";
 import { useCurrentStore, useStoreStore } from "@/stores/storeStore";
 import { useUser } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";

@@ -16,7 +16,7 @@ export function POSCartItem({ item, onUpdateQuantity, className }: POSCartItemPr
   };
 
   return (
-    <div className={cn("flex gap-3 p-3 border rounded-lg bg-background hover:bg-muted/30 transition-colors", className)}>
+    <div className={cn("flex gap-3 p-3 hover:bg-muted/20 transition-colors", className)}>
       {/* Product Image */}
       <div className="flex-shrink-0 w-10 h-10 rounded-md overflow-hidden bg-muted">
         {item.image_url ? (

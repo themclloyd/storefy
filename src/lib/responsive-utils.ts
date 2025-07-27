@@ -66,7 +66,12 @@ export const responsiveGrid = {
   products: "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6",
   stats: "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
   dashboard: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
-  
+
+  // Compact dashboard grids
+  dashboardCompact: "grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6",
+  metricsCompact: "grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
+  chartsCompact: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
+
   // Specific layouts
   sidebar: "grid grid-cols-1 lg:grid-cols-[280px_1fr]",
   content: "grid grid-cols-1 lg:grid-cols-[1fr_300px]",
@@ -106,13 +111,13 @@ export const compactContainer = {
 
 // Compact spacing - balanced spacing for compact mode
 export const compactSpacing = {
-  // Padding classes - balanced reduction
+  // Padding classes - more compact
   padding: {
-    xs: "p-2 sm:p-3",
-    sm: "p-3 sm:p-4",
-    md: "p-4 sm:p-5",
-    lg: "p-5 sm:p-6",
-    xl: "p-6 sm:p-7"
+    xs: "p-1.5 sm:p-2",
+    sm: "p-2 sm:p-3",
+    md: "p-3 sm:p-4",
+    lg: "p-4 sm:p-5",
+    xl: "p-5 sm:p-6"
   },
   // Margin classes - balanced reduction
   margin: {
@@ -122,13 +127,13 @@ export const compactSpacing = {
     lg: "m-5 sm:m-6",
     xl: "m-6 sm:m-7"
   },
-  // Gap classes for flex/grid - balanced reduction
+  // Gap classes for flex/grid - more compact
   gap: {
-    xs: "gap-2 sm:gap-3",
-    sm: "gap-3 sm:gap-4",
-    md: "gap-4 sm:gap-5",
-    lg: "gap-5 sm:gap-6",
-    xl: "gap-6 sm:gap-7"
+    xs: "gap-1 sm:gap-1.5",
+    sm: "gap-1.5 sm:gap-2",
+    md: "gap-2 sm:gap-3",
+    lg: "gap-3 sm:gap-4",
+    xl: "gap-4 sm:gap-5"
   }
 }
 
@@ -272,7 +277,9 @@ export const dashboardDesign = {
     // Metric cards with emphasis
     metric: "bg-gradient-to-br from-card to-card/80 border border-border/50 rounded-xl shadow-sm hover:shadow-md transition-all duration-200",
     // Interactive cards
-    interactive: "bg-card border border-border/50 rounded-xl shadow-sm hover:shadow-md hover:border-border transition-all duration-200 cursor-pointer"
+    interactive: "bg-card border border-border/50 rounded-xl shadow-sm hover:shadow-md hover:border-border transition-all duration-200 cursor-pointer",
+    // Compact cards for dense layouts
+    compact: "bg-card border border-border/40 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
   },
 
   // Color system for data visualization

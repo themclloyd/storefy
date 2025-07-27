@@ -1,9 +1,10 @@
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Users, Store, Globe, CreditCard, Bell, Activity, Copy } from "lucide-react";
+import { Users, Store, Globe, CreditCard, Bell, Activity, Copy, Crown } from "lucide-react";
 import { useCurrentStore } from "@/stores/storeStore";
 import { generateShowcaseUrl } from "@/lib/showcase-utils";
+import { useSubscription } from "@/hooks/useSubscription";
 import {
   useSettingsStore,
   useRoleStats
@@ -18,6 +19,7 @@ export function SettingsNavigation({ currentTab, onTabChange }: SettingsNavigati
   const currentStore = useCurrentStore();
   const roleStats = useRoleStats();
   const showcaseSettings = useSettingsStore(state => state.showcaseSettings);
+  const { subscription, isTrialing } = useSubscription();
 
   const copyShowcaseUrl = async () => {
     if (!currentStore) return;
@@ -37,7 +39,7 @@ export function SettingsNavigation({ currentTab, onTabChange }: SettingsNavigati
 
   return (
     <Tabs value={currentTab} onValueChange={onTabChange} className="space-y-6">
-      <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
+      <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7">
         <TabsTrigger value="team" className="flex items-center gap-2">
           <Users className="w-4 h-4" />
           <span className="hidden sm:inline">Team</span>
@@ -64,6 +66,21 @@ export function SettingsNavigation({ currentTab, onTabChange }: SettingsNavigati
         <TabsTrigger value="payments" className="flex items-center gap-2">
           <CreditCard className="w-4 h-4" />
           <span className="hidden sm:inline">Payments</span>
+        </TabsTrigger>
+
+        <TabsTrigger value="subscription" className="flex items-center gap-2">
+          <Crown className="w-4 h-4" />
+          <span className="hidden sm:inline">Subscription</span>
+          {isTrialing && (
+            <Badge variant="secondary" className="ml-1 text-xs">
+              Trial
+            </Badge>
+          )}
+          {subscription?.status === 'active' && (
+            <Badge variant="default" className="ml-1 text-xs">
+              Active
+            </Badge>
+          )}
         </TabsTrigger>
 
         <TabsTrigger value="notifications" className="flex items-center gap-2">

@@ -497,58 +497,107 @@ export function POSView() {
 
   return (
     <>
-      <PageLayout>
-        <div className={cn("flex flex-col lg:grid lg:grid-cols-3 h-full", responsiveSpacing.gap.md)}>
-      {/* Products Section */}
-      <div className="lg:col-span-2 space-y-4 md:space-y-6 flex-1">
-        <PageHeader
-          title="POS System"
-          description="Select products to add to cart"
-          icon={<ShoppingCart className="w-8 h-8 text-primary" />}
-          actions={
-            <div className="flex items-center gap-2">
-            {/* Mobile Cart Button */}
-            <Sheet open={showMobileCart} onOpenChange={setShowMobileCart}>
-              <SheetTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="lg:hidden relative"
-                  size="sm"
-                >
-                  <ShoppingCart className="w-4 h-4" />
-                  {cart.length > 0 && (
-                    <Badge
-                      variant="destructive"
-                      className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
-                    >
-                      {cart.length}
-                    </Badge>
-                  )}
-                </Button>
-              </SheetTrigger>
-            </Sheet>
+      <PageLayout className="h-full overflow-hidden">
+        {/* Main POS Layout */}
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 h-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+          {/* Left Side - Products Section */}
+          <div className="flex-1 lg:w-3/4 flex flex-col min-h-0 overflow-hidden">
+            <PageHeader
+              title="POS System"
+              description="Select products to add to cart"
+              icon={<ShoppingCart className="w-8 h-8 text-primary" />}
+              actions={
+                <div className="flex items-center gap-2">
+                  {/* Mobile Cart Button */}
+                  <Sheet open={showMobileCart} onOpenChange={setShowMobileCart}>
+                    <SheetTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="lg:hidden relative"
+                        size="sm"
+                      >
+                        <ShoppingCart className="w-4 h-4" />
+                        {cart.length > 0 && (
+                          <Badge
+                            variant="destructive"
+                            className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+                          >
+                            {cart.length}
+                          </Badge>
+                        )}
+                      </Button>
+                    </SheetTrigger>
+                    <SheetContent side="right" className="w-full sm:w-96">
+                      <SheetHeader>
+                        <SheetTitle>Shopping Cart</SheetTitle>
+                      </SheetHeader>
+                      <POSCartSection
+                        cart={cart}
+                        subtotal={subtotal}
+                        discountAmount={discountAmount}
+                        taxAmount={taxAmount}
+                        total={total}
+                        selectedCustomer={selectedCustomer}
+                        paymentMethod={paymentMethod}
+                        discountValue={discountValue}
+                        discountType={discountType}
+                        discountCode={discountCode}
+                        isProcessingOrder={isProcessingOrder}
+                        customers={customers}
+                        paymentOptions={getPaymentOptions()}
+                        onUpdateQuantity={updateQuantity}
+                        onClearCart={clearCart}
+                        onSetSelectedCustomer={setSelectedCustomer}
+                        onSetPaymentMethod={setPaymentMethod}
+                        onSetDiscountValue={setDiscountValue}
+                        onSetDiscountType={setDiscountType}
+                        onSetDiscountCode={setDiscountCode}
+                        onProcessOrder={processOrder}
+                        className="mt-6"
+                      />
+                    </SheetContent>
+                  </Sheet>
 
-              <Button
-                variant="outline"
-                onClick={() => setShowOrderHistory(true)}
-                className="flex items-center gap-2 w-full sm:w-auto"
-                size="sm"
-              >
-                <History className="w-4 h-4" />
-                <span className="hidden sm:inline">Order History</span>
-                <span className="sm:hidden">History</span>
-              </Button>
-            </div>
-          }
-        />
 
+                </div>
+              }
+            />
 
+            {/* Products Content */}
+            <div className="flex-1 flex flex-col min-h-0 space-y-4 md:space-y-6">
+            {/* Products Card */}
+            <Card className="flex-1 flex flex-col min-h-0">
+          <CardHeader className="pb-3 sm:pb-6 flex-shrink-0">
+            {/* Search, Filter, and View Controls in One Line */}
+            <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+              {/* Search */}
+              <div className="flex-1">
+                <ResponsiveSearch
+                  searchValue={searchTerm}
+                  onSearchChange={setSearchTerm}
+                  placeholder="Search products..."
+                  compactMode={false}
+                />
+              </div>
 
-        <Card>
-          <CardHeader className="pb-3 sm:pb-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <CardTitle className="text-foreground text-lg sm:text-xl">Products</CardTitle>
-              <div className="flex items-center gap-1 bg-muted rounded-lg p-1 self-start sm:self-auto">
+              {/* Category Filter - Desktop */}
+              <div className="hidden sm:block flex-shrink-0">
+                <QuickFilterButtons
+                  options={[
+                    { label: "All Categories", value: "" },
+                    ...categories.map(cat => ({
+                      label: cat.name,
+                      value: cat.id,
+                      count: products.filter(p => p.category_id === cat.id).length
+                    }))
+                  ]}
+                  activeValue={selectedCategory || ""}
+                  onChange={(value) => setSelectedCategory(value || null)}
+                />
+              </div>
+
+              {/* View Mode Toggle */}
+              <div className="flex items-center gap-1 bg-muted rounded-lg p-1 flex-shrink-0">
                 <Button
                   variant={viewMode === "compact" ? "default" : "ghost"}
                   size="sm"
@@ -576,17 +625,9 @@ export function POSView() {
               </div>
             </div>
           </CardHeader>
-          <CardContent className={cn("space-y-4", responsiveSpacing.padding.sm)}>
-            {/* Enhanced Responsive Search and Filter Controls */}
-            <ResponsiveSearch
-              searchValue={searchTerm}
-              onSearchChange={setSearchTerm}
-              placeholder="Search products..."
-              compactMode={false}
-            />
-
-            {/* Category Filter - Desktop */}
-            <div className="hidden sm:block">
+          <CardContent className={cn("flex-1 flex flex-col min-h-0 overflow-hidden", responsiveSpacing.padding.sm)}>
+            {/* Category Filter - Mobile */}
+            <div className="sm:hidden flex-shrink-0 mb-4">
               <QuickFilterButtons
                 options={[
                   { label: "All Categories", value: "" },
@@ -601,25 +642,8 @@ export function POSView() {
               />
             </div>
 
-            {/* Category Filter - Mobile */}
-            <div className="sm:hidden">
-              <select
-                value={selectedCategory || ""}
-                onChange={(e) => setSelectedCategory(e.target.value || null)}
-                className={cn(
-                  "w-full px-3 py-2 border border-border rounded-md bg-background text-foreground text-sm",
-                  touchFriendly.minTouch
-                )}
-              >
-                <option value="">All Categories</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
+            {/* Products Display - Scrollable */}
+            <div className="flex-1 overflow-y-auto">
             {/* Products Display */}
             {loading ? (
               <div className="flex items-center justify-center py-8">
@@ -634,15 +658,15 @@ export function POSView() {
               <>
                 {/* Compact View - Enhanced Responsive Grid */}
                 {viewMode === "compact" && (
-                  <div className={cn(responsiveGrid.products, responsiveSpacing.gap.xs)}>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-3">
                     {filteredProducts.map((product) => (
                       <Card
                         key={product.id}
-                        className="cursor-pointer hover:shadow-md transition-shadow overflow-hidden"
+                        className="cursor-pointer hover:shadow-md transition-shadow overflow-hidden flex flex-col"
                         onClick={() => handleAddToCart(product)}
                       >
                         {/* Product Image */}
-                        <div className="aspect-[4/3] bg-muted overflow-hidden">
+                        <div className="aspect-square bg-muted overflow-hidden">
                           {product.image_url ? (
                             <img
                               src={product.image_url}
@@ -656,53 +680,53 @@ export function POSView() {
                             />
                           ) : null}
                           <div className={`w-full h-full flex items-center justify-center ${product.image_url ? 'hidden' : 'flex'}`}>
-                            <span className="text-2xl font-semibold text-muted-foreground">
+                            <span className="text-lg sm:text-xl font-semibold text-muted-foreground">
                               {product.name.charAt(0).toUpperCase()}
                             </span>
                           </div>
                         </div>
 
-                        <CardContent className="p-3 sm:p-4">
-                          <h3 className="font-semibold text-xs sm:text-sm mb-1 sm:mb-2 line-clamp-2 leading-tight">{product.name}</h3>
-                          <p className="text-xs text-muted-foreground mb-2 sm:mb-3 line-clamp-1 sm:line-clamp-2">
+                        <CardContent className="p-2 sm:p-3 flex-1 flex flex-col">
+                          <h3 className="font-semibold text-xs sm:text-sm mb-1 line-clamp-2 leading-tight flex-shrink-0">{product.name}</h3>
+                          <p className="text-xs text-muted-foreground mb-2 line-clamp-1 flex-shrink-0">
                             {product.categories?.name || 'No category'}
                           </p>
 
                           {/* Stock indicator */}
-                          <div className="flex items-center justify-between mb-3">
-                            <span className="text-xs text-muted-foreground">{product.stock_quantity} Available</span>
-                            <Badge variant={product.stock_quantity > 0 ? "default" : "destructive"} className="text-xs">
+                          <div className="flex items-center justify-between mb-2 flex-shrink-0">
+                            <span className="text-xs text-muted-foreground truncate">{product.stock_quantity} Available</span>
+                            <Badge variant={product.stock_quantity > 0 ? "default" : "destructive"} className="text-xs flex-shrink-0">
                               {product.stock_quantity > 0 ? 'In Stock' : 'Out of Stock'}
                             </Badge>
                           </div>
 
                           {/* Price and Add Button */}
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm sm:text-lg font-bold">{formatCurrency(product.price)}</span>
-                            <div className="flex items-center gap-1 sm:gap-2">
+                          <div className="flex items-center justify-between mt-auto">
+                            <span className="text-sm sm:text-base font-bold truncate">{formatCurrency(product.price)}</span>
+                            <div className="flex items-center gap-1 flex-shrink-0">
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="h-7 w-7 sm:h-8 sm:w-8 p-0 rounded-full touch-manipulation"
+                                className="h-6 w-6 sm:h-7 sm:w-7 p-0 rounded-full touch-manipulation"
                                 disabled={getCartQuantity(product.id) === 0}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   updateQuantity(product.id, getCartQuantity(product.id) - 1);
                                 }}
                               >
-                                <Minus className="w-3 h-3 sm:w-4 sm:h-4" />
+                                <Minus className="w-3 h-3" />
                               </Button>
-                              <span className="w-6 sm:w-8 text-center font-medium text-sm">{getCartQuantity(product.id)}</span>
+                              <span className="w-4 sm:w-6 text-center font-medium text-xs sm:text-sm">{getCartQuantity(product.id)}</span>
                               <Button
                                 size="sm"
-                                className="h-7 w-7 sm:h-8 sm:w-8 p-0 rounded-full touch-manipulation"
+                                className="h-6 w-6 sm:h-7 sm:w-7 p-0 rounded-full touch-manipulation"
                                 disabled={product.stock_quantity === 0}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleAddToCart(product);
                                 }}
                               >
-                                <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+                                <Plus className="w-3 h-3" />
                               </Button>
                             </div>
                           </div>
@@ -714,11 +738,11 @@ export function POSView() {
 
                 {/* Grid View - Enhanced Responsive */}
                 {viewMode === "grid" && (
-                  <div className={cn(responsiveGrid.cards, responsiveSpacing.gap.md)}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                     {filteredProducts.map((product) => (
                       <Card
                         key={product.id}
-                        className="cursor-pointer hover:shadow-lg transition-shadow overflow-hidden"
+                        className="cursor-pointer hover:shadow-lg transition-shadow overflow-hidden flex flex-col"
                         onClick={() => handleAddToCart(product)}
                       >
                         {/* Product Image */}
@@ -736,53 +760,53 @@ export function POSView() {
                             />
                           ) : null}
                           <div className={`w-full h-full flex items-center justify-center ${product.image_url ? 'hidden' : 'flex'}`}>
-                            <span className="text-4xl font-semibold text-muted-foreground">
+                            <span className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-muted-foreground">
                               {product.name.charAt(0).toUpperCase()}
                             </span>
                           </div>
                         </div>
 
-                        <CardContent className="p-6">
-                          <h3 className="font-semibold text-lg mb-2 line-clamp-2">{product.name}</h3>
-                          <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+                        <CardContent className="p-4 sm:p-6 flex-1 flex flex-col">
+                          <h3 className="font-semibold text-base sm:text-lg mb-2 line-clamp-2 flex-shrink-0">{product.name}</h3>
+                          <p className="text-sm text-muted-foreground mb-3 sm:mb-4 line-clamp-2 sm:line-clamp-3 flex-shrink-0">
                             {product.categories?.name || 'No category'} • SKU: {product.sku}
                           </p>
 
                           {/* Stock indicator */}
-                          <div className="flex items-center justify-between mb-4">
-                            <span className="text-sm text-muted-foreground">{product.stock_quantity} Available</span>
-                            <Badge variant={product.stock_quantity > 0 ? "default" : "destructive"}>
+                          <div className="flex items-center justify-between mb-3 sm:mb-4 flex-shrink-0">
+                            <span className="text-sm text-muted-foreground truncate">{product.stock_quantity} Available</span>
+                            <Badge variant={product.stock_quantity > 0 ? "default" : "destructive"} className="flex-shrink-0">
                               {product.stock_quantity > 0 ? 'In Stock' : 'Out of Stock'}
                             </Badge>
                           </div>
 
                           {/* Price and Add Button */}
-                          <div className="flex items-center justify-between">
-                            <span className="text-2xl font-bold">{formatCurrency(product.price)}</span>
-                            <div className="flex items-center gap-3">
+                          <div className="flex items-center justify-between mt-auto">
+                            <span className="text-lg sm:text-xl lg:text-2xl font-bold truncate">{formatCurrency(product.price)}</span>
+                            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="h-10 w-10 p-0 rounded-full"
+                                className="h-8 w-8 sm:h-10 sm:w-10 p-0 rounded-full touch-manipulation"
                                 disabled={getCartQuantity(product.id) === 0}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   updateQuantity(product.id, getCartQuantity(product.id) - 1);
                                 }}
                               >
-                                <Minus className="w-5 h-5" />
+                                <Minus className="w-4 h-4 sm:w-5 sm:h-5" />
                               </Button>
-                              <span className="w-10 text-center font-semibold">{getCartQuantity(product.id)}</span>
+                              <span className="w-6 sm:w-8 lg:w-10 text-center font-semibold text-sm sm:text-base">{getCartQuantity(product.id)}</span>
                               <Button
                                 size="sm"
-                                className="h-10 w-10 p-0 rounded-full"
+                                className="h-8 w-8 sm:h-10 sm:w-10 p-0 rounded-full touch-manipulation"
                                 disabled={product.stock_quantity === 0}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleAddToCart(product);
                                 }}
                               >
-                                <Plus className="w-5 h-5" />
+                                <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                               </Button>
                             </div>
                           </div>
@@ -794,17 +818,17 @@ export function POSView() {
 
                 {/* List View */}
                 {viewMode === "list" && (
-                  <div className="space-y-3">
+                  <div className="space-y-2 sm:space-y-3">
                     {filteredProducts.map((product) => (
                       <Card
                         key={product.id}
                         className="cursor-pointer hover:shadow-md transition-shadow"
                         onClick={() => handleAddToCart(product)}
                       >
-                        <CardContent className="p-4">
-                          <div className="flex items-center">
+                        <CardContent className="p-3 sm:p-4">
+                          <div className="flex items-center gap-3 sm:gap-4">
                             {/* Product Image */}
-                            <div className="w-20 h-20 bg-muted rounded-lg overflow-hidden flex-shrink-0 mr-4">
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-muted rounded-lg overflow-hidden flex-shrink-0">
                               {product.image_url ? (
                                 <img
                                   src={product.image_url}
@@ -818,21 +842,21 @@ export function POSView() {
                                 />
                               ) : null}
                               <div className={`w-full h-full flex items-center justify-center ${product.image_url ? 'hidden' : 'flex'}`}>
-                                <span className="text-xl font-semibold text-muted-foreground">
+                                <span className="text-lg sm:text-xl font-semibold text-muted-foreground">
                                   {product.name.charAt(0).toUpperCase()}
                                 </span>
                               </div>
                             </div>
 
                             {/* Product Info */}
-                            <div className="flex items-center justify-between flex-1 min-w-0">
-                              <div className="flex-1 min-w-0 mr-4">
-                                <h3 className="font-semibold text-base mb-1 truncate">{product.name}</h3>
-                                <p className="text-sm text-muted-foreground mb-2">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between flex-1 min-w-0 gap-2 sm:gap-4">
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-semibold text-sm sm:text-base mb-1 line-clamp-1">{product.name}</h3>
+                                <p className="text-xs sm:text-sm text-muted-foreground mb-1 sm:mb-2 line-clamp-1">
                                   {product.categories?.name || 'No category'} • SKU: {product.sku}
                                 </p>
-                                <div className="flex items-center gap-2">
-                                  <span className="text-sm text-muted-foreground">{product.stock_quantity} Available</span>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="text-xs sm:text-sm text-muted-foreground">{product.stock_quantity} Available</span>
                                   <Badge variant={product.stock_quantity > 0 ? "default" : "destructive"} className="text-xs">
                                     {product.stock_quantity > 0 ? 'In Stock' : 'Out of Stock'}
                                   </Badge>
@@ -840,32 +864,32 @@ export function POSView() {
                               </div>
 
                               {/* Price and Controls */}
-                              <div className="flex items-center gap-4 flex-shrink-0">
-                                <span className="text-xl font-bold">{formatCurrency(product.price)}</span>
-                                <div className="flex items-center gap-2">
+                              <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 flex-shrink-0">
+                                <span className="text-lg sm:text-xl font-bold">{formatCurrency(product.price)}</span>
+                                <div className="flex items-center gap-1 sm:gap-2">
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    className="h-8 w-8 p-0 rounded-full"
+                                    className="h-7 w-7 sm:h-8 sm:w-8 p-0 rounded-full touch-manipulation"
                                     disabled={getCartQuantity(product.id) === 0}
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       updateQuantity(product.id, getCartQuantity(product.id) - 1);
                                     }}
                                   >
-                                    <Minus className="w-4 h-4" />
+                                    <Minus className="w-3 h-3 sm:w-4 sm:h-4" />
                                   </Button>
-                                  <span className="w-8 text-center font-medium">{getCartQuantity(product.id)}</span>
+                                  <span className="w-6 sm:w-8 text-center font-medium text-sm">{getCartQuantity(product.id)}</span>
                                   <Button
                                     size="sm"
-                                    className="h-8 w-8 p-0 rounded-full"
+                                    className="h-7 w-7 sm:h-8 sm:w-8 p-0 rounded-full touch-manipulation"
                                     disabled={product.stock_quantity === 0}
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       handleAddToCart(product);
                                     }}
                                   >
-                                    <Plus className="w-4 h-4" />
+                                    <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
                                   </Button>
                                 </div>
                               </div>
@@ -878,37 +902,39 @@ export function POSView() {
                 )}
               </>
             )}
+            </div> {/* End scrollable container */}
           </CardContent>
         </Card>
-      </div>
+            </div>
+          </div>
 
-      {/* Desktop Cart Section */}
-      <div className="hidden lg:block lg:col-span-1 space-y-6">
-        <POSCartSection
-          cart={cart}
-          subtotal={subtotal}
-          discountAmount={discountAmount}
-          taxAmount={taxAmount}
-          total={total}
-          selectedCustomer={selectedCustomer}
-          paymentMethod={paymentMethod}
-          discountValue={discountValue}
-          discountType={discountType}
-          discountCode={discountCode}
-          isProcessingOrder={isProcessingOrder}
-          customers={customers}
-          paymentOptions={getPaymentOptions()}
-          onUpdateQuantity={updateQuantity}
-          onClearCart={clearCart}
-          onSetSelectedCustomer={setSelectedCustomer}
-          onSetPaymentMethod={setPaymentMethod}
-          onSetDiscountValue={setDiscountValue}
-          onSetDiscountType={setDiscountType}
-          onSetDiscountCode={setDiscountCode}
-          onProcessOrder={processOrder}
-          className="sticky top-4 h-[calc(100vh-6rem)]"
-        />
-      </div>
+          {/* Right Side - Cart Section (Full Height) */}
+          <div className="hidden lg:block lg:w-1/4 lg:flex-shrink-0 lg:min-w-[320px] lg:max-w-[400px] h-full">
+            <POSCartSection
+              cart={cart}
+              subtotal={subtotal}
+              discountAmount={discountAmount}
+              taxAmount={taxAmount}
+              total={total}
+              selectedCustomer={selectedCustomer}
+              paymentMethod={paymentMethod}
+              discountValue={discountValue}
+              discountType={discountType}
+              discountCode={discountCode}
+              isProcessingOrder={isProcessingOrder}
+              customers={customers}
+              paymentOptions={getPaymentOptions()}
+              onUpdateQuantity={updateQuantity}
+              onClearCart={clearCart}
+              onSetSelectedCustomer={setSelectedCustomer}
+              onSetPaymentMethod={setPaymentMethod}
+              onSetDiscountValue={setDiscountValue}
+              onSetDiscountType={setDiscountType}
+              onSetDiscountCode={setDiscountCode}
+              onProcessOrder={processOrder}
+              className="h-full"
+            />
+          </div>
         </div>
       </PageLayout>
 
@@ -1030,9 +1056,10 @@ export function POSView() {
             ) : (
               <>
                 <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide py-4 flex-shrink-0">Items</h4>
-                <div className="flex-1 overflow-y-auto space-y-3 pb-4">
-                  {cart.map((item) => (
-                    <div key={item.id} className="flex items-center gap-3 p-3 border border-border rounded-lg">
+                <div className="flex-1 overflow-y-auto pb-4">
+                  {cart.map((item, index) => (
+                    <div key={item.id}>
+                      <div className="flex items-center gap-3 p-3 hover:bg-muted/20 transition-colors">
                       {/* Product Image */}
                       <div className="w-12 h-12 bg-muted rounded-md overflow-hidden flex-shrink-0">
                         {item.image_url ? (
@@ -1089,6 +1116,10 @@ export function POSView() {
                           </Button>
                         </div>
                       </div>
+                      </div>
+                      {index < cart.length - 1 && (
+                        <div className="border-b border-border/30 my-2" />
+                      )}
                     </div>
                   ))}
                 </div>

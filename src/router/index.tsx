@@ -9,7 +9,7 @@ const LandingPage = lazy(() => import('@/pages/LandingPage'));
 const AuthPage = lazy(() => import('@/pages/AuthPage'));
 const PinLoginPage = lazy(() => import('@/pages/PinLoginPage'));
 const RouterAppLayout = lazy(() => import('@/components/layout/RouterAppLayout'));
-const Dashboard = lazy(() => import('@/components/dashboard/DashboardWithNavigation').then(m => ({ default: m.DashboardWithNavigation })));
+const Dashboard = lazy(() => import('@/components/dashboard/SimpleFocusedDashboardWithNavigation').then(m => ({ default: m.SimpleFocusedDashboardWithNavigation })));
 const ReportsView = lazy(() => import('@/components/reports/ReportsWithNavigation').then(m => ({ default: m.ReportsWithNavigation })));
 const POSView = lazy(() => import('@/components/pos/POSView').then(m => ({ default: m.POSView })));
 const InventoryView = lazy(() => import('@/components/inventory/InventoryView').then(m => ({ default: m.InventoryView })));
@@ -24,7 +24,6 @@ const ExpenseView = lazy(() => import('@/components/expenses/ExpenseView').then(
 const ShowcaseView = lazy(() => import('@/components/showcase/ShowcaseManagementView').then(m => ({ default: m.ShowcaseManagementView })));
 const PublicStoreShowcase = lazy(() => import('@/components/showcase/PublicStoreShowcase').then(m => ({ default: m.PublicStoreShowcase })));
 const SettingsView = lazy(() => import('@/components/settings/SettingsView').then(m => ({ default: m.SettingsView })));
-const SubscriptionPage = lazy(() => import('@/pages/SubscriptionPage'));
 const PaymentResultPage = lazy(() => import('@/pages/PaymentResultPage'));
 const StoreSelectionPage = lazy(() => import('@/pages/StoreSelectionPage'));
 const StoreShortLinkPage = lazy(() => import('@/pages/StoreShortLinkPage'));
@@ -293,14 +292,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'subscription',
-        element: <RouterAppLayout />,
-        loader: protectedLoader,
-        children: [
-          {
-            index: true,
-            element: <SubscriptionPage />,
-          },
-        ],
+        loader: () => redirect('/app/settings?tab=subscription'),
       },
       {
         path: 'payment-result',

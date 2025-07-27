@@ -1,5 +1,5 @@
 
-import { Store, CreditCard } from "lucide-react";
+import { Store } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useRoleBasedNavigation } from "@/hooks/useRoleBasedAccess";
 import { useUser } from "@/stores/authStore";
@@ -117,27 +117,7 @@ export function Sidebar({ activeView, onViewChange, collapsible = "icon" }: Side
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Account Section */}
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-xs sm:text-sm">Account</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu className={cn(touchFriendly.touchSpacing)}>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  onClick={() => navigate('/app/subscription')}
-                  tooltip={state === "collapsed" ? "Subscription" : undefined}
-                  className={cn(
-                    touchFriendly.minTouch,
-                    "px-2 sm:px-3 justify-start gap-2 sm:gap-3"
-                  )}
-                >
-                  <CreditCard className={cn(responsiveIcon.sm, "shrink-0")} />
-                  <span className="truncate text-sm sm:text-base">Subscription</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+
 
 
       </SidebarContent>

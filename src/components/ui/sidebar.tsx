@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
-import { PanelLeft } from "lucide-react"
+import { MultiLevelMenuIcon } from "./multi-level-menu-icon"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
@@ -292,7 +292,7 @@ const SidebarTrigger = React.forwardRef<
       onClick={handleClick}
       {...props}
     >
-      <PanelLeft className="h-4 w-4" />
+      <MultiLevelMenuIcon size={16} />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )

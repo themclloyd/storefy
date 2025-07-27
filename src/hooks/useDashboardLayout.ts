@@ -28,7 +28,7 @@ const DEFAULT_LAYOUT: DashboardLayout = {
   id: 'default',
   name: 'Default Layout',
   theme: 'auto',
-  compactMode: false,
+  compactMode: true,
   refreshInterval: 300,
   isDefault: true,
   widgets: [

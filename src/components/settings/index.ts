@@ -8,6 +8,7 @@ export { TeamManagement } from './components/TeamManagement';
 export { StoreSettings } from './components/StoreSettings';
 export { ActivityLogs } from './components/ActivityLogs';
 export { SettingsNavigation } from './components/SettingsNavigation';
+export { SubscriptionSettings } from './components/SubscriptionSettings';
 
 // Showcase sub-components
 export { ShowcaseBasicSettings } from './showcase/ShowcaseBasicSettings';
