@@ -6,6 +6,7 @@ import { useUser } from "@/stores/authStore";
 import { usePermissions } from "@/stores/permissionStore";
 import { CompactStoreSelector } from "@/components/stores/CompactStoreSelector";
 import { UserMenu } from "@/components/layout/UserMenu";
+import { cn } from "@/lib/utils";
 import {
   Sidebar as SidebarPrimitive,
   SidebarContent,
