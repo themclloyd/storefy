@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Settings, Users, Shield, Eye, EyeOff, Edit, Trash2, UserCheck, UserX, Crown, UserCog, HelpCircle, UserPlus, Store, CreditCard, Bell, Activity, Copy } from "lucide-react";
+import { Settings, Users, Shield, Eye, EyeOff, Edit, Trash2, UserCheck, UserX, Crown, UserCog, HelpCircle, UserPlus, Store, CreditCard, Bell, Activity, Copy, Globe } from "lucide-react";
 import { useCurrentStore, useStoreStore } from "@/stores/storeStore";
 import { useUser } from "@/stores/authStore";
 import { SecureAction, SecureButton } from "@/components/auth/SecureAction";

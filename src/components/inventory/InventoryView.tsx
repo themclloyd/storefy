@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {} from "@/components/ui/input";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -71,7 +71,7 @@ export function InventoryView() {
 
   // Use Zustand store state
   const products = useProducts();
-  const _categories = useCategories();
+  const categories = useCategories();
   const suppliers = useSuppliers();
   const _searchTerm = useInventoryStore(state => state.searchTerm);
   const _selectedCategory = useInventoryStore(state => state.selectedCategory);

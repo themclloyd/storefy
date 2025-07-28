@@ -10,17 +10,22 @@ export const CSP_CONFIG = {
   'default-src': ["'self'"],
   'script-src': [
     "'self'",
-    "'unsafe-inline'", // Required for Vite in development
+    "'unsafe-inline'", // Required for Vite in development and React components
+    'blob:', // Required for dynamic imports and Vercel Analytics
+    'https://plausible.io',
+    'https://vercel.live',
+    'https://va.vercel-scripts.com',
     'https://cdn.jsdelivr.net',
     'https://unpkg.com',
   ],
   'style-src': [
     "'self'",
-    "'unsafe-inline'", // Required for CSS-in-JS
+    "'unsafe-inline'", // Required for CSS-in-JS and inline styles
     'https://fonts.googleapis.com',
   ],
   'font-src': [
     "'self'",
+    'data:',
     'https://fonts.gstatic.com',
   ],
   'img-src': [
@@ -35,11 +40,15 @@ export const CSP_CONFIG = {
     'ws://localhost:8080',
     'https://*.supabase.co',
     'wss://*.supabase.co',
+    'https://vitals.vercel-analytics.com',
+    'https://va.vercel-scripts.com',
+    'https://plausible.io',
     'https://api.vercel.com',
   ],
   'frame-ancestors': ["'none'"],
   'base-uri': ["'self'"],
   'form-action': ["'self'"],
+  'object-src': ["'none'"],
 };
 
 // Generate CSP header string
