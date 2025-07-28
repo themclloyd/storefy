@@ -12,7 +12,7 @@ import {
   CreditCardIcon,
   CogIcon,
   GlobeAltIcon
-} from '@heroicons/react/24/solid';
+} from '@heroicons/react/20/solid';
 import { Package as PackageIcon } from 'lucide-react';
 
 /**
