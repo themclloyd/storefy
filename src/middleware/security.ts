@@ -82,7 +82,7 @@ function setupXSSProtection(): void {
   if (originalInnerHTML) {
     Object.defineProperty(Element.prototype, 'innerHTML', {
       get: originalInnerHTML.get,
-      set: function(value: string) {
+      set(value: string) {
         const sanitized = XSSProtection.sanitizeHTML(value);
         originalInnerHTML.set?.call(this, sanitized);
       },

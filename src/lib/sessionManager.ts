@@ -10,6 +10,7 @@ interface PinSessionData {
   login_time: string;
   last_activity?: string;
   expires_at?: string;
+  sessionToken?: string; // Secure session token for RLS
 }
 
 interface SessionConfig {
@@ -172,18 +173,18 @@ class SessionManager {
   }
 
   /**
-   * Create a new PIN session with proper expiry
+   * Create a new PIN session with secure token
    */
   public createPinSession(sessionData: Omit<PinSessionData, 'last_activity' | 'expires_at'>): void {
     const now = new Date();
     const expiresAt = new Date(now.getTime() + this.config.pinSessionTimeout * 60 * 1000);
-    
+
     const fullSessionData: PinSessionData = {
       ...sessionData,
       last_activity: now.toISOString(),
       expires_at: expiresAt.toISOString()
     };
-    
+
     localStorage.setItem('pin_session', JSON.stringify(fullSessionData));
     
     // Trigger session change event

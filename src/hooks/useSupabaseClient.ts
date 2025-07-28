@@ -6,7 +6,7 @@ import { sessionManager } from '@/lib/sessionManager';
  * Hook for data operations that automatically handles PIN sessions
  */
 export function useStoreData() {
-  const user = useUser();
+  const _user = useUser();
 
   // Check for PIN session using session manager
   const pinData = sessionManager.getPinSession();

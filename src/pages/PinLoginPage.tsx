@@ -104,7 +104,7 @@ export default function PinLoginPage() {
       // Use navigate for better UX, fallback to reload if needed
       navigate('/dashboard');
     } catch (error: any) {
-      toast.error('Login failed: ' + error.message);
+      toast.error(`Login failed: ${  error.message}`);
     } finally {
       setLoading(false);
     }

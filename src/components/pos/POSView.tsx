@@ -42,7 +42,7 @@ import { cn } from "@/lib/utils";
 export function POSView() {
   const currentStore = useCurrentStore();
   const user = useUser();
-  const { getPaymentOptions, isValidPaymentMethod, formatPaymentMethodDisplay } = usePaymentMethods();
+  const { getPaymentOptions, isValidPaymentMethod, _formatPaymentMethodDisplay } = usePaymentMethods();
   const { calculateItemsTax, formatCurrency } = useTax();
   const { trackTransaction, trackSearch, trackFeatureUsage } = useAnalytics();
 
@@ -328,11 +328,11 @@ export function POSView() {
           customer_id: selectedCustomer?.id || null,
           cashier_id: user.id,
           order_number: orderNumber,
-          subtotal: subtotal,
+          subtotal,
           discount_amount: discountAmount,
           discount_code: discountCode || null,
           tax_amount: taxAmount,
-          total: total,
+          total,
           status: 'completed',
           payment_method: paymentMethod,
         })
@@ -449,7 +449,7 @@ export function POSView() {
       trackTransaction({
         amount: total,
         itemsCount: cart.length,
-        paymentMethod: paymentMethod,
+        paymentMethod,
         customerType: selectedCustomer?.status === 'vip' ? 'vip' :
                      selectedCustomer?.total_orders === 0 ? 'new' : 'returning'
       });

@@ -26,7 +26,7 @@ async function checkDatabase(): Promise<HealthCheckResult> {
   const start = Date.now();
   
   try {
-    const { data, error } = await supabase
+    const { data, _error } = await supabase
       .from('stores')
       .select('count')
       .limit(1);
@@ -65,7 +65,7 @@ async function checkAuth(): Promise<HealthCheckResult> {
   const start = Date.now();
   
   try {
-    const { data, error } = await supabase.auth.getSession();
+    const { data, _error } = await supabase.auth.getSession();
     const responseTime = Date.now() - start;
     
     if (error) {
@@ -206,7 +206,7 @@ export async function quickHealthCheck(): Promise<boolean> {
     if (envCheck.status === 'unhealthy') return false;
     
     // Quick database ping
-    const { error } = await supabase
+    const { _error } = await supabase
       .from('stores')
       .select('count')
       .limit(1);

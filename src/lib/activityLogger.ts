@@ -14,7 +14,7 @@ export interface ActivityLogEntry {
 
 export const logActivity = async (entry: ActivityLogEntry) => {
   try {
-    const { error } = await supabase
+    const { _error } = await supabase
       .from('activity_logs')
       .insert({
         store_id: entry.store_id,

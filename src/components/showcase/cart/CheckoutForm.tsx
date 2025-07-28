@@ -11,8 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { User, Phone, Mail, MapPin, MessageCircle, CheckCircle } from 'lucide-react';
 import { CartSummary } from './CartSummary';
 import { OrderSuccess } from './OrderSuccess';
-import { CartSummary as CartSummaryType, CustomerInfo, OrderResult } from '@/stores/showcaseCartStore';
-import { useShowcaseCartStore } from '@/stores/showcaseCartStore';
+import { CartSummary as CartSummaryType, CustomerInfo, OrderResult, useShowcaseCartStore } from '@/stores/showcaseCartStore';
 import { toast } from 'sonner';
 
 const checkoutSchema = z.object({

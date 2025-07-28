@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import {} from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Search, Plus, Users, Phone, Mail, Edit, Eye, Loader2, Download, BarChart3, MoreVertical, Filter, Grid3X3, List } from "lucide-react";
+import { Plus, Users, Phone, Mail, Edit, Eye, Loader2, Download, BarChart3, MoreVertical, Filter, Grid3X3, List } from "lucide-react";
 import { useCurrentStore } from "@/stores/storeStore";
 import { useUser } from "@/stores/authStore";
 import { useStoreData } from "@/hooks/useSupabaseClient";

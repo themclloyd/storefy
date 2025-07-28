@@ -41,7 +41,7 @@ export function ExpenseCategoriesView({
   onCategoriesUpdated 
 }: ExpenseCategoriesViewProps) {
   const currentStore = useCurrentStore();
-  const user = useUser();
+  const _user = useUser();
 
   const [categories, setCategories] = useState<ExpenseCategory[]>([]);
   const [filteredCategories, setFilteredCategories] = useState<ExpenseCategory[]>([]);

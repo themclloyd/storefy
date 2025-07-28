@@ -1,12 +1,8 @@
 import {
-  Home,
   ShoppingCart,
   Package,
   Users,
   BarChart3,
-  Clock,
-  Settings,
-  DollarSign,
   CreditCard,
   TrendingUp,
   Globe

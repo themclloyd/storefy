@@ -28,7 +28,7 @@ import { ErrorBoundary } from "../ErrorBoundary";
 
 export function TransactionView() {
   const currentStore = useCurrentStore();
-  const user = useUser();
+  const _user = useUser();
   const { formatCurrency } = useTax();
   const { getPaymentOptions, getPaymentMethodDisplay, getPaymentMethodBadgeVariant } = usePaymentMethods();
 

@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, MapPin } from 'lucide-react';
+import { Plus,} from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@/stores/authStore';
 import { useStoreActions } from '@/stores/storeStore';

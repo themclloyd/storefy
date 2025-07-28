@@ -19,17 +19,14 @@ import {
 import {
   Plus,
   MoreHorizontal,
-  Edit,
   Trash2,
   Calendar,
   DollarSign,
   Clock,
-  AlertCircle,
-  CheckCircle,
   Pause,
   Play
 } from "lucide-react";
-import { format, isAfter, isBefore, addDays } from "date-fns";
+import { format, isBefore, addDays } from "date-fns";
 import { useCurrentStore } from "@/stores/storeStore";
 import { useUser } from "@/stores/authStore";
 import { SecureAction, SecureButton } from "@/components/auth/SecureAction";
@@ -68,7 +65,7 @@ interface RecurringExpensesViewProps {
 
 export function RecurringExpensesView({ categories, onExpenseAdded }: RecurringExpensesViewProps) {
   const currentStore = useCurrentStore();
-  const user = useUser();
+  const _user = useUser();
   const { formatCurrency } = useTax();
   const [loading, setLoading] = useState(true);
   const [recurringExpenses, setRecurringExpenses] = useState<RecurringExpense[]>([]);

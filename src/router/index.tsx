@@ -60,7 +60,7 @@ async function protectedLoader({ request }: LoaderFunctionArgs) {
   return {
     user: session?.user || null,
     session: session || null,
-    pinSession: pinSession,
+    pinSession,
     pathname
   };
 }
@@ -84,6 +84,13 @@ async function storeLoader() {
     return { stores: [], currentStore: null };
   }
 }
+
+// Hydration fallback component
+const HydrateFallback = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+  </div>
+);
 
 // Create the router with data API
 export const router = createBrowserRouter([

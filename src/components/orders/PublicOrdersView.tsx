@@ -68,7 +68,7 @@ export function PublicOrdersView() {
     try {
       setLoading(true);
       
-      let query = supabase
+      const query = supabase
         .from('public_orders')
         .select(`
           *,

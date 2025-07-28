@@ -274,7 +274,7 @@ export const useTransactionStore = create<TransactionStore>()(
             const { error } = await supabase
               .from('transactions')
               .update({
-                notes: `${selectedTransaction.notes ? selectedTransaction.notes + '\n\n' : ''}VOIDED: ${reason} - Voided on ${new Date().toISOString()}`
+                notes: `${selectedTransaction.notes ? `${selectedTransaction.notes  }\n\n` : ''}VOIDED: ${reason} - Voided on ${new Date().toISOString()}`
               })
               .eq('id', transactionId);
 

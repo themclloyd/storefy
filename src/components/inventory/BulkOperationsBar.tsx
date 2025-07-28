@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { 
   X, 
-  Edit, 
   Trash2, 
   TrendingUp, 
   Eye, 

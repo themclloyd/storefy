@@ -40,7 +40,7 @@ export function DeleteProductDialog({
     setLoading(true);
     try {
       // Instead of hard deleting, we'll soft delete by setting is_active to false
-      const { error } = await supabase
+      const { _error } = await supabase
         .from('products')
         .update({ is_active: false })
         .eq('id', product.id);

@@ -2,11 +2,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { sessionManager, type PinSessionData } from './sessionManager';
 
 /**
- * Custom Supabase client for PIN sessions that sets context variables
- * This maintains RLS security while allowing PIN session access
+ * Secure PIN session client that manages session tokens
+ * This maintains RLS security with proper session validation
  */
 class PinSessionClient {
   private pinData: PinSessionData | null = null;
+  private sessionToken: string | null = null;
   private contextSet = false;
 
   constructor() {
@@ -16,30 +17,30 @@ class PinSessionClient {
   private loadPinSession() {
     // Use the session manager to get valid PIN session
     this.pinData = sessionManager.getPinSession();
+    this.sessionToken = this.pinData?.sessionToken || null;
   }
 
   /**
-   * Set PIN session context in the database for RLS policies
+   * Set PIN session token for secure database access
    */
   private async setPinContext(): Promise<void> {
-    if (!this.pinData || this.contextSet) return;
+    if (!this.sessionToken || this.contextSet) return;
 
     try {
-      const { error } = await supabase.rpc('set_pin_session_context', {
-        _member_id: this.pinData.member_id,
-        _store_id: this.pinData.store_id,
-        _role: this.pinData.role
+      const { error } = await supabase.rpc('set_pin_session_token', {
+        _token: this.sessionToken
       });
 
       if (error) {
-        console.error('Failed to set PIN context:', error);
+        console.warn('Failed to set PIN session token:', error);
         throw error;
       }
 
       this.contextSet = true;
-    } catch (error) {
-      console.error('PIN context error:', error);
-      throw error;
+    } catch (_error) {
+      // Handle error silently for security
+      this.contextSet = false;
+      throw new Error('Session validation failed');
     }
   }
 

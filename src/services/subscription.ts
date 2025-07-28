@@ -257,7 +257,7 @@ export class SubscriptionService {
     }
 
     const now = new Date();
-    let nextBillingDate = new Date(now);
+    const nextBillingDate = new Date(now);
 
     // Handle trial credits - if upgrading during trial, extend billing period
     if (currentSub.status === 'trial' && currentSub.trial_end_date) {

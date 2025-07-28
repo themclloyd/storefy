@@ -27,7 +27,7 @@ import { PageHeader, PageLayout } from "@/components/common/PageHeader";
 
 export function LaybyView() {
   const currentStore = useCurrentStore();
-  const user = useUser();
+  const _user = useUser();
   const { formatCurrency } = useTax();
 
   // Use Zustand store state

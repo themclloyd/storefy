@@ -9,13 +9,18 @@ import { useStoreConfig, useStoreConfigLoading } from './storeConfigStore';
 import { useCurrentTab, useDialogState } from './settingsUIStore';
 
 // Combined selectors for common use cases
-export const useSettingsOverview = () => ({
-  teamMembers: useTeamMembers(),
-  roleStats: useTeamRoleStats(),
-  storeConfig: useStoreConfig(),
-  currentTab: useCurrentTab(),
-  loading: useTeamLoading() || useStoreConfigLoading(),
-});
+export const useSettingsOverview = () => {
+  const teamLoading = useTeamLoading();
+  const storeConfigLoading = useStoreConfigLoading();
+
+  return {
+    teamMembers: useTeamMembers(),
+    roleStats: useTeamRoleStats(),
+    storeConfig: useStoreConfig(),
+    currentTab: useCurrentTab(),
+    loading: teamLoading || storeConfigLoading,
+  };
+};
 
 // Dialog management helpers
 export const useTeamMemberDialog = () => ({

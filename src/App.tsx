@@ -10,10 +10,17 @@ import { initializeSessionMonitoring } from "@/lib/authUtils";
 
 const queryClient = new QueryClient();
 
+// Hydration fallback component
+const HydrateFallback = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+  </div>
+);
+
 // Main app content - no more blocking initialization
 function AppContent() {
   // Directly render the router - let individual routes handle their own loading
-  return <RouterProvider router={router} />;
+  return <RouterProvider router={router} hydrateFallback={<HydrateFallback />} />;
 }
 
 const App = () => {

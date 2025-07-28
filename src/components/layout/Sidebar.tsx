@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useScreenSize } from "@/hooks/use-mobile";
 import { responsiveSpacing, responsiveIcon, touchFriendly } from "@/lib/responsive-utils";
-import { cn } from "@/lib/utils";
+import {} from "@/lib/utils";
 
 interface SidebarProps {
   activeView: string;

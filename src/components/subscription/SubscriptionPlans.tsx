@@ -362,7 +362,7 @@ export function SubscriptionPlans({ onPlanSelected, currentPlanId }: Subscriptio
                         {isTrialing ? (
                           <>
                             <Zap className="w-5 h-5 mr-2" />
-                            {getTrialPhase() === 'late' ? 'Upgrade Now' : 'Upgrade to ' + plan.display_name}
+                            {getTrialPhase() === 'late' ? 'Upgrade Now' : `Upgrade to ${  plan.display_name}`}
                           </>
                         ) : (
                           <>

@@ -115,7 +115,7 @@ export const useStoreStore = create<StoreStore>()(
             const user = useAuthStore.getState().user;
             if (user) {
               const selectionData = {
-                storeId: storeId,
+                storeId,
                 userId: user.id,
                 timestamp: Date.now()
               };

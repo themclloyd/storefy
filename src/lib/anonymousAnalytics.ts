@@ -158,7 +158,7 @@ class AnonymousAnalyticsCollector {
     if (!this.privacySettings.usageTracking) return;
 
     this.trackEvent('page_view', {
-      page: page,
+      page,
       referrer: document.referrer ? this.hashData(document.referrer) : null,
       viewport_width: window.innerWidth,
       viewport_height: window.innerHeight

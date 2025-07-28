@@ -135,7 +135,7 @@ export function RecurringExpenseDialog({
       const nextDueDate = calculateNextDueDate(data.start_date, data.frequency);
       
       // Create recurring expense
-      const { data: expenseData, error: expenseError } = await supabase
+      const { data: _expenseData, error: expenseError } = await supabase
         .from('recurring_expenses')
         .insert({
           store_id: currentStore.id,

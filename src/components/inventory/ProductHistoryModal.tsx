@@ -61,7 +61,7 @@ const adjustmentTypeLabels = {
   transfer: 'Transfer',
 };
 
-const adjustmentTypeColors = {
+const _adjustmentTypeColors = {
   manual: 'default',
   sale: 'destructive',
   return: 'success',

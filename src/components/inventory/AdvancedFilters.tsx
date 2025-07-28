@@ -19,9 +19,7 @@ import {
 import { 
   Filter, 
   ChevronDown, 
-  X, 
   RotateCcw,
-  ArrowUpDown,
   ArrowUp,
   ArrowDown
 } from "lucide-react";

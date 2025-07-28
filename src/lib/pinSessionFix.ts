@@ -59,7 +59,7 @@ export async function testPinSessionAccess(storeId: string) {
     const results = [];
     for (const test of tests) {
       try {
-        const { data, error } = await test.query;
+        const { data, _error } = await test.query;
         results.push({
           table: test.table,
           success: !error,

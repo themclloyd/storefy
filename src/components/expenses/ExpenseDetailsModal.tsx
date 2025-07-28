@@ -9,7 +9,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import {} from "@/components/ui/separator";
 import { 
   Receipt, 
   Calendar, 
@@ -17,12 +17,9 @@ import {
   User, 
   Building, 
   Phone, 
-  FileText, 
-  Download,
+  FileText,
   CheckCircle,
   Clock,
-  XCircle,
-  AlertCircle,
   CreditCard,
   Tag,
   ExternalLink
@@ -31,7 +28,7 @@ import { format } from "date-fns";
 import { useCurrentStore } from "@/stores/storeStore";
 import { supabase } from "@/integrations/supabase/client";
 import { useTax } from "@/hooks/useTax";
-import { toast } from "sonner";
+import {} from "sonner";
 
 interface Expense {
   id: string;
@@ -141,7 +138,7 @@ export function ExpenseDetailsModal({
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))  } ${  sizes[i]}`;
   };
 
   if (!expense) return null;

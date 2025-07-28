@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Building2, Plus, Users, Crown, UserCheck, Settings, BarChart3, Eye, Trash2 } from 'lucide-react';
+import { Building2, Plus, Users, Crown, UserCheck, Settings, BarChart3, Eye,} from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@/stores/authStore';
 import { toast } from 'sonner';

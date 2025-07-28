@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Store, User, KeyRound, ArrowLeft, AlertCircle, Shield, Building2 } from 'lucide-react';
+import { User, KeyRound, ArrowLeft, AlertCircle, Shield, Building2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -82,7 +82,7 @@ export default function StoreLoginPage() {
       toast.success(`Welcome to ${memberData.stores.name}, ${displayName}!`);
       navigate('/pos'); // Direct to POS system
     } catch (error: any) {
-      toast.error('Login failed: ' + error.message);
+      toast.error(`Login failed: ${  error.message}`);
     } finally {
       setLoading(false);
     }

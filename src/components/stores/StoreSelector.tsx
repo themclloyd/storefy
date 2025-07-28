@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Building2, Plus, Users, Crown, UserCheck, Store, Sparkles, ArrowRight, LogOut, ShoppingBag, MapPin, User } from 'lucide-react';
+import { Building2, Plus, Users, Crown, UserCheck,} from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser, useSignOut } from '@/stores/authStore';
 import { toast } from 'sonner';
@@ -21,9 +21,9 @@ export function StoreSelector() {
 export function LegacyStoreSelector() {
   const stores = useStores();
   const currentStore = useCurrentStore();
-  const { selectStore, refreshStores, clearStoreSelection } = useStoreActions();
+  const { selectStore, refreshStores, _clearStoreSelection } = useStoreActions();
   const user = useUser();
-  const signOut = useSignOut();
+  const _signOut = useSignOut();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [newStoreName, setNewStoreName] = useState('');
   const [newStoreAddress, setNewStoreAddress] = useState('');

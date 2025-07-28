@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import {} from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Search, Plus, Package, AlertTriangle, Edit, Trash2, Loader2, Settings, TrendingUp, Download, CheckSquare, FolderOpen, History, MoreVertical, Filter, Grid3X3, List, Globe } from "lucide-react";
+import { Plus, Package, AlertTriangle, Edit, Trash2, Loader2, Settings, TrendingUp, Download, FolderOpen, History, MoreVertical, Filter, Grid3X3, List, Globe } from "lucide-react";
 import { useCurrentStore } from "@/stores/storeStore";
 import { useUser } from "@/stores/authStore";
-import { SecureAction, SecureButton } from "@/components/auth/SecureAction";
+import { SecureButton } from "@/components/auth/SecureAction";
 import { useStoreData } from "@/hooks/useSupabaseClient";
 import { toast } from "sonner";
 import {
@@ -71,10 +71,10 @@ export function InventoryView() {
 
   // Use Zustand store state
   const products = useProducts();
-  const categories = useCategories();
+  const _categories = useCategories();
   const suppliers = useSuppliers();
-  const searchTerm = useInventoryStore(state => state.searchTerm);
-  const selectedCategory = useInventoryStore(state => state.selectedCategory);
+  const _searchTerm = useInventoryStore(state => state.searchTerm);
+  const _selectedCategory = useInventoryStore(state => state.selectedCategory);
   const loading = useInventoryStore(state => state.loading);
   const filters = useInventoryStore(state => state.filters);
   const filteredView = useInventoryStore(state => state.filteredView);

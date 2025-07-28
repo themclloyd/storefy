@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { BarChart3, TrendingUp, Calendar as CalendarIcon, Download, DollarSign, ShoppingCart, Users, Package, Loader2, ArrowUpRight, ArrowDownRight, Filter, RefreshCw, Eye, TrendingDown, ArrowLeft } from "lucide-react";
+import { BarChart3, TrendingUp, Calendar as CalendarIcon, Download, DollarSign, ShoppingCart, Users, Package, Loader2, ArrowUpRight, ArrowDownRight, RefreshCw, TrendingDown, ArrowLeft } from "lucide-react";
 import { useCurrentStore } from "@/stores/storeStore";
 import { useUser } from "@/stores/authStore";
 import { useTax } from "@/hooks/useTax";
@@ -15,7 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format, subDays, startOfMonth, endOfMonth, startOfWeek, endOfWeek } from "date-fns";
 import { DateRange } from "react-day-picker";
-import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import Papa from 'papaparse';
@@ -835,7 +835,7 @@ export function ReportsView({ onViewChange }: ReportsViewProps = {}) {
 
       {/* KPI Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {kpiMetrics.map((metric, index) => {
+        {kpiMetrics.map((metric, _index) => {
           const Icon = metric.icon;
           const TrendIcon = metric.trend === 'up' ? ArrowUpRight : metric.trend === 'down' ? ArrowDownRight : TrendingUp;
           const trendColor = metric.trend === 'up' ? 'text-success' : metric.trend === 'down' ? 'text-destructive' : 'text-muted-foreground';
@@ -946,7 +946,7 @@ export function ReportsView({ onViewChange }: ReportsViewProps = {}) {
                   <p className="text-sm">Start making sales to see top products</p>
                 </div>
               ) : (
-                topProducts.map((product, index) => (
+                topProducts.map((product, _index) => (
                   <div key={product.name} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold text-sm">
@@ -1162,7 +1162,7 @@ export function ReportsView({ onViewChange }: ReportsViewProps = {}) {
                         dataKey="count"
                         label={({ name, count }) => `${name}: ${count}`}
                       >
-                        {inventoryAnalytics?.categoryBreakdown.map((entry, index) => (
+                        {inventoryAnalytics?.categoryBreakdown.map((entry, _index) => (
                           <Cell key={`cell-${index}`} fill={`hsl(${200 + index * 40}, 70%, 50%)`} />
                         ))}
                       </Pie>
@@ -1189,7 +1189,7 @@ export function ReportsView({ onViewChange }: ReportsViewProps = {}) {
                       <p>No inventory data available</p>
                     </div>
                   ) : (
-                    inventoryAnalytics?.stockLevels.map((item, index) => (
+                    inventoryAnalytics?.stockLevels.map((item, _index) => (
                       <div key={index} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
                         <div className="flex-1">
                           <p className="font-medium text-foreground">{item.name}</p>
@@ -1297,7 +1297,7 @@ export function ReportsView({ onViewChange }: ReportsViewProps = {}) {
                         dataKey="count"
                         label={({ segment, percentage }) => `${segment}: ${percentage.toFixed(1)}%`}
                       >
-                        {customerAnalytics?.customerSegments.map((entry, index) => (
+                        {customerAnalytics?.customerSegments.map((entry, _index) => (
                           <Cell key={`cell-${index}`} fill={`hsl(${120 + index * 60}, 70%, 50%)`} />
                         ))}
                       </Pie>
@@ -1324,7 +1324,7 @@ export function ReportsView({ onViewChange }: ReportsViewProps = {}) {
                       <p>No customer data available</p>
                     </div>
                   ) : (
-                    customerAnalytics?.topCustomers.map((customer, index) => (
+                    customerAnalytics?.topCustomers.map((customer, _index) => (
                       <div key={index} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">

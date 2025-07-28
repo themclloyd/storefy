@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {} from 'react';
 import { useStores, useCurrentStore, useSelectStore } from '@/stores/storeStore';
 import { useUser } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
@@ -17,7 +17,7 @@ export function CompactStoreSelector() {
   const stores = useStores();
   const currentStore = useCurrentStore();
   const selectStore = useSelectStore();
-  const user = useUser();
+  const _user = useUser();
 
   const getRoleIcon = (role: string) => {
     switch (role) {

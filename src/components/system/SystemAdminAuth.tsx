@@ -46,7 +46,7 @@ export function SystemAdminAuth({ onAuthenticated, onCancel }: SystemAdminAuthPr
         sessionStorage.setItem('system_admin_session', JSON.stringify({
           authenticated: true,
           timestamp: Date.now(),
-          email: email,
+          email,
           isDefaultCredentials: true
         }));
         
@@ -63,7 +63,7 @@ export function SystemAdminAuth({ onAuthenticated, onCancel }: SystemAdminAuthPr
           sessionStorage.setItem('system_admin_session', JSON.stringify({
             authenticated: true,
             timestamp: Date.now(),
-            email: email,
+            email,
             isDefaultCredentials: false
           }));
           

@@ -437,7 +437,7 @@ export function TransactionDetailsModal({
       const { error } = await supabase
         .from('transactions')
         .update({
-          notes: `${notes ? notes + '\n\n' : ''}VOIDED: Transaction voided on ${new Date().toISOString()} by ${user?.email}`
+          notes: `${notes ? `${notes  }\n\n` : ''}VOIDED: Transaction voided on ${new Date().toISOString()} by ${user?.email}`
         })
         .eq('id', transaction.id);
 
