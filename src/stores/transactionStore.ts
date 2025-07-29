@@ -438,3 +438,8 @@ export const useTransactionStore = create<TransactionStore>()(
 export const useTransactions = () => useTransactionStore((state) => state.transactions);
 export const useFilteredTransactions = () => useTransactionStore((state) => state.filteredTransactions);
 export const useTransactionHistory = () => useTransactionStore((state) => state.transactionHistory);
+export const useTransactionStats = () => useTransactionStore((state) => state.todayRevenue);
+export const useTotalTransactions = () => useTransactionStore((state) => state.totalTransactions);
+
+// Action selectors
+export const useFetchTransactions = () => useTransactionStore((state) => state.fetchTransactions);

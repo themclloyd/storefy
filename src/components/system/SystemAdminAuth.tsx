@@ -20,10 +20,10 @@ interface SystemAdminAuthProps {
   onCancel: () => void;
 }
 
-// Default system admin credentials (should be changed after first login)
+// Default system admin credentials from environment variables
 const DEFAULT_ADMIN_CREDENTIALS = {
-  email: 'sysadmin@storefy.local',
-  password: 'Storefy@Admin2024!'
+  email: import.meta.env.VITE_ADMIN_EMAIL || 'admin@storefy.local',
+  password: import.meta.env.VITE_ADMIN_PASSWORD || 'ChangeMe123!'
 };
 
 export function SystemAdminAuth({ onAuthenticated, onCancel }: SystemAdminAuthProps) {

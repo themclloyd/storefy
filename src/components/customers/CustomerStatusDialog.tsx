@@ -27,7 +27,7 @@ import {
   ShoppingCart
 } from "lucide-react";
 import { useCurrentStore } from "@/stores/storeStore";
-import { useStoreData } from "@/hooks/useSupabaseClient";
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from "sonner";
 
 interface Customer {
@@ -59,7 +59,6 @@ export function CustomerStatusDialog({
   onStatusUpdated
 }: CustomerStatusDialogProps) {
   const currentStore = useCurrentStore();
-  const { from, currentStoreId, _isPinSession: _isPinSession } = useStoreData();
   const [loading, setLoading] = useState(false);
   const [newStatus, setNewStatus] = useState<string>("");
 

@@ -494,3 +494,6 @@ export const useCustomerStore = create<CustomerStore>()(
 export const useCustomers = () => useCustomerStore((state) => state.customers);
 export const useFilteredCustomers = () => useCustomerStore((state) => state.filteredCustomers);
 export const useCustomerOrders = () => useCustomerStore((state) => state.customerOrders);
+
+// Action selectors
+export const useFetchCustomers = () => useCustomerStore((state) => state.fetchCustomers);

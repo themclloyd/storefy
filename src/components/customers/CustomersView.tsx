@@ -8,7 +8,6 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Plus, Users, Phone, Mail, Edit, Eye, Loader2, Download, BarChart3, MoreVertical, Filter, Grid3X3, List, Search } from "lucide-react";
 import { useCurrentStore } from "@/stores/storeStore";
 import { useUser } from "@/stores/authStore";
-import { useStoreData } from "@/hooks/useSupabaseClient";
 import { useTax } from "@/hooks/useTax";
 import {
   useCustomerStore,
@@ -30,7 +29,7 @@ import { PageHeader, PageLayout } from "@/components/common/PageHeader";
 export function CustomersView() {
   const currentStore = useCurrentStore();
   const user = useUser();
-  const { from, currentStoreId, isPinSession } = useStoreData();
+  const { from, currentStoreId, isPinSession } = useSupabaseClient();
   const { formatCurrency } = useTax();
 
   // Use Zustand store state

@@ -2,23 +2,24 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { ShowcaseTheme, ShowcaseContactInfo } from './publicShowcaseStore';
 
 export interface PublicStoreCard {
   id: string;
   name: string;
-  address?: string;
-  phone?: string;
-  email?: string;
-  store_code?: string;
-  currency?: string;
-  showcase_slug?: string;
-  showcase_theme?: any;
-  showcase_description?: string;
-  showcase_logo_url?: string;
-  showcase_banner_url?: string;
-  showcase_contact_info?: any;
-  showcase_seo_title?: string;
-  showcase_seo_description?: string;
+  address?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  store_code: string;
+  currency?: string | null;
+  showcase_slug?: string | null;
+  showcase_theme?: ShowcaseTheme | null;
+  showcase_description?: string | null;
+  showcase_logo_url?: string | null;
+  showcase_banner_url?: string | null;
+  showcase_contact_info?: ShowcaseContactInfo | null;
+  showcase_seo_title?: string | null;
+  showcase_seo_description?: string | null;
   product_count: number;
   category_count: number;
   created_at: string;
@@ -51,27 +52,77 @@ const initialState = {
 
 export const usePublicStoresStore = create<PublicStoresState>()(
   devtools(
-    (set, get) => ({
+    (set) => ({
       ...initialState,
 
       loadStores: async () => {
         try {
           set({ storesLoading: true }, false, 'loadStores:start');
 
+          // Use direct table query instead of RPC
           const { data, error } = await supabase
-            .rpc('get_all_public_stores');
+            .from('stores')
+            .select(`
+              id,
+              name,
+              address,
+              phone,
+              email,
+              store_code,
+              currency,
+              showcase_slug,
+              showcase_theme,
+              showcase_description,
+              showcase_logo_url,
+              showcase_banner_url,
+              showcase_contact_info,
+              showcase_seo_title,
+              showcase_seo_description,
+              product_count: products(count),
+              category_count: categories(count),
+              created_at
+            `)
+            .eq('is_public', true)
+            .order('created_at', { ascending: false });
 
           if (error) throw error;
 
+          // Transform the data to match the PublicStoreCard interface
+          const stores = (data || []).map(store => {
+            // Safely parse JSON fields
+            let showcaseTheme: ShowcaseTheme | null = null;
+            let contactInfo: ShowcaseContactInfo | null = null;
+            
+            try {
+              showcaseTheme = typeof store.showcase_theme === 'string' 
+                ? JSON.parse(store.showcase_theme) 
+                : store.showcase_theme;
+                
+              contactInfo = typeof store.showcase_contact_info === 'string'
+                ? JSON.parse(store.showcase_contact_info)
+                : store.showcase_contact_info;
+            } catch (e) {
+              console.warn('Error parsing store JSON data:', e);
+            }
+            
+            return {
+              ...store,
+              showcase_theme: showcaseTheme || undefined,
+              showcase_contact_info: contactInfo || undefined,
+              product_count: Array.isArray(store.product_count) ? store.product_count[0]?.count || 0 : 0,
+              category_count: Array.isArray(store.category_count) ? store.category_count[0]?.count || 0 : 0
+            };
+          });
+
           set({ 
-            stores: data || [], 
+            stores,
             storesLoading: false 
           }, false, 'loadStores:success');
 
         } catch (error) {
           console.error('Error loading public stores:', error);
           toast.error('Failed to load stores');
-          set({ storesLoading: false }, false, 'loadStores:error');
+          set({ storesLoading: false, stores: [] }, false, 'loadStores:error');
         }
       },
 

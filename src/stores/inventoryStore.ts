@@ -461,3 +461,6 @@ export const useInventoryStore = create<InventoryStore>()(
 export const useProducts = () => useInventoryStore((state) => state.products);
 export const useCategories = () => useInventoryStore((state) => state.categories);
 export const useSuppliers = () => useInventoryStore((state) => state.suppliers);
+
+// Action selectors
+export const useFetchProducts = () => useInventoryStore((state) => state.fetchProducts);

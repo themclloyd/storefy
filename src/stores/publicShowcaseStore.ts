@@ -4,6 +4,38 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { trackShowcaseView, trackProductClick, trackContactClick } from '@/lib/analytics-tracker';
 
+export interface ShowcaseTheme {
+  layout?: 'grid' | 'list';
+  colors?: {
+    primary?: string;
+    secondary?: string;
+    background?: string;
+    text?: string;
+    accent?: string;
+  };
+  typography?: {
+    fontFamily?: string;
+    headingSize?: string;
+    bodySize?: string;
+  };
+  displayOptions?: {
+    showPrices?: boolean;
+    showStock?: boolean;
+    showCategories?: boolean;
+    showSearch?: boolean;
+  };
+}
+
+export interface ShowcaseContactInfo {
+  showPhone?: boolean;
+  showEmail?: boolean;
+  showAddress?: boolean;
+  phoneLabel?: string;
+  emailLabel?: string;
+  addressLabel?: string;
+  customMessage?: string;
+}
+
 export interface PublicStore {
   id: string;
   name: string;
@@ -13,11 +45,11 @@ export interface PublicStore {
   store_code?: string;
   currency?: string;
   showcase_slug?: string;
-  showcase_theme?: any;
+  showcase_theme?: ShowcaseTheme;
   showcase_description?: string;
   showcase_logo_url?: string;
   showcase_banner_url?: string;
-  showcase_contact_info?: any;
+  showcase_contact_info?: ShowcaseContactInfo;
   showcase_seo_title?: string;
   showcase_seo_description?: string;
   product_count: number;

@@ -9,7 +9,6 @@ import { Plus, Package, AlertTriangle, Edit, Trash2, Loader2, Settings, Trending
 import { useCurrentStore } from "@/stores/storeStore";
 import { useUser } from "@/stores/authStore";
 import { SecureButton } from "@/components/auth/SecureAction";
-import { useStoreData } from "@/hooks/useSupabaseClient";
 import { toast } from "sonner";
 import {
   useInventoryStore,
@@ -66,7 +65,7 @@ interface Product {
 export function InventoryView() {
   const currentStore = useCurrentStore();
   const user = useUser();
-  const { from, currentStoreId, isPinSession } = useStoreData();
+  const { from, currentStoreId, isPinSession } = useSupabaseClient();
   const { formatCurrency } = useTax();
 
   // Use Zustand store state

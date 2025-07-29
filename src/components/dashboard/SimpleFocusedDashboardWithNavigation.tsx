@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { SimpleFocusedDashboard } from './SimpleFocusedDashboard';
+import { DashboardErrorBoundary } from './components/DashboardErrorBoundary';
 
 /**
  * Simple Focused Dashboard wrapper that provides navigation for router-based usage
@@ -11,5 +12,9 @@ export function SimpleFocusedDashboardWithNavigation() {
     navigate(`/app/${view}`);
   };
 
-  return <SimpleFocusedDashboard onViewChange={handleViewChange} />;
+  return (
+    <DashboardErrorBoundary>
+      <SimpleFocusedDashboard onViewChange={handleViewChange} />
+    </DashboardErrorBoundary>
+  );
 }

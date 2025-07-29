@@ -31,7 +31,7 @@ import { Loader2, User, Mail, Phone, MapPin, Save, Trash2 } from "lucide-react";
 import { useCurrentStore } from "@/stores/storeStore";
 import { useUser } from "@/stores/authStore";
 import { SecureAction } from "@/components/auth/SecureAction";
-import { useStoreData } from "@/hooks/useSupabaseClient";
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from "sonner";
 
 const customerSchema = z.object({
@@ -73,7 +73,6 @@ export function EditCustomerDialog({
 }: EditCustomerDialogProps) {
   const currentStore = useCurrentStore();
   const user = useUser();
-  const { from, currentStoreId, isPinSession } = useStoreData();
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);

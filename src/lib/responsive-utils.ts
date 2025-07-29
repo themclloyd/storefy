@@ -73,7 +73,7 @@ export const responsiveGrid = {
   chartsCompact: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
 
   // Specific layouts
-  sidebar: "grid grid-cols-1 lg:grid-cols-[280px_1fr]",
+  sidebar: "grid grid-cols-1 lg:grid-cols-[224px_1fr]",
   content: "grid grid-cols-1 lg:grid-cols-[1fr_300px]",
   split: "grid grid-cols-1 md:grid-cols-2",
   thirds: "grid grid-cols-1 md:grid-cols-3"

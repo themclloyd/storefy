@@ -499,3 +499,6 @@ export const useFilteredLaybyOrders = () => useLaybyStore((state) => state.filte
 export const useLaybyStats = () => useLaybyStore((state) => state.stats);
 export const useLaybyPayments = () => useLaybyStore((state) => state.laybyPayments);
 export const useLaybySettings = () => useLaybyStore((state) => state.laybySettings);
+
+// Action selectors
+export const useFetchLaybyOrders = () => useLaybyStore((state) => state.fetchLaybyOrders);

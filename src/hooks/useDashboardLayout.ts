@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useCurrentStore } from '@/stores/storeStore';
-import { useStoreData } from '@/hooks/useSupabaseClient';
+import { useSupabaseClient } from '@/hooks/useSupabaseClient';
 
 export interface DashboardWidget {
   id: string;
@@ -93,7 +93,7 @@ const DEFAULT_LAYOUT: DashboardLayout = {
 
 export function useDashboardLayout() {
   const currentStore = useCurrentStore();
-  const { from } = useStoreData();
+  const { from } = useSupabaseClient();
   const [currentLayout, setCurrentLayout] = useState<DashboardLayout>(DEFAULT_LAYOUT);
   const [savedLayouts, setSavedLayouts] = useState<DashboardLayout[]>([]);
   const [loading, setLoading] = useState(true);

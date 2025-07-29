@@ -47,7 +47,11 @@ export const useAuthStore = create<AuthStore>()(
         signIn: async (email: string, password: string) => {
           try {
             set({ loading: true }, false, 'signIn:start');
-            console.log('🔐 Starting sign in for:', email);
+
+            // Only log in development mode
+            if (import.meta.env.DEV) {
+              console.log('🔐 Starting sign in for:', email);
+            }
 
             const { data, error } = await supabase.auth.signInWithPassword({
               email,
@@ -55,11 +59,17 @@ export const useAuthStore = create<AuthStore>()(
             });
 
             if (error) {
-              console.error('🔐 Sign in error:', error);
+              // Only log error details in development
+              if (import.meta.env.DEV) {
+                console.error('🔐 Sign in error:', error);
+              }
               throw error;
             }
 
-            console.log('🔐 Sign in successful:', data.user?.email);
+            // Only log success in development
+            if (import.meta.env.DEV) {
+              console.log('🔐 Sign in successful:', data.user?.email);
+            }
 
             // Directly update the store state with the user and session
             set({
@@ -70,7 +80,10 @@ export const useAuthStore = create<AuthStore>()(
 
             return { error: null };
           } catch (error) {
-            console.error('🔐 Sign in failed:', error);
+            // Only log error in development
+            if (import.meta.env.DEV) {
+              console.error('🔐 Sign in failed:', error);
+            }
             set({ loading: false }, false, 'signIn:error');
             return { error: error instanceof Error ? error : new Error('Sign in failed') };
           }
@@ -127,23 +140,28 @@ export const useAuthStore = create<AuthStore>()(
 
             // Get initial session
             const { data: { session }, error } = await supabase.auth.getSession();
-            
-            if (error) {
+
+            if (error && import.meta.env.DEV) {
               console.error('Auth initialization error:', error);
             }
 
-            set({ 
-              session, 
-              user: session?.user ?? null, 
-              loading: false, 
-              initialized: true 
+            set({
+              session,
+              user: session?.user ?? null,
+              loading: false,
+              initialized: true
             }, false, 'initialize:complete');
 
             // Set up auth state listener
-            console.log('🔐 Setting up auth state change listener...');
+            if (import.meta.env.DEV) {
+              console.log('🔐 Setting up auth state change listener...');
+            }
+
             const { data: { subscription } } = supabase.auth.onAuthStateChange(
               (event, session) => {
-                console.log('🔐 Auth state changed:', event, session?.user?.email);
+                if (import.meta.env.DEV) {
+                  console.log('🔐 Auth state changed:', event, session?.user?.email);
+                }
 
                 set({
                   session,
@@ -152,7 +170,10 @@ export const useAuthStore = create<AuthStore>()(
                 }, false, `authStateChange:${event}`);
               }
             );
-            console.log('🔐 Auth state change listener set up successfully');
+
+            if (import.meta.env.DEV) {
+              console.log('🔐 Auth state change listener set up successfully');
+            }
 
             // Return cleanup function
             return () => subscription.unsubscribe();

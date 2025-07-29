@@ -30,7 +30,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loader2, User, Mail, Phone, MapPin } from "lucide-react";
 import { useCurrentStore } from "@/stores/storeStore";
 import { useUser } from "@/stores/authStore";
-import { useStoreData } from "@/hooks/useSupabaseClient";
+import { useSupabaseClient } from "@/hooks/useSupabaseClient";
 import { toast } from "sonner";
 
 const customerSchema = z.object({
@@ -52,7 +52,7 @@ interface AddCustomerDialogProps {
 export function AddCustomerDialog({ open, onOpenChange, onCustomerAdded }: AddCustomerDialogProps) {
   const currentStore = useCurrentStore();
   const user = useUser();
-  const { from, currentStoreId, isPinSession } = useStoreData();
+  const { from, currentStoreId, isPinSession } = useSupabaseClient();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<CustomerFormData>({

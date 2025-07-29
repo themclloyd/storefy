@@ -49,28 +49,28 @@ export function Sidebar({ activeView, onViewChange, collapsible = "icon" }: Side
       className="border-r border-border/40 bg-sidebar"
     >
       <SidebarHeader className="border-b border-border/40 bg-sidebar">
-        {/* Logo Section - Enhanced Responsive */}
-        <div className={cn("flex items-center", responsiveSpacing.padding.sm)}>
+        {/* Logo Section - Compact */}
+        <div className="flex items-center p-2">
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton
-                size="lg"
+                size="default"
                 asChild
                 tooltip={state === "collapsed" ? "Storefy - Retail Management" : undefined}
                 className={cn(
                   touchFriendly.minTouch,
-                  "h-12 sm:h-14 md:h-auto"
+                  "h-10 sm:h-12"
                 )}
               >
-                <a href="#" className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 justify-start">
+                <a href="#" className="flex items-center gap-2 px-2 justify-start">
                   <div className={cn(
-                    "flex aspect-square items-center justify-center rounded-lg sm:rounded-xl bg-primary text-primary-foreground shadow-lg shrink-0",
-                    "size-8 sm:size-9 md:size-10"
+                    "flex aspect-square items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-lg shrink-0",
+                    "size-7 sm:size-8"
                   )}>
-                    <Store className={cn(responsiveIcon.sm)} />
+                    <Store className="size-4" />
                   </div>
                   <div className="grid flex-1 text-left leading-tight min-w-0">
-                    <span className="truncate font-bold text-foreground text-sm sm:text-base">Storefy</span>
+                    <span className="truncate font-light text-foreground text-sm">Storefy</span>
                     <span className="truncate text-xs text-muted-foreground hidden sm:block">Retail Management</span>
                   </div>
                 </a>
@@ -80,12 +80,12 @@ export function Sidebar({ activeView, onViewChange, collapsible = "icon" }: Side
         </div>
       </SidebarHeader>
 
-      <SidebarContent className={cn(responsiveSpacing.padding.sm)}>
+      <SidebarContent className="p-2">
         {/* Main Navigation */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xs sm:text-sm">Main</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-xs px-2 font-light">Main</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className={cn(touchFriendly.touchSpacing)}>
+            <SidebarMenu className="space-y-1">
               {navigationItems.map((item) => {
                 const Icon = item.icon;
 
@@ -103,13 +103,10 @@ export function Sidebar({ activeView, onViewChange, collapsible = "icon" }: Side
                         onViewChange(item.id);
                       }}
                       tooltip={state === "collapsed" ? item.label : undefined}
-                      className={cn(
-                        touchFriendly.minTouch,
-                        "px-2 sm:px-3 justify-start gap-2 sm:gap-3 text-sm sm:text-base"
-                      )}
+                      className="px-2 justify-start gap-2 text-sm h-9"
                     >
-                      <Icon className={cn(responsiveIcon.sm, "shrink-0")} />
-                      <span className="truncate font-medium sm:font-normal">{item.label}</span>
+                      <Icon className="size-4 shrink-0" />
+                      <span className="truncate font-light">{item.label}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
@@ -124,14 +121,11 @@ export function Sidebar({ activeView, onViewChange, collapsible = "icon" }: Side
       </SidebarContent>
 
       <SidebarFooter className="border-t border-border/40 bg-sidebar">
-        <div className={cn(
-          responsiveSpacing.padding.sm,
-          touchFriendly.touchSpacing
-        )}>
-          {/* User Menu - Enhanced for touch */}
+        <div className="p-2 space-y-2">
+          {/* User Menu - Compact */}
           <UserMenu onViewChange={onViewChange} />
 
-          {/* Store Selector - Full Width with responsive spacing */}
+          {/* Store Selector - Compact */}
           <div className="w-full">
             <CompactStoreSelector />
           </div>

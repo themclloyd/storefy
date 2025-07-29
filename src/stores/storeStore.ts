@@ -4,32 +4,41 @@ import { devtools, persist } from 'zustand/middleware';
 import { supabase } from '@/integrations/supabase/client';
 import { sessionManager } from '@/lib/sessionManager';
 import { useAuthStore } from './authStore';
+import { ShowcaseTheme, ShowcaseContactInfo } from './publicShowcaseStore';
 
-interface Store {
+interface StoreSettings {
+  // Add specific settings properties here
+  enableNotifications?: boolean;
+  defaultCurrency?: string;
+  taxInclusivePricing?: boolean;
+  // Add more settings as needed
+}
+
+export interface Store {
   id: string;
   name: string;
-  description?: string;
+  description?: string | null;
   owner_id: string;
   created_at: string;
   updated_at: string;
-  address?: string;
-  phone?: string;
-  email?: string;
-  currency?: string;
-  tax_rate?: number;
+  address?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  currency?: string | null;
+  tax_rate?: number | null;
   store_code: string;
   enable_public_showcase?: boolean;
-  showcase_slug?: string;
-  showcase_theme?: any;
-  showcase_description?: string;
-  showcase_logo_url?: string;
-  showcase_banner_url?: string;
-  showcase_contact_info?: any;
-  showcase_seo_title?: string;
-  showcase_seo_description?: string;
-  settings?: any;
-  subscription_tier?: string;
-  subscription_status?: string;
+  showcase_slug?: string | null;
+  showcase_theme?: ShowcaseTheme | null;
+  showcase_description?: string | null;
+  showcase_logo_url?: string | null;
+  showcase_banner_url?: string | null;
+  showcase_contact_info?: ShowcaseContactInfo | null;
+  showcase_seo_title?: string | null;
+  showcase_seo_description?: string | null;
+  settings?: StoreSettings | null;
+  subscription_tier?: string | null;
+  subscription_status?: string | null;
 }
 
 interface StoreState {
@@ -144,24 +153,31 @@ export const useStoreStore = create<StoreStore>()(
         refreshStores: async () => {
           try {
             set({ loading: true }, false, 'refreshStores:start');
-
-            const user = useAuthStore.getState().user;
-            if (!user) {
-              set({ stores: [], loading: false }, false, 'refreshStores:noUser');
-              return;
-            }
-
-            const { data: stores, error } = await supabase
+            const { data, error } = await supabase
               .from('stores')
               .select('*')
-              .eq('owner_id', user.id);
+              .order('name', { ascending: true });
 
             if (error) throw error;
 
-            set({ stores: stores || [], loading: false }, false, 'refreshStores:success');
+            // Transform the data to match the Store interface
+            const stores = (data || []).map(store => ({
+              ...store,
+              enable_public_showcase: store.enable_public_showcase ?? false,
+              showcase_theme: store.showcase_theme ?
+                (typeof store.showcase_theme === 'string' ? JSON.parse(store.showcase_theme) : store.showcase_theme) : null,
+              showcase_contact_info: store.showcase_contact_info ?
+                (typeof store.showcase_contact_info === 'string' ? JSON.parse(store.showcase_contact_info) : store.showcase_contact_info) : null,
+              settings: store.settings ?
+                (typeof store.settings === 'string' ? JSON.parse(store.settings) : store.settings) : null
+            }));
+
+            set({ stores }, false, 'refreshStores:success');
           } catch (error) {
             console.error('Error refreshing stores:', error);
-            set({ loading: false }, false, 'refreshStores:error');
+            set({ stores: [] }, false, 'refreshStores:error');
+          } finally {
+            set({ loading: false }, false, 'refreshStores:complete');
           }
         },
 

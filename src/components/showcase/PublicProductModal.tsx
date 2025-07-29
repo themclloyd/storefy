@@ -28,6 +28,8 @@ interface PublicProduct {
   sku?: string;
 }
 
+import { ShowcaseTheme, ShowcaseContactInfo } from '@/stores/publicShowcaseStore';
+
 interface PublicStore {
   id: string;
   name: string;
@@ -35,11 +37,11 @@ interface PublicStore {
   phone?: string;
   email?: string;
   store_code?: string;
-  showcase_theme?: any;
+  showcase_theme?: ShowcaseTheme;
   showcase_description?: string;
   showcase_logo_url?: string;
   showcase_banner_url?: string;
-  showcase_contact_info?: any;
+  showcase_contact_info?: ShowcaseContactInfo;
   showcase_seo_title?: string;
   showcase_seo_description?: string;
   product_count: number;

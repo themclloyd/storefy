@@ -29,8 +29,7 @@ const StoreSelectionPage = lazy(() => import('@/pages/StoreSelectionPage'));
 const StoreShortLinkPage = lazy(() => import('@/pages/StoreShortLinkPage'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
-// Design System Demo (Development)
-const DesignSystemDemo = lazy(() => import('@/components/test/DesignSystemDemo').then(m => ({ default: m.DesignSystemDemo })));
+
 
 
 
@@ -107,10 +106,7 @@ export const router = createBrowserRouter([
     path: '/pin-login',
     element: <PinLoginPage />,
   },
-  {
-    path: '/design-system',
-    element: <DesignSystemDemo />,
-  },
+
   // Public store showcase routes (no authentication required)
   {
     path: '/showcase/:storeId',

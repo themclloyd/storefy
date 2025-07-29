@@ -24,7 +24,7 @@ import {
   Loader2
 } from "lucide-react";
 import { useCurrentStore } from "@/stores/storeStore";
-import { useStoreData } from "@/hooks/useSupabaseClient";
+import { useSupabaseClient } from "@/hooks/useSupabaseClient";
 import { toast } from "sonner";
 import { useTax } from "@/hooks/useTax";
 
@@ -64,7 +64,7 @@ export function CustomerDetailsModal({
   onEditCustomer
 }: CustomerDetailsModalProps) {
   const currentStore = useCurrentStore();
-  const { from, currentStoreId, isPinSession } = useStoreData();
+  const { from, currentStoreId, isPinSession } = useSupabaseClient();
   const { formatCurrency } = useTax();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);

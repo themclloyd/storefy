@@ -158,8 +158,19 @@ export function AnonymousAnalytics() {
   };
 
   const getAverageSessionDuration = async (): Promise<number> => {
-    // In a real system, this would track session start/end times anonymously
-    return 25.5; // minutes (mock data)
+    try {
+      // Get anonymous session data from localStorage
+      const sessionData = localStorage.getItem('anonymous_session_data');
+      if (sessionData) {
+        const sessions = JSON.parse(sessionData);
+        const totalDuration = sessions.reduce((sum: number, session: any) => sum + (session.duration || 0), 0);
+        return sessions.length > 0 ? totalDuration / sessions.length / 60000 : 0; // Convert to minutes
+      }
+      return 0;
+    } catch (error) {
+      console.warn('Could not calculate session duration:', error);
+      return 0;
+    }
   };
 
   const getFeatureUsage = async (feature: string): Promise<number> => {
@@ -179,8 +190,13 @@ export function AnonymousAnalytics() {
           return productCount || 0;
           
         case 'report_view':
-          // This would be tracked via anonymous events
-          return 150; // mock data
+          // Get report views from anonymous events
+          const events = localStorage.getItem('anonymous_events');
+          if (events) {
+            const parsedEvents = JSON.parse(events);
+            return parsedEvents.filter((event: any) => event.type === 'report_view').length;
+          }
+          return 0;
           
         default:
           return 0;

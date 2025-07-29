@@ -83,35 +83,20 @@ export interface ExpenseStats {
   taxDeductibleAmount: number;
 }
 
-// Store State
+// Core expense data store - focused only on data management
 interface ExpenseState {
   // Core data
   expenses: Expense[];
   categories: ExpenseCategory[];
   recurringExpenses: RecurringExpense[];
   loading: boolean;
-  
-  // Filtering and search
-  filters: ExpenseFilters;
-  filteredExpenses: Expense[];
-  
-  // Statistics
+  error: string | null;
+
+  // Statistics (computed from data)
   stats: ExpenseStats;
-  
-  // Selected expense and details
-  selectedExpense: Expense | null;
-  
-  // Dialog states
-  showAddExpenseDialog: boolean;
-  showEditExpenseDialog: boolean;
-  showExpenseDetailsModal: boolean;
-  showCategoriesView: boolean;
-  showAddCategoryDialog: boolean;
-  showEditCategoryDialog: boolean;
-  selectedCategory: ExpenseCategory | null;
-  
-  // Current view
-  currentTab: 'expenses' | 'recurring';
+
+  // Last updated timestamp for cache invalidation
+  lastUpdated: number | null;
 }
 
 // Store Actions
@@ -679,3 +664,6 @@ export const useFilteredExpenses = () => useExpenseStore((state) => state.filter
 export const useExpenseCategories = () => useExpenseStore((state) => state.categories);
 export const useRecurringExpenses = () => useExpenseStore((state) => state.recurringExpenses);
 export const useExpenseStats = () => useExpenseStore((state) => state.stats);
+
+// Action selectors
+export const useFetchExpenses = () => useExpenseStore((state) => state.fetchExpenses);
