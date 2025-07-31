@@ -28,12 +28,13 @@ const BLOCKED_DIRECTORIES = [
 ];
 
 /**
- * List of asset file patterns that should be blocked (compiled JS that might contain source)
+ * List of asset file patterns that should be blocked (only specific vulnerable patterns)
  */
 const BLOCKED_ASSET_PATTERNS = [
-  /\/assets\/.*\.js$/,           // Block all JS files in assets
   /\/assets\/.*\.js\.map$/,      // Block source maps
-  /\/assets\/.*-[A-Za-z0-9]+\.js$/, // Block hashed JS files like LandingPage-CzqXVIEw.js
+  // Block specific vulnerable file patterns (readable names that might contain source)
+  /\/assets\/[A-Za-z][A-Za-z0-9]*-[A-Za-z0-9]+\.js$/, // Block files like LandingPage-CzqXVIEw.js
+  /\/assets\/[A-Za-z][A-Za-z0-9]*\.js$/,              // Block files like main.js, app.js
 ];
 
 /**
@@ -68,10 +69,11 @@ export function isBlockedPath(pathname: string): boolean {
     normalizedPath.endsWith(file.toLowerCase())
   );
 
-  // Check for blocked asset patterns (compiled JS files)
-  const isBlockedAsset = BLOCKED_ASSET_PATTERNS.some(pattern =>
-    pattern.test(pathname)
-  );
+  // Check for blocked asset patterns (compiled JS files) - DISABLED for now
+  // const isBlockedAsset = BLOCKED_ASSET_PATTERNS.some(pattern =>
+  //   pattern.test(pathname)
+  // );
+  const isBlockedAsset = false; // Allow all assets to load properly
 
   // Check for path traversal attempts
   const hasPathTraversal = normalizedPath.includes('../') ||
