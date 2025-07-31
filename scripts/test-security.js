@@ -5,13 +5,13 @@
  * Tests file access security measures
  */
 
-const http = require('http');
-const https = require('https');
+import http from 'http';
+import https from 'https';
 
 // Test configuration
 const TEST_CONFIG = {
   // Change this to your actual domain/localhost
-  baseUrl: 'http://localhost:8080',
+  baseUrl: 'https://storefy.app',
   // Test paths that should be blocked
   blockedPaths: [
     '/src/App.tsx',
