@@ -28,6 +28,15 @@ const BLOCKED_DIRECTORIES = [
 ];
 
 /**
+ * List of asset file patterns that should be blocked (compiled JS that might contain source)
+ */
+const BLOCKED_ASSET_PATTERNS = [
+  /\/assets\/.*\.js$/,           // Block all JS files in assets
+  /\/assets\/.*\.js\.map$/,      // Block source maps
+  /\/assets\/.*-[A-Za-z0-9]+\.js$/, // Block hashed JS files like LandingPage-CzqXVIEw.js
+];
+
+/**
  * List of specific files that should be blocked
  */
 const BLOCKED_FILES = [
@@ -43,28 +52,33 @@ const BLOCKED_FILES = [
  */
 export function isBlockedPath(pathname: string): boolean {
   const normalizedPath = pathname.toLowerCase();
-  
+
   // Check for blocked file extensions
-  const hasBlockedExtension = BLOCKED_EXTENSIONS.some(ext => 
+  const hasBlockedExtension = BLOCKED_EXTENSIONS.some(ext =>
     normalizedPath.endsWith(ext)
   );
-  
+
   // Check for blocked directories
-  const isInBlockedDirectory = BLOCKED_DIRECTORIES.some(dir => 
+  const isInBlockedDirectory = BLOCKED_DIRECTORIES.some(dir =>
     normalizedPath.includes(dir)
   );
-  
+
   // Check for specific blocked files
-  const isBlockedFile = BLOCKED_FILES.some(file => 
+  const isBlockedFile = BLOCKED_FILES.some(file =>
     normalizedPath.endsWith(file.toLowerCase())
   );
-  
+
+  // Check for blocked asset patterns (compiled JS files)
+  const isBlockedAsset = BLOCKED_ASSET_PATTERNS.some(pattern =>
+    pattern.test(pathname)
+  );
+
   // Check for path traversal attempts
-  const hasPathTraversal = normalizedPath.includes('../') || 
+  const hasPathTraversal = normalizedPath.includes('../') ||
                           normalizedPath.includes('..\\') ||
                           normalizedPath.includes('%2e%2e');
-  
-  return hasBlockedExtension || isInBlockedDirectory || isBlockedFile || hasPathTraversal;
+
+  return hasBlockedExtension || isInBlockedDirectory || isBlockedFile || isBlockedAsset || hasPathTraversal;
 }
 
 /**

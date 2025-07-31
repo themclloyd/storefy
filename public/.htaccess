@@ -20,6 +20,16 @@ Header always set Content-Security-Policy "default-src 'self'; script-src 'self'
     Require all denied
 </FilesMatch>
 
+# Block access to compiled JavaScript assets that might contain source code
+<LocationMatch "^/assets/.*\.js$">
+    Require all denied
+</LocationMatch>
+
+# Block access to source maps
+<FilesMatch "\.map$">
+    Require all denied
+</FilesMatch>
+
 # Block access to specific directories
 RewriteRule ^src/ - [F,L]
 RewriteRule ^components/ - [F,L]

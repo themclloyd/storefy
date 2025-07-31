@@ -77,8 +77,16 @@
         "Content-Type": "text/plain"
       }
     },
+
     {
-      "src": "/.*\\.(ts|tsx|js|jsx|env|json|config)$",
+      "src": "/assets/.*\\.js$",
+      "status": 403,
+      "headers": {
+        "Content-Type": "text/plain"
+      }
+    },
+    {
+      "src": "/.*\\.(ts|tsx|js|jsx|env|json|config|map)$",
       "status": 403,
       "headers": {
         "Content-Type": "text/plain"

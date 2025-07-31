@@ -35,14 +35,27 @@ export default defineConfig(({ command }) => ({
   optimizeDeps: {
     include: ['react', 'react-dom']
   },
-  // Configure source maps - hidden for production, inline for development
+  // Configure source maps - completely disabled for security
   build: {
-    sourcemap: command === 'serve' ? false : 'hidden', // Disable source maps in dev for security
+    sourcemap: false, // Never generate source maps for security
     minify: 'terser',
     terserOptions: {
       compress: {
         drop_console: command === 'build',
         drop_debugger: command === 'build',
+        // Additional security options
+        pure_funcs: ['console.log', 'console.info', 'console.debug'],
+        drop_console: true,
+        drop_debugger: true,
+      },
+      mangle: {
+        // Obfuscate function and variable names
+        toplevel: true,
+        safari10: true,
+      },
+      format: {
+        // Remove comments and make code harder to read
+        comments: false,
       },
     },
     rollupOptions: {
@@ -52,6 +65,10 @@ export default defineConfig(({ command }) => ({
           router: ['react-router-dom'],
           ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
         },
+        // Obfuscate chunk names for security
+        chunkFileNames: 'assets/[hash].js',
+        entryFileNames: 'assets/[hash].js',
+        assetFileNames: 'assets/[hash].[ext]',
       },
     },
   },

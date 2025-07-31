@@ -23,7 +23,11 @@ const TEST_CONFIG = {
     '/vite.config.ts',
     '/.env',
     '/components.json',
-    '/vercel.json'
+    '/vercel.json',
+    '/assets/LandingPage-CzqXVIEw.js',
+    '/assets/index-BwXkgQzN.js',
+    '/assets/main.js',
+    '/assets/app.js.map'
   ],
   // Test paths that should work
   allowedPaths: [
