@@ -41,8 +41,6 @@ export default defineConfig(({ command }) => ({
     minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: command === 'build',
-        drop_debugger: command === 'build',
         // Additional security options
         pure_funcs: ['console.log', 'console.info', 'console.debug'],
         drop_console: true,
