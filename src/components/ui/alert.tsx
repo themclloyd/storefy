@@ -56,4 +56,7 @@ const AlertDescription = React.forwardRef<
 ))
 AlertDescription.displayName = "AlertDescription"
 
-export { Alert, AlertTitle, AlertDescription }
+// Explicit exports to ensure proper bundling
+export { Alert };
+export { AlertTitle };
+export { AlertDescription };
