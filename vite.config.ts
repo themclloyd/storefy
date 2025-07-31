@@ -11,6 +11,16 @@ export default defineConfig(({ command }) => ({
     hmr: {
       port: 8080,
       host: 'localhost'
+    },
+    // Security: Restrict file system access
+    fs: {
+      strict: true,
+      allow: [
+        // Allow access to project root
+        path.resolve(__dirname),
+        // Allow access to node_modules
+        path.resolve(__dirname, 'node_modules'),
+      ]
     }
   },
   plugins: [
@@ -27,7 +37,7 @@ export default defineConfig(({ command }) => ({
   },
   // Configure source maps - hidden for production, inline for development
   build: {
-    sourcemap: command === 'serve' ? 'inline' : 'hidden',
+    sourcemap: command === 'serve' ? false : 'hidden', // Disable source maps in dev for security
     minify: 'terser',
     terserOptions: {
       compress: {

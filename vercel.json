@@ -35,5 +35,58 @@
       "source": "/(.*)",
       "destination": "/index.html"
     }
+  ],
+  "functions": {
+    "src/api/**/*.ts": {
+      "runtime": "@vercel/node"
+    }
+  },
+  "routes": [
+    {
+      "src": "/src/(.*)",
+      "status": 403,
+      "headers": {
+        "Content-Type": "text/plain"
+      }
+    },
+    {
+      "src": "/components/(.*)",
+      "status": 403,
+      "headers": {
+        "Content-Type": "text/plain"
+      }
+    },
+    {
+      "src": "/middleware/(.*)",
+      "status": 403,
+      "headers": {
+        "Content-Type": "text/plain"
+      }
+    },
+    {
+      "src": "/lib/(.*)",
+      "status": 403,
+      "headers": {
+        "Content-Type": "text/plain"
+      }
+    },
+    {
+      "src": "/utils/(.*)",
+      "status": 403,
+      "headers": {
+        "Content-Type": "text/plain"
+      }
+    },
+    {
+      "src": "/.*\\.(ts|tsx|js|jsx|env|json|config)$",
+      "status": 403,
+      "headers": {
+        "Content-Type": "text/plain"
+      }
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
   ]
 }

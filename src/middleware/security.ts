@@ -4,6 +4,7 @@
  */
 
 import { CSRFProtection, XSSProtection, RateLimiter } from '@/utils/security';
+import { initializeFileAccessSecurity } from './fileAccessSecurity';
 
 // Security headers configuration
 export const SECURITY_HEADERS = {
@@ -37,18 +38,21 @@ export const SECURITY_HEADERS = {
 export function initializeSecurity(): void {
   // Set up CSRF protection
   setupCSRFProtection();
-  
+
   // Set up XSS protection
   setupXSSProtection();
-  
+
+  // Set up file access security
+  initializeFileAccessSecurity();
+
   // Set up secure headers (for development - in production use server config)
   if (import.meta.env.DEV) {
     setupSecurityHeaders();
   }
-  
+
   // Set up input sanitization
   setupInputSanitization();
-  
+
   console.log('🔒 Security measures initialized');
 }
 
