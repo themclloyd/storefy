@@ -5,11 +5,11 @@ import path from "path";
 export default defineConfig(({ command }) => ({
   server: {
     host: "localhost",
-    port: 8080,
-    strictPort: true, // Fail if port is already in use
+    port: 3000,
+    strictPort: false, // Allow fallback to other ports
     open: true,
     hmr: {
-      port: 8080,
+      port: 3000,
       host: 'localhost'
     },
     // Security: Restrict file system access
