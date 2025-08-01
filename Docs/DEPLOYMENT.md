@@ -82,15 +82,6 @@ npm run preview
 
 ## Deployment Platforms
 
-### Vercel
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel --prod
-```
-
 ### Netlify
 ```bash
 # Build command: npm run build

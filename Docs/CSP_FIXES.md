@@ -4,24 +4,24 @@
 
 The deployed Storefy application was experiencing CSP violations that prevented proper functionality:
 
-1. **Script violations**: Blob URLs and Vercel Analytics scripts were blocked
+1. **Script violations**: Blob URLs and external scripts were blocked
 2. **Style violations**: Inline styles were blocked due to missing `'unsafe-inline'`
 
 ## Root Cause
 
 The CSP configuration was too restrictive for a modern React application that uses:
-- **Vercel Analytics** (`@vercel/analytics`) - Creates dynamic scripts and blob URLs
+- **Generic Analytics** - Custom analytics implementation
 - **CSS-in-JS** and **inline styles** - Used by UI components and charts
 - **Dynamic imports** - Vite creates blob URLs for code splitting
-- **Third-party analytics** - Plausible Analytics script
+- **Third-party analytics** - Plausible Analytics script (optional)
 
 ## Changes Made
 
-### 1. Updated `vercel.json`
+### 1. Updated `netlify.toml`
 Enhanced the CSP header to allow necessary resources:
 
-```json
-"Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' blob: https://plausible.io https://vercel.live https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vitals.vercel-analytics.com https://va.vercel-scripts.com https://plausible.io; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'"
+```toml
+Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' blob: https://plausible.io https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://plausible.io https://challenges.cloudflare.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'"
 ```
 
 ### 2. Updated `public/_headers`
@@ -34,8 +34,8 @@ Enhanced the CSP configuration object to match production settings.
 
 ### `script-src`
 - `'unsafe-inline'` - Required for React components and inline scripts
-- `blob:` - Required for dynamic imports and Vercel Analytics
-- `https://va.vercel-scripts.com` - Vercel Analytics scripts
+- `blob:` - Required for dynamic imports
+- `https://challenges.cloudflare.com` - Turnstile CAPTCHA scripts
 
 ### `style-src`
 - `'unsafe-inline'` - Required for CSS-in-JS and inline styles
@@ -44,7 +44,7 @@ Enhanced the CSP configuration object to match production settings.
 - `blob:` - Required for dynamic image handling
 
 ### `connect-src`
-- `https://va.vercel-scripts.com` - Vercel Analytics API calls
+- `https://challenges.cloudflare.com` - Turnstile CAPTCHA API calls
 
 ## Security Considerations
 

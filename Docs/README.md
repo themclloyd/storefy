@@ -91,15 +91,15 @@ npm run preview          # Preview production build locally
 
 See [DEPLOYMENT.md](./DEPLOYMENT.md) for comprehensive deployment instructions.
 
-### Quick Deploy to Vercel
-```bash
-npm run build:production
-npx vercel --prod
-```
-
 ### Quick Deploy to Netlify
 - Build command: `npm run build:production`
 - Publish directory: `dist`
+
+### Quick Deploy to Other Platforms
+```bash
+npm run build:production
+# Upload the 'dist' folder to your hosting provider
+```
 
 ## 📁 Project Structure
 

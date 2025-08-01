@@ -103,8 +103,8 @@ async function checkSecurityHeaders() {
   
   // This is a placeholder - in production, you'd make HTTP requests to check headers
   console.log('✅ Security headers configuration files added');
-  console.log('   - public/_headers (Netlify)');
-  console.log('   - vercel.json (Vercel)');
+  console.log('   - public/_headers (Apache)');
+  console.log('   - netlify.toml (Netlify)');
   
   return true;
 }

@@ -6,7 +6,7 @@ This document outlines the security fixes applied to address vulnerabilities ide
 ## 1. Content Security Policy (CSP) Hardening
 
 ### Changes Made:
-- **Removed `unsafe-inline` and `unsafe-eval`** from CSP headers in both `public/_headers` and `vercel.json`
+- **Removed `unsafe-inline` and `unsafe-eval`** from CSP headers in both `public/_headers` and `netlify.toml`
 - **Added additional CSP directives**:
   - `object-src 'none'` - Prevents plugin execution
   - `base-uri 'self'` - Restricts base URL changes
@@ -14,7 +14,7 @@ This document outlines the security fixes applied to address vulnerabilities ide
 
 ### Files Modified:
 - `public/_headers`
-- `vercel.json`
+- `netlify.toml`
 
 ### Security Impact:
 - Prevents inline script execution

@@ -16,7 +16,7 @@ This document establishes the baseline for security auditing of the Storefy appl
 - **Backend:** Supabase (PostgreSQL + Auth + Storage)
 - **UI Library:** Radix UI + Tailwind CSS + shadcn/ui
 - **Payment Processing:** PayChangu integration
-- **Deployment:** Vercel/Netlify (SPA)
+- **Deployment:** Netlify/Traditional hosting (SPA)
 - **Database:** PostgreSQL with Row Level Security (RLS)
 
 ### Key Features
@@ -139,7 +139,7 @@ VITE_PAYCHANGU_WEBHOOK_SECRET=wh_sec_storefy_2024_k9m2n8p5q7r3t6v9x2z5
 - **RBAC:** Page-level and action-level access control
 
 ### Security Headers
-**File:** `vercel.json` & `public/_headers`
+**File:** `public/_headers` & `netlify.toml`
 ```
 X-Frame-Options: DENY
 X-Content-Type-Options: nosniff
@@ -185,9 +185,9 @@ Referrer-Policy: strict-origin-when-cross-origin
 ## Deployment Configuration
 
 ### Deployment Platforms
-- **Primary:** Vercel
-- **Alternative:** Netlify
-- **Configuration:** `vercel.json`
+- **Primary:** Netlify
+- **Alternative:** Traditional hosting
+- **Configuration:** `netlify.toml`
 
 ### Deployment Documentation
 **File:** `Docs/DEPLOYMENT.md`
@@ -227,7 +227,7 @@ src/
 - `@supabase/supabase-js@2.51.0` - Database and auth
 - `dompurify@3.2.6` - HTML sanitization
 - `zod@4.0.5` - Schema validation
-- `@vercel/analytics@1.5.0` - Analytics tracking
+- Generic analytics implementation - Custom tracking
 
 **UI/Styling:**
 - `react@19.1.0` - Latest React version

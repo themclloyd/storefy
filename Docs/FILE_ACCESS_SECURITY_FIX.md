@@ -69,18 +69,17 @@ server: {
 
 ### **3. Production Server Configurations**
 
-#### **Vercel Configuration (`vercel.json`)**
-```json
-"routes": [
-  {
-    "src": "/src/(.*)",
-    "status": 403
-  },
-  {
-    "src": "/.*\\.(ts|tsx|js|jsx|env|json|config)$",
-    "status": 403
-  }
-]
+#### **Netlify Configuration (`netlify.toml`)**
+```toml
+[[redirects]]
+  from = "/src/*"
+  to = "/404.html"
+  status = 403
+
+[[redirects]]
+  from = "/*.ts"
+  to = "/404.html"
+  status = 403
 ```
 
 #### **Apache Configuration (`public/.htaccess`)**
@@ -157,8 +156,8 @@ clearSecurityLogs();
 
 ### **Production Deployment:**
 
-#### **Vercel:**
-- Configuration automatically applied via `vercel.json`
+#### **Netlify:**
+- Configuration automatically applied via `netlify.toml`
 - No additional setup required
 
 #### **Apache:**

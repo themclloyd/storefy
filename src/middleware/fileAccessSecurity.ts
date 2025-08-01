@@ -45,7 +45,7 @@ const BLOCKED_FILES = [
   'tsconfig.json', 'vite.config.ts',
   'tailwind.config.ts', 'eslint.config.js',
   '.gitignore', '.env', '.env.local',
-  'vercel.json', 'components.json'
+  'netlify.toml', 'components.json'
 ];
 
 /**

@@ -101,9 +101,6 @@ Add these environment variables to your `.env` file:
 VITE_ENABLE_ANALYTICS=true
 VITE_ANALYTICS_DEBUG=false
 VITE_REQUIRE_ANALYTICS_CONSENT=true
-
-# Optional: Vercel Analytics (automatically configured if deployed on Vercel)
-VITE_VERCEL_ANALYTICS_ID=your_analytics_id
 ```
 
 ## 📊 Tracked Events
@@ -289,18 +286,17 @@ analytics.trackEvent('test_event', { test: true });
 
 ## 🚀 Deployment
 
-### Vercel Deployment
-When deployed on Vercel, analytics are automatically configured. The CSP headers are configured to allow:
-- Vercel Analytics: `https://vitals.vercel-analytics.com`
-- Google Fonts: `https://fonts.googleapis.com` and `https://fonts.gstatic.com`
-- Plausible Analytics: `https://plausible.io`
-
-### Other Platforms
-For other platforms, ensure environment variables are properly set:
+### All Platforms
+Ensure environment variables are properly set:
 ```bash
 VITE_ENABLE_ANALYTICS=true
 VITE_REQUIRE_ANALYTICS_CONSENT=true
 ```
+
+### CSP Configuration
+The CSP headers are configured to allow:
+- Google Fonts: `https://fonts.googleapis.com` and `https://fonts.gstatic.com`
+- Plausible Analytics: `https://plausible.io` (if using)
 
 ### Content Security Policy
 The application includes a comprehensive CSP that allows analytics while maintaining security:

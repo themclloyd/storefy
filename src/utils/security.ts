@@ -11,12 +11,11 @@ export const CSP_CONFIG = {
   'script-src': [
     "'self'",
     "'unsafe-inline'", // Required for Vite in development and React components
-    'blob:', // Required for dynamic imports and Vercel Analytics
+    'blob:', // Required for dynamic imports
     'https://plausible.io',
-    'https://vercel.live',
-    'https://va.vercel-scripts.com',
     'https://cdn.jsdelivr.net',
     'https://unpkg.com',
+    'https://challenges.cloudflare.com', // Turnstile CAPTCHA
   ],
   'style-src': [
     "'self'",
@@ -40,13 +39,11 @@ export const CSP_CONFIG = {
     'ws://localhost:8080',
     'https://*.supabase.co',
     'wss://*.supabase.co',
-    'https://vitals.vercel-analytics.com',
-    'https://va.vercel-scripts.com',
     'https://plausible.io',
-    'https://api.vercel.com',
     'https://www.google-analytics.com',
     'https://analytics.google.com',
     'https://*.googletagmanager.com',
+    'https://challenges.cloudflare.com', // Turnstile CAPTCHA API
   ],
   'frame-ancestors': ["'none'"],
   'base-uri': ["'self'"],

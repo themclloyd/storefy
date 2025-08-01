@@ -1,4 +1,4 @@
-import { track } from '@vercel/analytics';
+// Generic analytics implementation - no external dependencies
 
 // Analytics event types for type safety
 export interface AnalyticsEvent {
@@ -216,8 +216,8 @@ export class Analytics {
         ...(this.userRole && { current_role: this.userRole }),
       };
       
-      // Track with Vercel Analytics
-      track(event, enhancedProperties);
+      // Track with generic analytics (console logging for now)
+      this.sendToAnalytics(event, enhancedProperties);
       
       this.log('Event tracked', { event, properties: enhancedProperties });
     } catch (error) {
@@ -290,6 +290,36 @@ export class Analytics {
       context: JSON.stringify({ value: metric.value, ...metric.metadata }),
       store_id: this.currentStore || undefined,
     });
+  }
+
+  // Generic analytics sender (replaces Vercel Analytics)
+  private sendToAnalytics(event: string, properties: Record<string, any>): void {
+    // In development, log to console
+    if (import.meta.env.DEV) {
+      console.log('📊 Analytics Event:', event, properties);
+    }
+
+    // In production, you can integrate with any analytics service here
+    // Examples: Google Analytics, Mixpanel, PostHog, etc.
+    if (import.meta.env.PROD) {
+      // Example: Send to Google Analytics if available
+      if (window.gtag) {
+        window.gtag('event', event, properties);
+      }
+
+      // Example: Send to custom analytics endpoint
+      try {
+        fetch('/api/analytics', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ event, properties })
+        }).catch(() => {
+          // Silently fail - analytics shouldn't break the app
+        });
+      } catch {
+        // Silently fail
+      }
+    }
   }
 }
 

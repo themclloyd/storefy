@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { Analytics } from '@vercel/analytics/react';
 import { usePageTracking } from '@/hooks/useAnalyticsTracking';
 import { ConsentBanner } from './ConsentBanner';
 import { analytics } from '@/utils/analytics';
@@ -132,9 +131,6 @@ export const AnalyticsProvider = ({ children }: AnalyticsProviderProps) => {
   return (
     <>
       {children}
-
-      {/* Vercel Analytics Component */}
-      <Analytics />
 
       {/* Consent Banner for GDPR compliance */}
       <ConsentBanner />

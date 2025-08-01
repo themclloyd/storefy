@@ -261,7 +261,7 @@ export class PerformanceMonitor {
    * Send metric to analytics service
    */
   private sendMetricToAnalytics(metric: PerformanceMetric): void {
-    // Integration with analytics services (Google Analytics, Vercel Analytics, etc.)
+    // Integration with analytics services (Google Analytics, etc.)
     if (window.gtag) {
       window.gtag('event', 'web_vitals', {
         event_category: 'Performance',
@@ -271,13 +271,24 @@ export class PerformanceMonitor {
       });
     }
 
-    // Vercel Analytics integration
-    if (window.va) {
-      window.va('track', 'Performance Metric', {
-        metric: metric.name,
-        value: metric.value,
-        rating: metric.rating,
+    // Generic analytics integration
+    try {
+      // Send to custom analytics endpoint if available
+      fetch('/api/analytics/performance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event: 'performance_metric',
+          metric: metric.name,
+          value: metric.value,
+          rating: metric.rating,
+          timestamp: new Date().toISOString()
+        })
+      }).catch(() => {
+        // Silently fail - analytics shouldn't break the app
       });
+    } catch {
+      // Silently fail
     }
   }
 

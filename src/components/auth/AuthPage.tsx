@@ -7,6 +7,7 @@ import { Store, LogIn, UserPlus, AlertCircle, KeyRound, Eye, EyeOff } from 'luci
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { TurnstileCaptcha } from './TurnstileCaptcha';
 
 export function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -17,6 +18,8 @@ export function AuthPage() {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaError, setCaptchaError] = useState<string | null>(null);
   const signIn = useSignIn();
   const signUp = useSignUp();
   const user = useUser();
@@ -49,23 +52,37 @@ export function AuthPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setCaptchaError(null);
+
+    // Check if CAPTCHA is required and verified
+    if (!captchaToken) {
+      setError('Please complete the CAPTCHA verification');
+      setLoading(false);
+      return;
+    }
 
     try {
       if (isLogin) {
         const { error } = await signIn(email, password);
         if (error) {
           setError(`Login failed: ${error.message}`);
+          // Reset CAPTCHA on error
+          setCaptchaToken(null);
         }
       } else {
         const { error } = await signUp(email, password, displayName);
         if (error) {
           setError(`Sign up failed: ${error.message}`);
+          // Reset CAPTCHA on error
+          setCaptchaToken(null);
         } else {
           setError('Check your email for the confirmation link!');
         }
       }
     } catch (err) {
       setError(`An unexpected error occurred: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      // Reset CAPTCHA on error
+      setCaptchaToken(null);
     } finally {
       setLoading(false);
     }
@@ -94,6 +111,21 @@ export function AuthPage() {
     } finally {
       setForgotPasswordLoading(false);
     }
+  };
+
+  const handleCaptchaVerify = (token: string) => {
+    setCaptchaToken(token);
+    setCaptchaError(null);
+  };
+
+  const handleCaptchaError = (error: string) => {
+    setCaptchaToken(null);
+    setCaptchaError(error);
+  };
+
+  const handleCaptchaExpire = () => {
+    setCaptchaToken(null);
+    setCaptchaError('CAPTCHA expired');
   };
 
   return (
@@ -233,6 +265,24 @@ export function AuthPage() {
               </div>
             </div>
 
+            {/* CAPTCHA Verification */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-foreground">
+                Security Verification
+              </Label>
+              <TurnstileCaptcha
+                onVerify={handleCaptchaVerify}
+                onError={handleCaptchaError}
+                onExpire={handleCaptchaExpire}
+                theme="auto"
+                size="normal"
+                className="w-full"
+              />
+              {captchaError && (
+                <p className="text-xs text-destructive">{captchaError}</p>
+              )}
+            </div>
+
             {error && (
               <div className="flex items-center gap-2 p-2 bg-destructive/10 border border-destructive/20 rounded-lg">
                 <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0" />
@@ -243,7 +293,7 @@ export function AuthPage() {
             <Button
               type="submit"
               className="w-full h-10"
-              disabled={loading}
+              disabled={loading || !captchaToken}
             >
               {loading ? (
                 'Please wait...'
