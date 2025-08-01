@@ -20,11 +20,10 @@ export function TurnstileCaptcha({
 }: TurnstileCaptchaProps) {
   const turnstileRef = useRef<TurnstileInstance>(null);
 
-  // Use the site key that corresponds to the secret key configured in Supabase
-  // For development, use Cloudflare's test key
+  // Use the site key provided by the user
   const siteKey = import.meta.env.DEV
     ? '1x00000000000000000000AA' // Cloudflare test key for development
-    : '0x4AAAAAABneaJauDiUynU9m'; // Production site key - this should match your Cloudflare Turnstile site
+    : '0x4AAAAAABneaJauDiUynU9m'; // Production site key provided by user
 
   const handleSuccess = (token: string) => {
     onVerify(token);
