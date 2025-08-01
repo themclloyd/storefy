@@ -38,6 +38,9 @@ export const CSP_CONFIG = {
     'data:',
     'blob:',
   ],
+  'frame-src': [
+    'https://challenges.cloudflare.com',
+  ],
   'connect-src': [
     "'self'",
     'http://localhost:8080',

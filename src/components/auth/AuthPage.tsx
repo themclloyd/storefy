@@ -54,29 +54,23 @@ export function AuthPage() {
     setError('');
     setCaptchaError(null);
 
-    // Check if CAPTCHA is required and verified (bypass in development if CAPTCHA fails)
-    const isDevelopment = import.meta.env.DEV;
-    if (!captchaToken && !isDevelopment) {
+    // Check if CAPTCHA is required and verified
+    if (!captchaToken) {
       setError('Please complete the CAPTCHA verification');
       setLoading(false);
       return;
     }
 
-    // In development, show warning if CAPTCHA is bypassed
-    if (!captchaToken && isDevelopment) {
-      console.warn('⚠️ CAPTCHA bypassed in development mode');
-    }
-
     try {
       if (isLogin) {
-        const { error } = await signIn(email, password);
+        const { error } = await signIn(email, password, captchaToken || undefined);
         if (error) {
           setError(`Login failed: ${error.message}`);
           // Reset CAPTCHA on error
           setCaptchaToken(null);
         }
       } else {
-        const { error } = await signUp(email, password, displayName);
+        const { error } = await signUp(email, password, displayName, captchaToken || undefined);
         if (error) {
           setError(`Sign up failed: ${error.message}`);
           // Reset CAPTCHA on error
