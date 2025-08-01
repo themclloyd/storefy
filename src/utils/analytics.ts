@@ -307,7 +307,9 @@ export class Analytics {
         window.gtag('event', event, properties);
       }
 
-      // Example: Send to custom analytics endpoint
+      // Note: Custom analytics endpoint disabled to prevent 404 errors
+      // Enable this when you have a backend analytics endpoint
+      /*
       try {
         fetch('/api/analytics', {
           method: 'POST',
@@ -319,6 +321,7 @@ export class Analytics {
       } catch {
         // Silently fail
       }
+      */
     }
   }
 }

@@ -33,6 +33,11 @@ export const CSP_CONFIG = {
     'blob:',
     'https:',
   ],
+  'media-src': [
+    "'self'",
+    'data:',
+    'blob:',
+  ],
   'connect-src': [
     "'self'",
     'http://localhost:8080',

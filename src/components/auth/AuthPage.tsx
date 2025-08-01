@@ -54,11 +54,17 @@ export function AuthPage() {
     setError('');
     setCaptchaError(null);
 
-    // Check if CAPTCHA is required and verified
-    if (!captchaToken) {
+    // Check if CAPTCHA is required and verified (bypass in development if CAPTCHA fails)
+    const isDevelopment = import.meta.env.DEV;
+    if (!captchaToken && !isDevelopment) {
       setError('Please complete the CAPTCHA verification');
       setLoading(false);
       return;
+    }
+
+    // In development, show warning if CAPTCHA is bypassed
+    if (!captchaToken && isDevelopment) {
+      console.warn('⚠️ CAPTCHA bypassed in development mode');
     }
 
     try {

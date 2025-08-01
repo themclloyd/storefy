@@ -36,14 +36,14 @@ export function TurnstileCaptcha({
   const [isLoading, setIsLoading] = useState(true);
 
   const siteKey = import.meta.env.DEV
-    ? import.meta.env.VITE_TURNSTILE_SITE_KEY_DEV || '1x00000000000000000000AA'
-    : import.meta.env.VITE_TURNSTILE_SITE_KEY;
+    ? '1x00000000000000000000AA' // Cloudflare test key for development
+    : '0x4AAAAAABneaJauDiUynU9m'; // Production site key
   const isDevelopment = import.meta.env.DEV;
 
   useEffect(() => {
     if (!siteKey) {
       console.error('Turnstile site key not configured');
-      onError?.('CAPTCHA configuration error');
+      onError?.('CAPTCHA configuration error. Please contact support.');
       return;
     }
 
@@ -68,7 +68,7 @@ export function TurnstileCaptcha({
     script.onerror = () => {
       console.error('Failed to load Turnstile script');
       setIsLoading(false);
-      onError?.('Failed to load CAPTCHA');
+      onError?.('Failed to load CAPTCHA. Please check your internet connection and refresh the page.');
     };
 
     document.head.appendChild(script);
