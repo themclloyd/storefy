@@ -17,8 +17,8 @@ interface AuthActions {
   setSession: (session: Session | null) => void;
   setLoading: (loading: boolean) => void;
   setInitialized: (initialized: boolean) => void;
-  signIn: (email: string, password: string, captchaToken?: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string, displayName?: string, captchaToken?: string) => Promise<{ error: any }>;
+  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, displayName?: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   initialize: () => Promise<void>;
 }
@@ -44,7 +44,7 @@ export const useAuthStore = create<AuthStore>()(
         
         setInitialized: (initialized) => set({ initialized }, false, 'setInitialized'),
 
-        signIn: async (email: string, password: string, captchaToken?: string) => {
+        signIn: async (email: string, password: string) => {
           try {
             set({ loading: true }, false, 'signIn:start');
 
@@ -56,7 +56,6 @@ export const useAuthStore = create<AuthStore>()(
             const { data, error } = await supabase.auth.signInWithPassword({
               email,
               password,
-              options: captchaToken ? { captchaToken } : undefined,
             });
 
             if (error) {
@@ -90,7 +89,7 @@ export const useAuthStore = create<AuthStore>()(
           }
         },
 
-        signUp: async (email: string, password: string, displayName?: string, captchaToken?: string) => {
+        signUp: async (email: string, password: string, displayName?: string) => {
           try {
             set({ loading: true }, false, 'signUp:start');
             
@@ -104,7 +103,6 @@ export const useAuthStore = create<AuthStore>()(
                 data: {
                   display_name: displayName || email.split('@')[0]
                 },
-                captchaToken,
               }
             });
             

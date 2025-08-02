@@ -15,7 +15,6 @@ export const CSP_CONFIG = {
     'https://plausible.io',
     'https://cdn.jsdelivr.net',
     'https://unpkg.com',
-    'https://challenges.cloudflare.com', // Turnstile CAPTCHA
   ],
   'style-src': [
     "'self'",
@@ -38,9 +37,7 @@ export const CSP_CONFIG = {
     'data:',
     'blob:',
   ],
-  'frame-src': [
-    'https://challenges.cloudflare.com',
-  ],
+
   'connect-src': [
     "'self'",
     'http://localhost:8080',
@@ -51,7 +48,7 @@ export const CSP_CONFIG = {
     'https://www.google-analytics.com',
     'https://analytics.google.com',
     'https://*.googletagmanager.com',
-    'https://challenges.cloudflare.com', // Turnstile CAPTCHA API
+
   ],
   'frame-ancestors': ["'none'"],
   'base-uri': ["'self'"],
